@@ -1,15 +1,15 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080"; 
+const API_URL = "http://localhost:8080";
 
 export const AuthService = {
-  async signup(email: string, password: string, name: string): Promise<any> {
-    const response = await axios.post(`${API_URL}/signup`, { email, password, name });
+  async signup(email: string, password: string, firstName: string, lastName: string): Promise<any> {
+    const response = await axios.post(`${API_URL}/auth/signup`, { email, password, firstName, lastName });
     return response.data;
   },
 
-  async verify(email: string, code: string): Promise<any> {
-    const response = await axios.post(`${API_URL}/verify`, { email, code });
+  async verify(email: string, verificationCode: string): Promise<any> {
+    const response = await axios.post(`${API_URL}/auth/verify`, { email, verificationCode });
     return response.data;
   },
 

@@ -1,23 +1,25 @@
-import { createRouter, createWebHistory } from "vue-router";
-import type { RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 
-import SignupForm from "@/components/SignupForm.vue";
-import VerifyForm from "@/components/VerifyForm.vue";
-import LoginForm from "@/components/LoginForm.vue";
-import ResendCode from "@/components/ResendCode.vue";
-import AuthorizationPage from "@/pages/auth/Authorization.vue";
+
+import AuthorizationPage from '@/pages/auth/Authorization.vue'
+import LoginPage from '@/pages/AuthPages/LoginPage/LoginPage.vue'
+import RegisterPage from '@/pages/AuthPages/RegisterPage/RegisterPage.vue'
+import ResetPasswordPage from '@/pages/AuthPages/ResetPasswordPage/ResetPasswordPage.vue'
+import SignUpPage from '@/pages/AuthPages/SignUpPage/SignUpPage.vue'
+import VerificationPage from '@/pages/AuthPages/VerificationPage/VerificationPage.vue'
 
 const routes: Array<RouteRecordRaw> = [
-  { path: "/signup", component: SignupForm },
-  { path: "/verify", component: VerifyForm },
-  { path: "/login", component: LoginForm },
-  { path: "/resend", component: ResendCode },
-  {path: "/auth", component: AuthorizationPage},
-];
+  { path: '/register', component: RegisterPage },
+  { path: '/login', component: LoginPage },
+  { path: '/reset', component: ResetPasswordPage },
+  { path: '/auth', component: AuthorizationPage },
+  {path: '/verify', component: VerificationPage}
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
-export default router;
+export default router

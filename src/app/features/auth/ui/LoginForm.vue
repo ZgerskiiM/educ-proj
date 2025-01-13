@@ -1,76 +1,82 @@
 <template>
-    <v-card
-      class="auth-card d-flex flex-column justify-center align-md-center w-33 rounded-xl mt-10 pt-15 pb-10"
+  <v-card
+    class="auth-card d-flex flex-column justify-center align-md-center w-33 rounded-xl mt-10 pt-15 pb-10"
+  >
+    <div class="logo"></div>
+    <form
+      @submit.prevent="handleLogin"
+      class="auth-form d-flex flex-column justify-center align-center w-66"
     >
-      <div class="logo">
-      </div>
-      <form
-        class="auth-form d-flex flex-column justify-center align-center w-66"
-      >
-        <v-text-field
-          class="mt-12 w-100"
-          v-model="formData.login"
-          label="Логин"
-          variant="outlined"
-        />
-        <v-text-field
-          class="mt-4 w-100"
-          label="Пароль"
-          variant="outlined"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          v-model="formData.password"
-          :type="visible ? 'text' : 'password'"
-          @click:append-inner="visible = !visible"
-        />
-        <v-btn class="mt-4 mb-6 w-100" type="submit">Войти</v-btn>
-      </form>
-    </v-card>
-  </template>
+      <v-text-field class="mt-12 w-100" v-model="formData.login" label="Логин" variant="outlined" />
+      <v-text-field
+        class="mt-4 w-100"
+        label="Пароль"
+        variant="outlined"
+        :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+        v-model="formData.password"
+        :type="visible ? 'text' : 'password'"
+        @click:append-inner="visible = !visible"
+      />
+      Не помню пароль
+      <v-btn class="mt-4 mb-6 w-100" type="submit">Войти</v-btn>
+      <v-btn class="mt-4 mb-6 w-100" type="submit">Создать аккаунт</v-btn>
+    </form>
+  </v-card>
+</template>
 
-  <script lang="ts" setup>
-  import { ref, reactive} from "vue";
+<script lang="ts" setup>
+import { ref, reactive } from 'vue'
+import { AuthService } from '@/app/features/auth/model/Auth'
 
-  const visible = ref<boolean>(false);
+const visible = ref<boolean>(false)
 
+const formData = reactive<FormData>({
+  login: '',
+  password: '',
+  message: '',
+})
 
-  const formData = reactive<FormData>({
-    login: "",
-    password: "",
-  });
+interface FormData {
+  login: string
+  password: string
+  message: string
+}
 
-  interface FormData {
-    login: string;
-    password: string;
+  const handleLogin = async () => {
+    try {
+      const result = await AuthService.login(formData.login, formData.password) // Используем данные из formData
+      localStorage.setItem('token', result.token) // Сохраняем токен в LocalStorage
+      localStorage.setItem('expiresAt', result.expiresAt) // Сохраняем время действия токена
+      message.value = 'Login successful!'
+    } catch (error) {
+      message.value = error.response?.data?.message || 'Login failed.'
+    }
   }
 
+</script>
 
-  </script>
+<style scoped>
+.auth-card {
+  display: flex;
+  justify-content: row;
+}
 
-  <style scoped>
-  .auth-card {
-    display: flex;
-    justify-content: row;
-  }
+.logo-img {
+  width: 90%;
+  margin-top: 50px;
+  padding-left: 2vw;
+}
 
-  .logo-img {
-    width: 90%;
-    margin-top: 50px;
-    padding-left: 2vw;
-  }
+a {
+  color: #3e81ff;
+}
 
-  a {
-    color: #3e81ff;
-  }
+.v-btn {
+  background-color: #3e81ff;
+  color: white;
+}
 
-  .v-btn {
-    background-color: #3e81ff;
-    color: white;
-  }
-
-
-
-  .v-card {
-    background-color: white;
-    
-  }
-  </style>
+.v-card {
+  background-color: white;
+}
+</style>
