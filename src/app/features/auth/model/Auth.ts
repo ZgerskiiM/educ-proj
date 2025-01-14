@@ -14,12 +14,40 @@ export const AuthService = {
   },
 
   async login(email: string, password: string): Promise<any> {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
+    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
     return response.data;
   },
 
+  async resetRequest(email: string): Promise<any> {
+    const response = await axios.post(`${API_URL}/auth/request-password-reset`,
+      null,
+      {
+        params: {
+          email,
+        },
+      }
+    );
+    return response.data;
+  },
+  async resetPassword(token: string, newPassword: string) {
+    return axios.post(`${API_URL}/auth/reset-password`, null, {
+        params: {
+            token,
+            newPassword
+        }
+    });
+},
+
   async resend(email: string): Promise<any> {
-    const response = await axios.post(`${API_URL}/resend`, { email });
+    const response = await axios.post(
+      `${API_URL}/auth/resend`,
+      null,
+      {
+        params: {
+          email,
+        },
+      }
+    );
     return response.data;
   },
 };

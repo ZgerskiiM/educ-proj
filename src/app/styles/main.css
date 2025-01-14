@@ -4,3 +4,18 @@
     box-sizing: border-box;
     font-family: "Montserrat", sans-serif;
   }
+
+.main-button {
+  background-color: #4C64FF;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.v-card {
+  min-height: 45vh;
+}
+
+.info-card {
+  min-height: 5vh
+}

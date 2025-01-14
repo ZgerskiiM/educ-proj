@@ -1,98 +1,177 @@
 <template>
+  <div class="page-container">
     <v-card
-      class="auth-card d-flex flex-column justify-center align-md-center w-33 rounded-xl mt-10 pt-15 pb-10"
+      class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl mt-10 pb-10"
     >
       <form
         @submit.prevent="handleVerify"
         class="auth-form d-flex flex-column justify-center align-center w-66"
       >
+        <v-card-title class="align-xl-start w-100 ml-0 mr-0 pa-0 mt-10">
+          Подтверждение
+        </v-card-title>
         <div>Отправили код-подтверждение на {{ formData.email }}</div>
         <v-text-field
-          class="mt-2 w-100"
+          class="mt-4 w-100"
           v-model="formData.verificationCode"
           label="Код-подтверждение"
           variant="outlined"
         />
         <v-btn
-          class="mt-4 mb-6 w-100"
+          class="mt-0 mb-6 w-100"
           type="submit"
-          @click="result"
+          @click="handleVerify"
         >
           Создать профиль
         </v-btn>
+
+        <v-btn
+          class=" mb-6 w-100"
+          type="button"
+          :disabled="timerState.isResendDisabled"
+          @click="resendCode"
+        >
+          {{ timerState.resendButtonText }}
+        </v-btn>
       </form>
     </v-card>
-  </template>
+  </div>
+</template>
 
-  <script lang="ts" setup>
-  import { reactive } from 'vue';
-  import { AuthService } from '@/app/features/auth/model/Auth';
-  import { useRoute } from 'vue-router';
-  import { useRouter } from 'vue-router'; // Используем useRouter
+<script lang="ts" setup>
+import { reactive, onMounted } from 'vue';
+import { AuthService } from '@/app/features/auth/model/Auth';
+import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-  const router = useRouter();
-  const route = useRoute();
+const router = useRouter();
+const route = useRoute();
 
-  const formData = reactive<FormData>({
-    email: '',
-    verificationCode: '',
-  });
+const formData = reactive<FormData>({
+  email: '',
+  verificationCode: '',
+});
 
-  // Получаем email из query параметров маршрута
-  const emailFromRoute = route.query.email as string;
+const emailFromRoute = route.query.email as string;
+formData.email = emailFromRoute;
 
-  // Записываем email в formData
-  formData.email = emailFromRoute;
+interface FormData {
+  email: string;
+  verificationCode: string;
+}
 
-  interface FormData {
-    email: string;
-    verificationCode: string;
-  }
+const timerState = reactive({
+  remainingTime: 10,
+  resendButtonText: 'Отправить повторно',
+  isResendDisabled: false,
+  timer: null as number | null,
+});
 
-  const handleVerify = async () => {
-    try {
-      const result = await AuthService.verify(formData.email, formData.verificationCode);
-      console.log('Данные для сервера:', result);
-      router.push('/');
-    } catch (error: any) {
-      if (error.response) {
-        // Сервер ответил с кодом ошибки
-        console.log('Данные для сервера:', formData.email, formData.verificationCode);
-        console.error('Ошибка сервера:', error.response.data); // Вывод JSON ошибки
-        console.error('Код статуса:', error.response.status); // Код статуса (например, 400)
-      } else if (error.request) {
-        // Сервер не ответил, ошибка на уровне сети
-        console.error('Ошибка запроса:', error.request);
-      } else {
-        // Неожиданная ошибка на клиенте
-        console.error('Ошибка:', error.message);
-      }
+const startResendTimer = () => {
+  timerState.isResendDisabled = true;
+  timerState.resendButtonText = `Повторно через ${timerState.remainingTime} сек`;
+
+  timerState.timer = setInterval(() => {
+    timerState.remainingTime--;
+    timerState.resendButtonText = `Повторно через ${timerState.remainingTime} сек`;
+
+    if (timerState.remainingTime <= 0) {
+      if (timerState.timer) clearInterval(timerState.timer);
+      timerState.isResendDisabled = false;
+      timerState.resendButtonText = 'Отправить повторно';
+      timerState.remainingTime = 10;
     }
-  };
-  </script>
+  }, 1000);
+};
 
-  <style scoped>
-  .auth-card {
-    display: flex;
-    justify-content: row;
+const resendCode = async () => {
+  try {
+    const reset = await AuthService.resend(formData.email);
+    console.log('Данные для сервера:', reset);
+    startResendTimer();
+  } catch (error: any) {
+    if (error.response) {
+      console.log('Данные для сервера:', formData.email);
+      console.error('Ошибка сервера:', error.response.data);
+      console.error('Код статуса:', error.response.status);
+    } else if (error.request) {
+      console.error('Ошибка запроса:', error.request);
+    } else {
+      console.error('Ошибка:', error.message);
+    }
   }
+};
 
-  .logo-img {
-    width: 90%;
-    margin-top: 50px;
-    padding-left: 2vw;
+const handleVerify = async () => {
+  try {
+    const result = await AuthService.verify(formData.email, formData.verificationCode);
+    console.log('Данные для сервера:', result);
+    router.push('/');
+  } catch (error: any) {
+    if (error.response) {
+      console.log('Данные для сервера:', formData.email, formData.verificationCode);
+      console.error('Ошибка сервера:', error.response.data);
+      console.error('Код статуса:', error.response.status);
+    } else if (error.request) {
+      console.error('Ошибка запроса:', error.request);
+    } else {
+      console.error('Ошибка:', error.message);
+    }
   }
+};
 
-  a {
-    color: #3e81ff;
-  }
+onMounted(() => {
+  startResendTimer();
+});
+</script>
 
-  .v-btn {
-    background-color: #3e81ff;
-    color: white;
-  }
+<style scoped>
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  margin: 0;
+}
 
-  .v-card {
-    background-color: white;
-  }
-  </style>
+.auth-card {
+  display: flex;
+  justify-content: row;
+}
+
+.v-btn {
+  background-color: #4C64FF;
+  color: white;
+  border-radius: 0.4vw;
+  height: 4.5vh;
+}
+
+.v-card {
+  background-color: white;
+}
+
+.info-card {
+  background-color: #333333;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  font-size: 0.6vw;
+  border-radius: 0.5vw;
+}
+
+.info-icon {
+  font-size: 24px;
+}
+
+.info-text {
+  line-height: 1.6;
+}
+
+.link {
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+}
+</style>

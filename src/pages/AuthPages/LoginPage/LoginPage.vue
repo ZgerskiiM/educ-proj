@@ -1,32 +1,57 @@
 <template>
-  <v-card
-    class="auth-card d-flex flex-column justify-center align-md-center w-33 rounded-xl mt-10 pt-15 pb-10"
-  >
-    <div class="logo"></div>
-    <form
-      @submit.prevent="handleLogin"
-      class="auth-form d-flex flex-column justify-center align-center w-66"
+  <div class="page-container">
+    <v-card
+      class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl pt-5"
     >
-      <v-text-field class="mt-12 w-100" v-model="formData.email" label="Логин" variant="outlined" />
-      <v-text-field
-        class="mt-4 w-100"
-        label="Пароль"
-        variant="outlined"
-        :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-        v-model="formData.password"
-        :type="visible ? 'text' : 'password'"
-        @click:append-inner="visible = !visible"
-      />
-      Не помню пароль
-      <v-btn class="mt-4 mb-6 w-100" type="submit">Войти</v-btn>
-      <v-btn class="mt-4 mb-6 w-100" type="submit">Создать аккаунт</v-btn>
-    </form>
-  </v-card>
-  </template>
+      <form
+        @submit.prevent="handleLogin"
+        class="auth-form d-flex flex-column justify-center align-center w-66"
+      >
+        <v-card-title class="align-xl-start w-100 ml-0 mr-0 mt-7 pa-0">
+        Войти
+        </v-card-title>
+        <v-text-field
+          class="mt-7 mb-0 w-100"
+          v-model="formData.email"
+          label="Логин"
+          variant="outlined"
+        />
+        <v-text-field
+          class="mb-1 w-100"
+          label="Пароль"
+          variant="outlined"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          v-model="formData.password"
+          :type="visible ? 'text' : 'password'"
+          @click:append-inner="visible = !visible"
+        />
+        <div class="w-100 align-xl-start pa-0 ma-0 mb-4">
+          <router-link to="reset-password">Не помню пароль</router-link>
+        </div>
+        <v-btn
+          class="mt-2 mb-2 w-100"
+          type="submit"
+          text="Войти"
+          :disabled="isButtonDisabled"
+        />
+        <v-btn
+          class="mt-2 mb-12 w-100"
+          type="submit"
+          text="Создать аккаунт"
+          @click="navigateToLogin()"
+        />
+      </form>
+    </v-card>
+  </div>
+</template>
 
-  <script lang="ts" setup>
-  import { ref, reactive } from 'vue'
+
+<script lang="ts" setup>
+  import { ref, reactive, computed} from 'vue'
   import { AuthService } from '@/app/features/auth/model/Auth'
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter()
 
   const visible = ref<boolean>(false)
 
@@ -45,6 +70,10 @@
     email: string
   }
 
+    const navigateToLogin = () => {
+      router.push('/register');
+    }
+
     const handleLogin = async () => {
       try {
         const result = await AuthService.login(formData.email, formData.password) // Используем данные из formData
@@ -54,28 +83,38 @@
       }
     }
 
-  </script>
+    const isButtonDisabled = computed(() => {
+  return !formData.email || !formData.password;
+});
 
-  <style scoped>
+</script>
+
+<style scoped>
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  margin: 0;
+}
+
   .auth-card {
     display: flex;
     justify-content: row;
   }
 
-  .logo-img {
-    width: 90%;
-    margin-top: 50px;
-    padding-left: 2vw;
-  }
-
   a {
-    color: #3e81ff;
+    color: #000000;
   }
 
   .v-btn {
-    background-color: #3e81ff;
+    background-color: #4C64FF;
     color: white;
+    border-radius: 0.4vw;
+    height: 4.5vh;
   }
+
 
   .v-card {
     background-color: white;
