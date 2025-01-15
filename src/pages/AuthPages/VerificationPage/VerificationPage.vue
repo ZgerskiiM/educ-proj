@@ -24,7 +24,6 @@
         >
           Создать профиль
         </v-btn>
-
         <v-btn
           class=" mb-6 w-100"
           type="button"

@@ -8,7 +8,7 @@
         class="auth-form d-flex flex-column justify-center align-center w-66"
       >
         <v-card-title class="align-xl-start w-100 ml-0 mr-0 mt-7 pa-0">
-        Войти
+          Войти
         </v-card-title>
         <v-text-field
           class="mt-7 mb-0 w-100"
@@ -35,58 +35,54 @@
           :disabled="isButtonDisabled"
         />
         <v-btn
-          class="mt-2 mb-12 w-100"
-          type="submit"
-          text="Создать аккаунт"
-          @click="navigateToLogin()"
+            class="mt-2 mb-12 w-100"
+            type="submit"
+            text="Создать аккаунт"
+            @click="navigateToLogin()"
         />
       </form>
     </v-card>
   </div>
 </template>
 
-
 <script lang="ts" setup>
-  import { ref, reactive, computed} from 'vue'
-  import { AuthService } from '@/app/features/auth/model/Auth'
-  import { useRouter } from 'vue-router';
+import { ref, reactive, computed } from 'vue'
+import { AuthService } from '@/app/features/auth/model/Auth'
+import { useRouter } from 'vue-router'
 
-  const router = useRouter()
+const router = useRouter()
 
-  const visible = ref<boolean>(false)
+const visible = ref<boolean>(false)
 
-  const formData = reactive<FormData>({
-    username: '',
-    surname: '',
-    password: '',
-    email: '',
+const formData = reactive<FormData>({
+  username: '',
+  surname: '',
+  password: '',
+  email: '',
+})
 
-  })
+interface FormData {
+  username: string
+  surname: string
+  password: string
+  email: string
+}
 
-  interface FormData {
-    username: string
-    surname: string
-    password: string
-    email: string
-  }
+const navigateToLogin = () => {
+  router.push('/register')
+}
 
-    const navigateToLogin = () => {
-      router.push('/register');
-    }
+const handleLogin = async () => {
+  try {
+    const result = await AuthService.login(formData.email, formData.password) // Используем данные из formData
+    localStorage.setItem('token', result.token) // Сохраняем токен в LocalStorage
+    localStorage.setItem('expiresAt', result.expiresAt) // Сохраняем время действия токена
+  } catch (error) {}
+}
 
-    const handleLogin = async () => {
-      try {
-        const result = await AuthService.login(formData.email, formData.password) // Используем данные из formData
-        localStorage.setItem('token', result.token) // Сохраняем токен в LocalStorage
-        localStorage.setItem('expiresAt', result.expiresAt) // Сохраняем время действия токена
-      } catch (error) {
-      }
-    }
-
-    const isButtonDisabled = computed(() => {
-  return !formData.email || !formData.password;
-});
-
+const isButtonDisabled = computed(() => {
+  return !formData.email || !formData.password
+})
 </script>
 
 <style scoped>
@@ -99,24 +95,23 @@
   margin: 0;
 }
 
-  .auth-card {
-    display: flex;
-    justify-content: row;
-  }
+.auth-card {
+  display: flex;
+  justify-content: row;
+}
 
-  a {
-    color: #000000;
-  }
+a {
+  color: #000000;
+}
 
-  .v-btn {
-    background-color: #4C64FF;
-    color: white;
-    border-radius: 0.4vw;
-    height: 4.5vh;
-  }
+.v-btn {
+  background-color: #4c64ff;
+  color: white;
+  border-radius: 0.4vw;
+  height: 4.5vh;
+}
 
-
-  .v-card {
-    background-color: white;
-  }
-  </style>
+.v-card {
+  background-color: white;
+}
+</style>

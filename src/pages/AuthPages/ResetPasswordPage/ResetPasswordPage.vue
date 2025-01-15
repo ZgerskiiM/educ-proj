@@ -1,17 +1,16 @@
 <template>
   <div class="page-container">
-    <v-card
-      class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl "
-    >
+    <v-card class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl">
       <form
         @submit.prevent="handleReset"
         class="auth-form d-flex flex-column justify-center align-center w-66"
       >
         <v-card-title class="align-xl-start w-100 ml-0 mr-0 pa-0">
-        Воccтановление
+          Воccтановление
         </v-card-title>
         <v-card-subtitle class="align-xl-start w-100 ml-0 mr-0 mt-1 pa-0">
-          Отправим ссылку восстановления <br> на почту
+          Отправим ссылку восстановления <br />
+          на почту
         </v-card-subtitle>
         <v-text-field
           class="mt-7 mb-0 w-100"
@@ -26,58 +25,55 @@
           :disabled="isButtonDisabled"
         />
         <div class="w-100 pa-0 ma-0 mb-4 d-flex justify-center mt-12">
-          Уже есть аккаунт? <router-link to="login">  Войдите </router-link>
-      </div>
+          Уже есть аккаунт? <router-link to="login"> Войдите </router-link>
+        </div>
       </form>
     </v-card>
   </div>
 </template>
 
-
 <script lang="ts" setup>
-  import { ref, reactive, computed} from 'vue'
-  import { AuthService } from '@/app/features/auth/model/Auth'
-  import { useRouter } from 'vue-router';
+import { reactive, computed } from 'vue'
+import { AuthService } from '@/app/features/auth/model/Auth'
+import { useRouter } from 'vue-router'
 
-  const router = useRouter()
+const router = useRouter()
 
-  const formData = reactive<FormData>({
-    username: '',
-    surname: '',
-    password: '',
-    email: '',
+const formData = reactive<FormData>({
+  username: '',
+  surname: '',
+  password: '',
+  email: '',
+})
 
-  })
+interface FormData {
+  username: string
+  surname: string
+  password: string
+  email: string
+}
 
-  interface FormData {
-    username: string
-    surname: string
-    password: string
-    email: string
-  }
-
-  const handleReset = async () => {
+const handleReset = async () => {
   try {
-    const result = await AuthService.resetRequest(formData.email);
-    console.log('Данные для сервера:', result);
-    router.push('/');
+    const result = await AuthService.resetRequest(formData.email)
+    console.log('Данные для сервера:', result)
+    router.push('/')
   } catch (error: any) {
     if (error.response) {
-      console.log('Данные для сервера:', formData.email);
-      console.error('Ошибка сервера:', error.response.data);
-      console.error('Код статуса:', error.response.status);
+      console.log('Данные для сервера:', formData.email)
+      console.error('Ошибка сервера:', error.response.data)
+      console.error('Код статуса:', error.response.status)
     } else if (error.request) {
-      console.error('Ошибка запроса:', error.request);
+      console.error('Ошибка запроса:', error.request)
     } else {
-      console.error('Ошибка:', error.message);
+      console.error('Ошибка:', error.message)
     }
   }
-};
+}
 
-    const isButtonDisabled = computed(() => {
-  return !formData.email ;
-});
-
+const isButtonDisabled = computed(() => {
+  return !formData.email
+})
 </script>
 
 <style scoped>
@@ -90,24 +86,23 @@
   margin: 0;
 }
 
-  .auth-card {
-    display: flex;
-    justify-content: row;
-  }
+.auth-card {
+  display: flex;
+  justify-content: row;
+}
 
-  a {
-    color: #000000;
-  }
+a {
+  color: #000000;
+}
 
-  .v-btn {
-    background-color: #4C64FF;
-    color: white;
-    border-radius: 0.4vw;
-    height: 4.5vh;
-  }
+.v-btn {
+  background-color: #4c64ff;
+  color: white;
+  border-radius: 0.4vw;
+  height: 4.5vh;
+}
 
-
-  .v-card {
-    background-color: white;
-  }
-  </style>
+.v-card {
+  background-color: white;
+}
+</style>
