@@ -1,0 +1,26 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Unbounded", serif;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+.v-card {
+  min-height: 45vh;
+}
+
+.block-card {
+  min-height: 16vh;
+}
+
+.info-card {
+  min-height: 5vh
+}
+
+$material-light: (
+  'background': #FAFAFA
+);

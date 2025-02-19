@@ -24,5 +24,9 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/r-password',
     component: () => import("@/pages/AuthPages/rPassword/rPassword.vue")
+  },
+  {
+    path: '/course',
+    component: () => import("@/pages/Courses/CourseBlocks.vue")
   }
 ]

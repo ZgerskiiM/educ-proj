@@ -1,47 +1,63 @@
 <template>
   <div class="page-container">
-    <v-card
-      class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl pt-5"
-    >
+    <v-img
+      class="responsive-image d-none d-sm-flex"
+      src="/public/main--menu3.png"
+      :aspect-ratio="16/9"
+      cover
+    ></v-img>
+    <v-container class="main-container">
       <form
         @submit.prevent="handleLogin"
-        class="auth-form d-flex flex-column justify-center align-center w-66"
+        class="align-md-center d-flex flex-column"
+        :class="mdAndDown ? 'w-66' : 'w-50'"
       >
-        <v-card-title class="align-xl-start w-100 ml-0 mr-0 mt-7 pa-0">
-          Войти
+      <v-img
+      class="responsive-image-second"
+      src="/school_вектор.png"
+      height="15vh"
+      v-show="sm"
+      ></v-img>
+        <v-card-title class="align-md-center justify-center d-flex pl-0 mb-3 font-weight-regular">
+          Вход
         </v-card-title>
         <v-text-field
-          class="mt-7 mb-0 w-100"
+          class="w-100 font-weight-light"
           v-model="formData.email"
           label="Логин"
           variant="outlined"
+          :density="smAndUp ? 'comfortable' : 'compact'"
         />
         <v-text-field
-          class="mb-1 w-100"
+          class="w-100 mb-0 font-weight-light"
           label="Пароль"
+          :density="smAndUp ? 'comfortable' : 'compact'"
           variant="outlined"
           :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
           v-model="formData.password"
           :type="visible ? 'text' : 'password'"
           @click:append-inner="visible = !visible"
         />
-        <div class="w-100 align-xl-start pa-0 ma-0 mb-4">
-          <router-link to="reset-password">Не помню пароль</router-link>
-        </div>
-        <v-btn
-          class="mt-2 mb-2 w-100"
-          type="submit"
-          text="Войти"
-          :disabled="isButtonDisabled"
-        />
-        <v-btn
-            class="mt-2 mb-12 w-100"
+        <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light ">
+          Забыли пароль? &nbsp <router-link to="reset-password"> Восстановить</router-link>
+        </v-card-text>
+        <p v-if="message" class="mt-2">{{ message }}</p>
+          <v-btn
+            class="text-none mb-2 w-100 font-weight-thin"
+            type="submit"
+            text="Войти"
+            :disabled="isButtonDisabled"
+            flat
+          />
+          <v-btn
+            class="text-none mb-2 w-100 font-weight-thin"
             type="submit"
             text="Создать аккаунт"
             @click="navigateToLogin()"
-        />
+            flat
+          />
       </form>
-    </v-card>
+    </v-container>
   </div>
 </template>
 
@@ -49,6 +65,9 @@
 import { ref, reactive, computed } from 'vue'
 import { AuthService } from '@/app/features/auth/model/Auth'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
+
+const { mdAndDown, smAndDown, sm, smAndUp } = useDisplay()
 
 const router = useRouter()
 
@@ -74,9 +93,9 @@ const navigateToLogin = () => {
 
 const handleLogin = async () => {
   try {
-    const result = await AuthService.login(formData.email, formData.password) // Используем данные из formData
-    localStorage.setItem('token', result.token) // Сохраняем токен в LocalStorage
-    localStorage.setItem('expiresAt', result.expiresAt) // Сохраняем время действия токена
+    const result = await AuthService.login(formData.email, formData.password)
+    localStorage.setItem('token', result.token)
+    localStorage.setItem('expiresAt', result.expiresAt)
   } catch (error) {}
 }
 
@@ -88,30 +107,49 @@ const isButtonDisabled = computed(() => {
 <style scoped>
 .page-container {
   display: flex;
-  justify-content: center;
+  background-color: #FAFAFA;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  margin: 0;
-}
-
-.auth-card {
-  display: flex;
-  justify-content: row;
+  min-height: 100vh;
 }
 
 a {
   color: #000000;
 }
 
-.v-btn {
-  background-color: #4c64ff;
-  color: white;
-  border-radius: 0.4vw;
-  height: 4.5vh;
+.main-container {
+  display: flex;
+  align-items: center;
+  align-self:center;
+  justify-content: center;
 }
 
-.v-card {
-  background-color: white;
+.v-btn {
+  background-color: #302E2F;
+  color: white;
+  height: 5vh;
+  font-size: 1rem;
 }
+
+.v-card-text {
+  font-size: 0.8rem;
+}
+
+.responsive-image {
+  width: 100%;
+  height: 100vh;
+  max-width: 60vw;
+  min-width: 0vw;
+}
+
+
+@media (max-width: 1200px) {
+  .responsive-image {
+    width: 0;
+  }
+  .info--card {
+  font-size: 0.6rem;
+}
+}
+
+
 </style>

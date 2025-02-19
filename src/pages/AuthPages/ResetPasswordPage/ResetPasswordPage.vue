@@ -1,34 +1,49 @@
 <template>
   <div class="page-container">
-    <v-card class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl">
+    <v-img
+      class="responsive-image d-none d-sm-flex"
+      src="/public/main--menu3.png"
+      :aspect-ratio="16/9"
+      cover
+    ></v-img>
+    <v-container class="main-container">
       <form
         @submit.prevent="handleReset"
-        class="auth-form d-flex flex-column justify-center align-center w-66"
+        class="align-md-center d-flex flex-column"
+        :class="mdAndDown ? 'w-66' : 'w-50'"
       >
-        <v-card-title class="align-xl-start w-100 ml-0 mr-0 pa-0">
+      <v-card-title class="align-md-center justify-center d-flex pl-0 pb-0 mb-3 font-weight-regular">
           Воccтановление
         </v-card-title>
-        <v-card-subtitle class="align-xl-start w-100 ml-0 mr-0 mt-1 pa-0">
-          Отправим ссылку восстановления <br />
-          на почту
-        </v-card-subtitle>
+      <v-img
+      class="responsive-image-second"
+      src="/school_вектор.png"
+      height="15vh"
+      v-show="sm"
+      ></v-img>
         <v-text-field
-          class="mt-7 mb-0 w-100"
+          class="w-100 font-weight-light mb-3"
           v-model="formData.email"
           label="Почта"
+          hint="Отправим ссылку восстановления
+          на почту"
+          persistent-hint
           variant="outlined"
+          :density="smAndUp ? 'comfortable' : 'compact'"
         />
-        <v-btn
-          class="mb-2 w-100"
-          type="submit"
-          text="Отправить"
-          :disabled="isButtonDisabled"
-        />
-        <div class="w-100 pa-0 ma-0 mb-4 d-flex justify-center mt-12">
-          Уже есть аккаунт? <router-link to="login"> Войдите </router-link>
-        </div>
+        <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light ">
+            Уже есть аккаунт? &nbsp <router-link to="login"> Войдите</router-link>
+        </v-card-text>
+        <p v-if="message" class="mt-2">{{ message }}</p>
+          <v-btn
+            class="text-none mb-2 w-100 font-weight-thin"
+            type="submit"
+            text="Отправить"
+            :disabled="isButtonDisabled"
+            flat
+          />
       </form>
-    </v-card>
+    </v-container>
   </div>
 </template>
 
@@ -36,6 +51,10 @@
 import { reactive, computed } from 'vue'
 import { AuthService } from '@/app/features/auth/model/Auth'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
+
+const { mdAndDown, smAndDown, sm, smAndUp } = useDisplay()
+
 
 const router = useRouter()
 
@@ -79,30 +98,48 @@ const isButtonDisabled = computed(() => {
 <style scoped>
 .page-container {
   display: flex;
-  justify-content: center;
+  background-color: #FAFAFA;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  margin: 0;
-}
-
-.auth-card {
-  display: flex;
-  justify-content: row;
+  min-height: 100vh;
 }
 
 a {
   color: #000000;
 }
 
-.v-btn {
-  background-color: #4c64ff;
-  color: white;
-  border-radius: 0.4vw;
-  height: 4.5vh;
+.main-container {
+  display: flex;
+  align-items: center;
+  align-self:center;
+  justify-content: center;
+
 }
 
-.v-card {
-  background-color: white;
+.v-btn {
+  background-color: #302E2F;
+  color: white;
+  height: 5vh;
+  font-size: 1rem;
 }
+
+.v-card-text {
+  font-size: 0.8rem;
+}
+
+.responsive-image {
+  width: 100%;
+  height: 100vh;
+  max-width: 60vw;
+  min-width: 0vw;
+}
+
+@media (max-width: 1200px) {
+  .responsive-image {
+    width: 0;
+  }
+  .info--card {
+  font-size: 0.6rem;
+}
+}
+
 </style>

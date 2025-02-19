@@ -1,39 +1,53 @@
 <template>
   <div class="page-container">
-    <v-card
-      class="auth-card d-flex flex-column justify-center align-md-center w-25 rounded-xl mt-10 pb-10"
-    >
+    <v-img
+      class="responsive-image d-none d-sm-flex"
+      src="/public/main--menu3.png"
+      :aspect-ratio="16/9"
+      cover
+    ></v-img>
+    <v-container class="main-container">
       <form
         @submit.prevent="handleVerify"
-        class="auth-form d-flex flex-column justify-center align-center w-66"
+        class="align-md-center d-flex flex-column"
+        :class="mdAndDown ? 'w-66' : 'w-50'"
       >
-        <v-card-title class="align-xl-start w-100 ml-0 mr-0 pa-0 mt-10">
-          Подтверждение
-        </v-card-title>
+      <v-img
+      class="responsive-image-second"
+      src="/school_вектор.png"
+      height="15vh"
+      v-show="sm"
+      ></v-img>
         <div>Отправили код-подтверждение на {{ formData.email }}</div>
         <v-text-field
-          class="mt-4 w-100"
+          class="w-100 font-weight-light"
           v-model="formData.verificationCode"
           label="Код-подтверждение"
           variant="outlined"
+          :density="smAndUp ? 'comfortable' : 'compact'"
         />
-        <v-btn
-          class="mt-0 mb-6 w-100"
-          type="submit"
-          @click="handleVerify"
-        >
-          Создать профиль
-        </v-btn>
-        <v-btn
-          class=" mb-6 w-100"
-          type="button"
-          :disabled="timerState.isResendDisabled"
-          @click="resendCode"
-        >
+        <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light ">
+          Забыли пароль? &nbsp <router-link to="reset-password"> Восстановить</router-link>
+        </v-card-text>
+        <p v-if="message" class="mt-2">{{ message }}</p>
+          <v-btn
+            class="text-none mb-2 w-100 font-weight-thin"
+            text="Создать профиль"
+            type="submit"
+            @click="handleVerify"
+            flat
+          />
+          <v-btn
+            class="text-none mb-2 w-100 font-weight-thin"
+            type="button"
+            :disabled="timerState.isResendDisabled"
+            @click="resendCode"
+            flat
+          >
           {{ timerState.resendButtonText }}
-        </v-btn>
+          </v-btn>
       </form>
-    </v-card>
+    </v-container>
   </div>
 </template>
 
@@ -42,6 +56,9 @@ import { reactive, onMounted } from 'vue';
 import { AuthService } from '@/app/features/auth/model/Auth';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify'
+
+const { mdAndDown, smAndDown, sm, smAndUp } = useDisplay()
 
 const router = useRouter();
 const route = useRoute();

@@ -1,4 +1,4 @@
-import '@/app/styles/main.css';
+import '@/app/styles/main.scss';
 
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
