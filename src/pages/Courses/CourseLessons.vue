@@ -18,9 +18,6 @@
         Программа курса
     </v-card-title>
     <v-container class="d-flex flex-column ga-10 ml-0 pl-0 align-center">
-<CourseCard @click="navigateToCourse(1)"/>
-<CourseCard/>
-<CourseCard/>
 
 </v-container>
 </v-container>
@@ -31,18 +28,14 @@
 
 <script lang="ts" setup>
 import Header from "@/shared/ui/PagesElem/Header.vue"
-import CourseCard from "@/shared/ui/PagesElem/CourseCard.vue";
 import { useDisplay } from 'vuetify'
 
 const { mdAndDown } = useDisplay()
 
 import { useRouter } from 'vue-router'
 
-const router = useRouter()
 
-const navigateToCourse = (courseId) => {
-  router.push(`/course/${courseId}`)
-}
+
 
 </script>
 

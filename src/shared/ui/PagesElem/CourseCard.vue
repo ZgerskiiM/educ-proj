@@ -1,9 +1,8 @@
 <template>
-    <v-card
-    class="block-card d-flex align-center "
+    <v-card @click="$emit('click')"
+    class="course-block-card d-flex align-center "
     width="100%"
     flat>
-    <!-- Изображение -->
     <v-img
       src="/public/main--menu.JPG"
       class="responsive-image rounded-t	"
@@ -53,6 +52,8 @@
 </template>
 
 <style lang="css" scoped>
+
+
 .v-card {
     height: 1vh;
 }

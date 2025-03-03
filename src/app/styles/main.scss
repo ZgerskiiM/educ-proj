@@ -17,6 +17,16 @@
   min-height: 16vh;
 }
 
+.course-block-card {
+  min-height: 15vh;
+}
+
+@media (max-width: 1200px) {
+  .course-block-card {
+    min-height: 10vh;
+  }
+}
+
 .info-card {
   min-height: 5vh
 }
