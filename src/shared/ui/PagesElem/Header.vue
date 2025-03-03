@@ -5,7 +5,6 @@
         class="upper-wrapper justify-center"
         density="default"
         elevation="0"
-        scroll-behavior="hide"
         scroll-threshold="10"
     >
     <v-container

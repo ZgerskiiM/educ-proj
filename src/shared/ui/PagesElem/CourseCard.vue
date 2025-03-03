@@ -1,38 +1,40 @@
 <template>
-    <v-card @click="$emit('click')"
-    class="course-block-card d-flex align-center "
+  <v-card @click="$emit('click')"
+    :class="smAndDown ? 'course-block-card d-flex flex-column' : 'course-block-card d-flex align-center'"
     width="100%"
     flat>
     <v-img
-      src="/public/main--menu.JPG"
-      class="responsive-image rounded-t	"
+      src="/public/main--menu3.png"
+      class="responsive-image rounded-t"
       :aspect-ratio="16/9"
       cover
-    ></v-img>
+    />
 
-    <div class="ml-10 flex-grow-1">
+    <div
+      :class="smAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'">
       <div class="d-flex align-center justify-space-between">
         <div class="text-h6">
-            <span class="font-weight-bold">Блок 1 /</span> <span class="font-weight-light">Бриошь</span>
+          <span class="font-weight-bold">Блок 1 /</span> <span class="font-weight-light">Бриошь</span>
         </div>
 
-        <div class="font-weight-light mt-8 mr-10 grey--text">
+        <div :class="smAndDown ? 'font-weight-light grey--text progress-small' : 'font-weight-light mt-8 mr-10 grey--text'">
           Пройдено 8/9
           <v-icon small>mdi-chevron-right</v-icon>
         </div>
       </div>
 
-      <div class="d-flex ">
+      <!-- Десктопная версия чипов -->
+      <div v-if="!smAndDown" class="chip d-flex flex-wrap gap-2 mt-2">
         <v-chip
-          class="custom-chip1"
-          text="10 часов"
+          class="custom-chip1 my-1"
+          text=" 10 часов"
           label
         >
         </v-chip>
 
         <v-chip
           style="background-color: #FFE68E;"
-          class="custom-chip2 ml-4"
+          class=" custom-chip2 my-1 ml-2"
           label
           color="#333132"
         >
@@ -41,21 +43,70 @@
 
         <v-chip
           style="background-color: #FEE99E; color: #333132"
-          class="custom-chip3 ml-4"
+          class="custom-chip3 my-1 ml-2"
           label
         >
           11 технологических карт
+        </v-chip>
+      </div>
+
+      <div v-else class="chip-container w-100 mt-2 ">
+        <v-chip
+          class="custom-chip1 equal-width-chip"
+          text="10 часов"
+          label
+        >
+        </v-chip>
+
+        <v-chip
+          style="background-color: #FFE68E;"
+          class="custom-chip2 equal-width-chip mx-1"
+          label
+          color="#333132"
+        >
+          9 уроков
+        </v-chip>
+
+        <v-chip
+          style="background-color: #FEE99E; color: #333132"
+          class="custom-chip3 equal-width-chip"
+          label
+        >
+          11 технологических <br> карт
         </v-chip>
       </div>
     </div>
   </v-card>
 </template>
 
+<script lang="ts" setup>
+  import { useDisplay } from 'vuetify';
+
+  const { smAndDown, smAndUp } = useDisplay()
+</script>
+
 <style lang="css" scoped>
-
-
 .v-card {
     height: 1vh;
+    background-color: #F5F5F5;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.v-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chip-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.equal-width-chip {
+    flex: 1 1 0 !important;
+    text-align: center;
+    justify-content: center;
 }
 
 .course-title {
@@ -75,10 +126,6 @@ h2 {
 
 h3 {
     color: #333132;
-}
-
-template {
-    background-color: BLACK;
 }
 
 .custom-chip1 {
@@ -102,4 +149,51 @@ template {
   min-width: 0vw;
 }
 
+.gap-2 {
+  gap: 8px;
+}
+
+@media (max-width: 819px) {
+  h1 {
+    font-size: 1rem;
+  }
+
+  .responsive-image {
+    width: 100%;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 10vh;
+  }
+
+  .card-text {
+    font-size: 0.7rem;
+  }
+
+  .v-chip {
+    font-size: 0.47rem;
+  }
+
+  span {
+    font-size: 0.8rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+  }
+
+  h3 {
+    font-size: 0.9rem;
+  }
+
+  .progress-small {
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .mx-2 {
+    margin-left: 8px !important;
+    margin-right: 8px !important;
+  }
+}
 </style>

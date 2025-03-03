@@ -28,5 +28,13 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/course',
     component: () => import("@/pages/Courses/CourseBlocks.vue")
+  },
+  {
+    path: '/blocks',
+    component: () => import("@/pages/Courses/CourseLessons.vue")
+  },
+  {
+    path: '/lesson',
+    component: () => import("@/pages/Courses/LessonPage.vue")
   }
 ]

@@ -1,0 +1,571 @@
+<template>
+    <div class="page-wrapper">
+        <Header/>
+        <v-container fluid class="content-container px-6 pt-2"
+        :width="mdAndDown ? '100vw' : '80vw'"
+        >
+            <v-breadcrumbs
+                class="mb-1 pl-0 font-weight-light"
+                color="#F48A21"
+                :items="['Главная', 'Пекарская витрина', 'Уроки', 'Урок 1']"
+            />
+            <div class="content-wrapper">
+
+                <div class="video-block">
+                    <h2 class="font-weight-medium mb-3">Основы работы с бриошью</h2>
+                    <div class="video-container" ref="videoContainer">
+                        <video
+                            ref="videoPlayer"
+                            @timeupdate="updateProgress"
+                            @loadedmetadata="onVideoLoaded"
+                            @ended="isPlaying = false"
+                            @click="togglePlay"
+                        >
+                            <source src="https://file-examples.com/wp-content/uploads/2018/04/file_example_AVI_480_750kB.avi" type="video/avi"></source>
+                        </video>
+
+                        <div class="video-controls" :class="{'controls-visible': controlsVisible}">
+                            <div class="video-progress">
+                                <div class="progress-bar" :style="{width: `${progressPercent}%`}"></div>
+                                <input
+                                    type="range"
+                                    class="progress-seek"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    v-model="progressPercent"
+                                    @input="seek"
+                                >
+                            </div>
+
+                            <div class="controls-main">
+                                <button class="control-btn" @click.stop="togglePlay">
+                                    <v-icon v-if="!isPlaying">mdi-play</v-icon>
+                                    <v-icon v-else>mdi-pause</v-icon>
+                                </button>
+
+                                <div class="volume-control">
+                                    <button class="control-btn" @click.stop="toggleMute">
+                                        <v-icon v-if="isMuted">mdi-volume-off</v-icon>
+                                        <v-icon v-else-if="volume < 0.5">mdi-volume-low</v-icon>
+                                        <v-icon v-else>mdi-volume-high</v-icon>
+                                    </button>
+                                    <input
+                                        type="range"
+                                        class="volume-slider"
+                                        min="0"
+                                        max="1"
+                                        step="0.1"
+                                        v-model="volume"
+                                        @input="changeVolume"
+                                    >
+                                </div>
+
+                                <div class="time-display">
+                                    {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
+                                </div>
+
+                                <button class="control-btn fullscreen-btn" @click.stop="toggleFullscreen">
+                                    <v-icon v-if="isFullscreen">mdi-fullscreen-exit</v-icon>
+                                    <v-icon v-else>mdi-fullscreen</v-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Большая кнопка "Play" в центре видео когда видео на паузе -->
+                        <div v-if="!isPlaying" class="big-play-button" @click.stop="togglePlay">
+                            <v-icon size="64">mdi-play</v-icon>
+                        </div>
+                    </div>
+                    <div class="nav--buttons pt-0 mt-0 d-flex justify-end">
+                        <v-btn class="text-none  rounded-lg">Предыдущий урок</v-btn>
+                        <v-btn class=" text-none rounded-lg ml-4">Следующий урок</v-btn>
+                    </div>
+                </div>
+                <div class="lesson-sidebar">
+                        <v-expansion-panels class= "mt-6 w-100">
+                            <v-expansion-panel class="w-100"
+                                v-for="i in 3"
+                                :key="i"
+                                text="Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad
+                            Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad
+                            Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad
+                            Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad"
+                                title="01 / Описание урока"
+                            ></v-expansion-panel>
+                            </v-expansion-panels>
+                </div>
+            </div>
+        </v-container>
+    </div>
+</template>
+
+<script lang="ts" setup>
+import Header from "@/shared/ui/PagesElem/Header.vue"
+import { useDisplay } from 'vuetify'
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const { mdAndDown } = useDisplay()
+const videoPlayer = ref(null)
+const videoContainer = ref(null)
+const isPlaying = ref(false)
+const currentTime = ref(0)
+const duration = ref(0)
+const progressPercent = ref(0)
+const volume = ref(1)
+const isMuted = ref(false)
+const isFullscreen = ref(false)
+const controlsVisible = ref(true)
+let controlsTimeout = null
+
+// Показать/скрыть элементы управления при движении мыши
+const showControls = () => {
+    controlsVisible.value = true
+
+    // Очистить предыдущий таймер
+    if (controlsTimeout) {
+        clearTimeout(controlsTimeout)
+    }
+
+    // Установить новый таймер для скрытия элементов управления
+    controlsTimeout = setTimeout(() => {
+        if (isPlaying.value) {
+            controlsVisible.value = false
+        }
+    }, 3000)
+}
+
+const togglePlay = () => {
+    if (!videoPlayer.value) return
+
+    if (isPlaying.value) {
+        videoPlayer.value.pause()
+    } else {
+        videoPlayer.value.play()
+    }
+
+    isPlaying.value = !isPlaying.value
+    showControls()
+}
+
+const updateProgress = () => {
+    if (!videoPlayer.value) return
+
+    currentTime.value = videoPlayer.value.currentTime
+    progressPercent.value = (currentTime.value / duration.value) * 100
+}
+
+const onVideoLoaded = () => {
+    if (!videoPlayer.value) return
+
+    duration.value = videoPlayer.value.duration
+}
+
+const seek = () => {
+    if (!videoPlayer.value) return
+
+    const seekTime = (progressPercent.value / 100) * duration.value
+    videoPlayer.value.currentTime = seekTime
+}
+
+const changeVolume = () => {
+    if (!videoPlayer.value) return
+
+    videoPlayer.value.volume = volume.value
+    isMuted.value = volume.value === 0
+}
+
+const toggleMute = () => {
+    if (!videoPlayer.value) return
+
+    if (isMuted.value) {
+        isMuted.value = false
+        volume.value = volume.value === 0 ? 1 : volume.value
+        videoPlayer.value.volume = volume.value
+    } else {
+        isMuted.value = true
+        videoPlayer.value.volume = 0
+    }
+}
+
+const toggleFullscreen = () => {
+    if (!videoContainer.value) return
+
+    if (document.fullscreenElement) {
+        document.exitFullscreen()
+        isFullscreen.value = false
+    } else {
+        videoContainer.value.requestFullscreen()
+        isFullscreen.value = true
+    }
+}
+
+// Обработчик события при выходе из полноэкранного режима
+const handleFullscreenChange = () => {
+    isFullscreen.value = !!document.fullscreenElement
+}
+
+const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`
+}
+
+// Обработка горячих клавиш
+const handleKeyDown = (e) => {
+    // Только обрабатываем клавиши, если элемент находится в фокусе или в полноэкранном режиме
+    if (document.activeElement === videoPlayer.value ||
+        document.activeElement === videoContainer.value ||
+        isFullscreen.value) {
+
+        if (e.code === 'Space') {
+            togglePlay()
+            e.preventDefault()
+        } else if (e.code === 'ArrowRight') {
+            if (videoPlayer.value) videoPlayer.value.currentTime += 10
+            showControls()
+        } else if (e.code === 'ArrowLeft') {
+            if (videoPlayer.value) videoPlayer.value.currentTime -= 10
+            showControls()
+        } else if (e.code === 'KeyM') {
+            toggleMute()
+            showControls()
+        } else if (e.code === 'KeyF') {
+            toggleFullscreen()
+            showControls()
+        }
+    }
+}
+
+onMounted(() => {
+    // Инициализация обработчиков событий
+    window.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+    // Инициализация движения мыши для отображения элементов управления
+    if (videoContainer.value) {
+        videoContainer.value.addEventListener('mousemove', showControls)
+    }
+
+    // Установка начального объема звука
+    if (videoPlayer.value) {
+        videoPlayer.value.volume = volume.value
+    }
+})
+
+onUnmounted(() => {
+    // Удаление обработчиков событий при уничтожении компонента
+    window.removeEventListener('keydown', handleKeyDown)
+    document.removeEventListener('fullscreenchange', handleFullscreenChange)
+
+    if (videoContainer.value) {
+        videoContainer.value.removeEventListener('mousemove', showControls)
+    }
+
+    // Очистка таймера для предотвращения утечек памяти
+    if (controlsTimeout) {
+        clearTimeout(controlsTimeout)
+    }
+})
+</script>
+
+<style scoped>
+
+p {
+    font-size: 1.1rem
+}
+
+.content-container {
+    max-width: 100%;
+}
+
+.content-wrapper {
+    gap: 6vw;
+
+}
+
+.lesson-sidebar {
+    flex-shrink: 0;
+}
+
+.nav--buttons {
+    margin-left: 10px;
+}
+
+.lesson-info {
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 24px;
+}
+
+.video-block {
+    flex-grow: 1;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 67vh;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background-color:  #333132;;
+    margin-bottom: 2vw;
+    aspect-ratio: 16/9;
+}
+
+video {
+    display: block;
+    background-color:  #333132;;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+.big-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(244, 138, 33, 0.7);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    z-index: 5;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.big-play-button:hover {
+    background-color: rgba(244, 138, 33, 0.9);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.video-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    padding: 16px;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    z-index: 10;
+}
+
+.controls-visible {
+    opacity: 1;
+}
+
+.video-container:hover .video-controls {
+    opacity: 1;
+}
+
+.video-progress {
+    position: relative;
+    height: 0.5vh;
+    background-color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    border-radius: 2px;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #F48A21;
+    border-radius: 2px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.v-btn {
+    background-color: #333132;
+    color: white;
+    font-weight: 400;
+}
+
+.progress-seek {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 1vh;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.controls-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0.2vh;
+    margin-right: 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.volume-slider {
+    width: 60px;
+    appearance: none;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.time-display {
+    color: white;
+    font-size: 14px;
+    margin: 0 15px;
+}
+
+.fullscreen-btn {
+    margin-left: auto;
+}
+
+.video-container:fullscreen {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-container:fullscreen video {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.video-container:fullscreen .video-controls {
+    bottom: 0;
+    padding: 20px;
+    border-radius: 0;
+}
+
+.video-container:fullscreen .video-progress {
+    height: 6px;
+    margin-bottom: 15px;
+}
+
+.video-container:fullscreen .control-btn {
+    font-size: 22px;
+    padding: 8px;
+}
+
+.video-container:fullscreen .time-display {
+    font-size: 16px;
+}
+
+.video-container:fullscreen .volume-slider {
+    width: 80px;
+}
+
+.v-expansion-panel {
+    background-color: #333132;
+    color: white;
+    margin-top: 1.5vh;
+}
+
+@media (max-width: 821px ) {
+    .video-container {
+    width: 100%;
+    height: 100%;
+    }
+}
+
+
+@media (max-width: 819px) {
+    .content-wrapper {
+        flex-direction: column;
+    }
+
+    .lesson-sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        font-size: 1.1rem;
+    }
+
+    .time-display {
+        display: none;
+    }
+
+    .volume-slider {
+        width: 40px;
+    }
+
+    .video-container {
+        aspect-ratio: 16/9;
+    }
+
+    .big-play-button {
+        width: 60px;
+        height: 60px;
+    }
+
+    .big-play-button .v-icon {
+        font-size: 44px !important;
+    }
+
+    h1 {
+    font-size: 1.4rem;
+    }
+
+    h2 {
+    font-size: 1.1rem;
+    }
+
+    h3 {
+    font-size: 0.9rem;
+    }
+
+    .course-title {
+    font-size: 1.2rem;
+    }
+
+    .v-breadcrumbs {
+    font-size: 0.62rem;
+    }
+}
+
+</style>

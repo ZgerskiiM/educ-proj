@@ -2,7 +2,7 @@
   <div class="page-container">
     <v-img
       class="responsive-image d-none d-sm-flex"
-      src="/public/main--menu3.svg"
+      src="/public/main--menu3.png"
       :aspect-ratio="16/9"
       cover
     ></v-img>
@@ -176,6 +176,7 @@ a {
   height: 5vh;
   font-size: 1rem;
 }
+
 
 .v-card-text {
   font-size: 0.8rem;

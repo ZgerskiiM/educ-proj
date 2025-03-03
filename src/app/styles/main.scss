@@ -21,9 +21,35 @@
   min-height: 15vh;
 }
 
+.course-lessons {
+  min-height: 28vh;
+}
+
 @media (max-width: 1200px) {
   .course-block-card {
     min-height: 10vh;
+  }
+}
+
+.course-lessons {
+  max-width: 18vw;
+}
+
+@media (min-width: 819px) and (max-width: 1000px) {
+  .course-lessons {
+    min-width: 40vw;
+    max-width: 48.5%;
+  }
+}
+
+@media (max-width: 819px) {
+  .course-lessons {
+    min-width: 40vw;
+    max-width: 47.2%;
+  }
+
+  .course-block-card {
+    min-height: 22vh;
   }
 }
 
@@ -31,6 +57,6 @@
   min-height: 5vh
 }
 
-$material-light: (
-  'background': #FAFAFA
-);
+body {
+  background-color: #FAFAFA;
+}

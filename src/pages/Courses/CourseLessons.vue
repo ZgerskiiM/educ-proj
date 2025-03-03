@@ -4,20 +4,25 @@
     <v-container
     :width="mdAndDown ? '100vw' : '80vw'"
     >
-    <h2 class="font-weight-medium">Пекарская Витрина</h2>
-    <h1>от Булок до Хлеба</h1>
-    <h3 class=" mb-4 font-weight-regular">Авторский курс от Максима Бабича</h3>
+    <h2 class="font-weight-medium pb-0 mb-0">Пекарская витрина:</h2>
+    <h1 class="mt-0 pt-0">От булок до хлеба</h1>
+    <h3 class="mb-4 font-weight-regular">Авторский курс от Максима Бабича</h3>
     <v-breadcrumbs
     class="mb-3 ml-0 pl-0 font-weight-light"
     color="#F48A21"
-    :items="['Главная', 'Пекарская витрина']"
+    :items="['Главная', 'Пекарская витрина', 'Уроки']"
     />
     <v-card-title class="course-title font-weight-bold pt-0 pl-0 mb-4"
     style=" color: #333132"
     >
-        Программа курса
+        Блок 1 / Бриошь
     </v-card-title>
-    <v-container class="d-flex flex-column ga-10 ml-0 pl-0 align-center">
+    <v-container
+    :class="mdAndDown ? 'd-flex flex-row flex-wrap ga-5 ml-0 pl-0 mr-0 pr-0' : 'd-flex flex-row ga-5 ml-0 pl-0 align-center' ">
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
 
 </v-container>
 </v-container>
@@ -29,14 +34,11 @@
 <script lang="ts" setup>
 import Header from "@/shared/ui/PagesElem/Header.vue"
 import { useDisplay } from 'vuetify'
+import LessonCard from "@/shared/ui/PagesElem/LessonCard.vue";
 
 const { mdAndDown } = useDisplay()
 
 import { useRouter } from 'vue-router'
-
-
-
-
 </script>
 
 <style scoped>
@@ -51,6 +53,10 @@ h1 {
 
 }
 
+body {
+  background-color: #FAFAFA;
+}
+
 h2 {
     color: #333132;
     font-size: 1.8rem;
@@ -60,35 +66,11 @@ h3 {
     color: #333132;
 }
 
-template {
-    background-color: BLACK;
-}
-
-.custom-chip1 {
-  background-color: #e5ff9f !important;
-  color: #333132;
-}
-
-.custom-chip2 {
-  background-color: #f8ff31 !important;
-  color: #333132;
-}
-.custom-chip3 {
-  background-color: #ffea9d !important;
-  color: #333132;
-}
-
 .page-wrapper {
     background-color: #fafafa;
     height: 100vh;
 }
 
-.responsive-image {
-  width: 100%;
-  height: 100vh;
-  max-width: 20vw;
-  min-width: 0vw;
-}
 
 @media (max-width: 819px) {
 

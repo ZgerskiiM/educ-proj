@@ -16,7 +16,7 @@
       class="responsive-image-second"
       src="/school_вектор.png"
       height="15vh"
-      v-show="sm"
+      v-show="smAndDown"
       ></v-img>
         <v-card-title class="align-md-center justify-center d-flex pl-0 mb-3 font-weight-regular">
           Вход
