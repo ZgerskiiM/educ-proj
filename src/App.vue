@@ -1,5 +1,7 @@
 <template>
-  <RouterView></RouterView>
+  <keep-alive>
+    <router-view />
+  </keep-alive>
 </template>
 
 <style lang="css" scoped>

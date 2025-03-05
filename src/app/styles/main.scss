@@ -9,6 +9,11 @@
     font-size: 16px;
   }
 
+.profile--card {
+  max-height: 5vh;
+  min-height: 1vh;
+}
+
 .v-card {
   min-height: 45vh;
 }
@@ -22,7 +27,7 @@
 }
 
 .course-lessons {
-  min-height: 28vh;
+  min-height: 27vh;
 }
 
 @media (max-width: 1200px) {

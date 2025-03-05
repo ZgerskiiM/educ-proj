@@ -74,15 +74,11 @@ const router = useRouter()
 const visible = ref<boolean>(false)
 
 const formData = reactive<FormData>({
-  username: '',
-  surname: '',
   password: '',
   email: '',
 })
 
 interface FormData {
-  username: string
-  surname: string
   password: string
   email: string
 }
@@ -96,6 +92,8 @@ const handleLogin = async () => {
     const result = await AuthService.login(formData.email, formData.password)
     localStorage.setItem('token', result.token)
     localStorage.setItem('expiresAt', result.expiresAt)
+    // Перенаправление после успешного входа
+    router.push('/course') // или любой другой маршрут
   } catch (error) {}
 }
 

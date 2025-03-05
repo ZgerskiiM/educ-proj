@@ -309,15 +309,17 @@ p {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background-color:  #333132;;
+    background-color: #333132;;
     margin-bottom: 2vw;
     aspect-ratio: 16/9;
 }
 
 video {
     display: block;
-    background-color:  #333132;;
+    background-color: #333132;
     object-fit: contain;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
 }
 

@@ -1,5 +1,6 @@
 <template>
-    <div class="page-wrapper">
+    <div class="page-wrapper"
+    style="background-color: #F3F3F3;">
     <Header/>
     <v-container
     :width="mdAndDown ? '100vw' : '80vw'"
@@ -38,7 +39,6 @@ import LessonCard from "@/shared/ui/PagesElem/LessonCard.vue";
 
 const { mdAndDown } = useDisplay()
 
-import { useRouter } from 'vue-router'
 </script>
 
 <style scoped>
@@ -53,8 +53,8 @@ h1 {
 
 }
 
-body {
-  background-color: #FAFAFA;
+template {
+  background-color: black;
 }
 
 h2 {

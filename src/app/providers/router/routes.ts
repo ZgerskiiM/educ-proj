@@ -4,10 +4,12 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: () => import("@/pages/MainPage.vue"),
+    meta: { breadcrumb: 'Главная' }
   },
   {
     path: '/register',
     component: () => import("@/pages/AuthPages/RegisterPage/RegisterPage.vue"),
+    // Если не нужно показывать этот маршрут в хлебных крошках, можно и не задавать meta
   },
   {
     path: '/login',
@@ -27,14 +29,27 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/course',
-    component: () => import("@/pages/Courses/CourseBlocks.vue")
+    component: () => import("@/pages/Courses/CourseBlocks.vue"),
+    meta: { breadcrumb: 'Курсы' }
   },
   {
     path: '/blocks',
-    component: () => import("@/pages/Courses/CourseLessons.vue")
+    component: () => import("@/pages/Courses/CourseLessons.vue"),
+    meta: { breadcrumb: 'Занятия' }
   },
   {
     path: '/lesson',
-    component: () => import("@/pages/Courses/LessonPage.vue")
-  }
+    component: () => import("@/pages/Courses/LessonPage.vue"),
+    meta: { breadcrumb: 'Урок' }
+  },
+  {
+    path: '/lk',
+    component: () => import("@/pages/LK.vue"),
+    meta: { breadcrumb: 'Личный кабинет' }
+  },
+  {
+    path: '/admin',
+    component: () => import("@/pages/AdminFunctional/AdminPanel.vue"),
+    meta: { breadcrumb: 'Админ-панель' }
+  },
 ]
