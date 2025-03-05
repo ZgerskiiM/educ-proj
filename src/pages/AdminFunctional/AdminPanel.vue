@@ -26,7 +26,7 @@
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
+              <v-list-item-title class="font-weight-light">{{ item.title }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -36,13 +36,13 @@
       <v-main>
         <v-container fluid>
           <div v-if="currentPage === 'dashboard'">
-            <h1 class="text-h4 mb-6">Панель управления</h1>
+            <h1 class="font-weight-medium mb-6">Панель управления</h1>
             <v-row>
               <v-col cols="12" sm="6" md="3">
                 <v-card class="mx-auto" color="#C4DB87" dark>
                   <v-card-text>
-                    <div class="text-h4 font-weight-thin">{{ stats.totalCourses }}</div>
-                    <div>Всего курсов</div>
+                    <div class="font-weight-thin">{{ stats.totalCourses }}</div>
+                    <div  class="font-weight-thin">Всего курсов</div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -50,8 +50,8 @@
               <v-col cols="12" sm="6" md="3">
                 <v-card class="mx-auto" color="#FEE99E" dark>
                   <v-card-text>
-                    <div class="text-h4 font-weight-thin">{{ stats.totalStudents }}</div>
-                    <div>Студентов</div>
+                    <div class="font-weight-thin">{{ stats.totalStudents }}</div>
+                    <div class="font-weight-thin">Студентов</div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -59,8 +59,8 @@
               <v-col cols="12" sm="6" md="3">
                 <v-card class="mx-auto" color="#302E2F" dark>
                   <v-card-text>
-                    <div class="text-h4 font-weight-thin">{{ stats.totalEnrollments }}</div>
-                    <div>Всего записей</div>
+                    <div class="font-weight-thin">{{ stats.totalEnrollments }}</div>
+                    <div class="font-weight-thin">Всего записей</div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -68,14 +68,13 @@
               <v-col cols="12" sm="6" md="3">
                 <v-card class="mx-auto" color="#FED85D" dark>
                   <v-card-text>
-                    <div class="text-h4 font-weight-thin">{{ stats.totalRevenue }} ₽</div>
-                    <div>Выручка</div>
+                    <div class="font-weight-thin">{{ stats.totalRevenue }} ₽</div>
+                    <div class="font-weight-thin">Выручка</div>
                   </v-card-text>
                 </v-card>
               </v-col>
             </v-row>
 
-            <!-- Графики -->
             <v-row class="mt-6">
               <v-col cols="12" md="8">
                 <v-card>
@@ -88,7 +87,7 @@
 
               <v-col cols="12" md="4">
                 <v-card>
-                  <v-card-title>Популярные курсы</v-card-title>
+                  <v-card-title class="font-weight-medium">Популярные курсы</v-card-title>
                   <v-card-text>
                     <v-chart class="chart" :option="popularCoursesChartOption" />
                   </v-card-text>
@@ -102,9 +101,9 @@
           <!-- Управление курсами -->
           <div v-if="currentPage === 'courses'">
             <div class="d-flex justify-space-between align-center mb-6">
-              <h1 class="text-h4">Управление курсами</h1>
+              <h1 class="font-weight-regular">Управление курсами</h1>
               <v-btn
-                color="primary"
+                color="#333132"
                 prepend-icon="mdi-plus"
                 @click="newCourseDialog = !newCourseDialog"
               >
@@ -147,7 +146,7 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="12" md="2">
-                    <v-btn color="primary" block>
+                    <v-btn color="#333132" block>
                       Применить
                     </v-btn>
                   </v-col>
@@ -205,9 +204,9 @@
           <!-- Управление пользователями -->
           <div v-if="currentPage === 'users'">
             <div class="d-flex justify-space-between align-center mb-6">
-              <h1 class="text-h4">Управление пользователями</h1>
+              <h1 class="font-weight-regular">Управление пользователями</h1>
               <v-btn
-                color="primary"
+                color="#333132"
                 prepend-icon="mdi-account-plus"
                 @click="openNewAdminDialog"
               >
@@ -240,13 +239,13 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="12" md="2">
-                    <v-btn color="primary" block>
+                    <v-btn color="#333132" block>
                       Применить
                     </v-btn>
                   </v-col>
                   <v-col cols="12" md="2">
                     <v-btn
-                      color="success"
+                      color="#333132"
                       block
                       prepend-icon="mdi-gift"
                       @click="openGrantAccessDialog"
@@ -289,7 +288,7 @@
                   v-if="item.role === 'Администратор'"
                   icon
                   small
-                  color="error"
+                  color="#333132"
                   @click="removeAdmin(item)"
                 >
                   <v-icon small>mdi-close</v-icon>
@@ -298,7 +297,7 @@
                   v-else
                   icon
                   small
-                  color="success"
+                  color="#333132"
                   @click="makeAdmin(item)"
                 >
                   <v-icon small>mdi-account-check</v-icon>
@@ -309,7 +308,7 @@
 
           <!-- Отчеты -->
           <div v-if="currentPage === 'reports'">
-            <h1 class="text-h4 mb-6">Отчеты</h1>
+            <h1 class="font-weight-regular">Отчеты</h1>
 
             <v-card class="mb-6">
               <v-card-title>Генерация отчетов</v-card-title>
@@ -359,7 +358,7 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="12" md="2">
-                    <v-btn color="primary" block height="56">
+                    <v-btn color="#333132" block height="56">
                       Сформировать
                     </v-btn>
                   </v-col>
@@ -377,11 +376,11 @@
                 class="elevation-0"
               >
                 <template v-slot:item.actions="{ item }">
-                  <v-btn small text color="primary" class="mr-2">
+                  <v-btn small text color="#333132" class="mr-2">
                     <v-icon small left>mdi-download</v-icon>
                     Скачать
                   </v-btn>
-                  <v-btn small text color="info">
+                  <v-btn small text color="#333132">
                     <v-icon small left>mdi-eye</v-icon>
                     Просмотр
                   </v-btn>
@@ -393,7 +392,12 @@
           <!-- Редактирование курса -->
           <div v-if="currentPage === 'editCourse'">
             <div class="d-flex align-center mb-6">
-              <v-btn icon @click="currentPage = 'courses'" class="mr-3">
+              <v-btn
+                color="#333132"
+                icon
+                @click="currentPage = 'courses'"
+                class="mr-3"
+              >
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
               <h1 class="text-h4">Редактирование курса: {{ editingCourse.title }}</h1>
@@ -516,10 +520,10 @@
                       </v-row>
 
                       <div class="d-flex justify-end">
-                        <v-btn color="primary" large class="mr-4">
+                        <v-btn color="#333132" large class="mr-4">
                           Сохранить
                         </v-btn>
-                        <v-btn text @click="currentPage = 'courses'">
+                        <v-btn color="#333132" text @click="currentPage = 'courses'">
                           Отмена
                         </v-btn>
                       </div>
@@ -534,7 +538,7 @@
                   <v-card-text>
                     <div class="d-flex justify-space-between mb-4">
                       <h2 class="text-h5">Уроки курса</h2>
-                      <v-btn  prepend-icon="mdi-plus" @click="addNewLesson">
+                      <v-btn color="#333132"  prepend-icon="mdi-plus" @click="addNewLesson">
                         Добавить урок
                       </v-btn>
                     </div>
@@ -592,7 +596,7 @@
                             <div class="d-flex justify-end">
                               <v-btn
                                 text
-                                color="error"
+                                color="#333132"
                                 @click="removeLesson(index)"
                                 class="mr-4"
                                 prepend-icon="mdi-trash-can"
@@ -600,7 +604,7 @@
                                 Удалить
                               </v-btn>
                               <v-btn
-                                prepend-icon="mdi-content-save"
+                                prepend-icon="mdi-content-save" color="#333132"
                               >
                                 Сохранить
                               </v-btn>
@@ -706,7 +710,7 @@
           <!-- Статистика курса -->
           <div v-if="currentPage === 'courseStats'">
             <div class="d-flex align-center mb-6">
-              <v-btn icon @click="currentPage = 'courses'" class="mr-3">
+              <v-btn color="#333132" icon @click="currentPage = 'courses'" class="mr-3">
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
               <h1 class="">Статистика курса: {{ currentCourseStats.title }}</h1>
@@ -1504,8 +1508,9 @@ onMounted(() => {
   }
 
   .v-btn {
-    background-color: #31331
-  }
+  font-weight: 200;
+  font-size: 0.8rem;
+}
 
   .logo__img {
     height: 4vh;

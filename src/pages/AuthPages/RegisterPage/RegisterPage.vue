@@ -1,23 +1,13 @@
 <template>
   <div class="page-container">
-    <v-img
-      class="responsive-image d-none d-sm-flex"
-      src="/public/main--menu3.png"
-      :aspect-ratio="16/9"
-      cover
-    ></v-img>
+    <AuthImage />
     <v-container class="main-container">
       <form
         @submit.prevent="handleSignup"
         class="align-md-center d-flex flex-column"
         :class="mdAndDown ? 'w-66' : 'w-50'"
       >
-      <v-img
-      class="responsive-image-second"
-      src="/school_вектор.png"
-      height="15vh"
-      v-show="smAndDown"
-      ></v-img>
+        <AuthMobileImage />
         <v-card-title class="align-md-center justify-center d-flex pl-0 mb-3 font-weight-regular">
           Регистрация
         </v-card-title>
@@ -64,31 +54,42 @@
           :type="visible ? 'text' : 'password'"
           @click:append-inner="visible = !visible"
         />
-        <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light ">
-          Уже есть аккаунт? &nbsp <router-link to="/login">Войдите </router-link>
+        <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light">
+          Уже есть аккаунт? &nbsp
+          <router-link to="/login">
+            Войдите
+          </router-link>
         </v-card-text>
-        <p v-if="message" class="mt-2">{{ message }}</p>
-          <v-btn
-            class="text-none mb-2 w-100 font-weight-thin"
-            text="Создать профиль"
-            type="submit"
-            :density="mdAndDown ? 'compact' : 'comfortable'"
-            :disabled="isButtonDisabled"
-            @click="result"
-          />
+        <v-btn
+          class="text-none mb-2 w-100 font-weight-thin"
+          text="Создать профиль"
+          type="submit"
+          :density="mdAndDown ? 'compact' : 'comfortable'"
+          :disabled="isButtonDisabled"
+          @click="result"
+        />
         <v-card
           class="info-card d-flex align-center mt-3 bg-color-none"
           rounded="xm"
           variant="outlined"
         >
-          <v-icon class="info-icon ml-5" color="black">
+          <v-icon
+            class="info-icon ml-5"
+            color="black"
+          >
             mdi-information-outline
           </v-icon>
-          <v-card-text class="info--card font-weight-light px-3 py-2 mr-5" style=" text-align: justify; ">
-            Создавая профиль, нажимая на кнопку, вы даёте <a href ="Согласие на обработку персональных данных">согласие на обработку персональных данных</a>
+          <v-card-text
+            class="info--card font-weight-light px-3 py-2 mr-5"
+            style="text-align: justify"
+          >
+            Создавая профиль, нажимая на кнопку, вы даёте
+            <a href="Согласие на обработку персональных данных">
+              согласие на обработку персональных данных
+            </a>
             и рассылку информационных сообщений
             <a href="https://www.consultant.ru/document/cons_doc_LAW_61801/" class="link">
-              согласно закону</a> О персональных данных от 27.07.2006 №152-ФЗ
+              согласно закону</a>О персональных данных от 27.07.2006 №152-ФЗ
           </v-card-text>
         </v-card>
       </form>
@@ -101,8 +102,10 @@ import { ref, reactive, computed } from 'vue'
 import { AuthService } from '@/app/features/auth/model/Auth'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
+import AuthImage from '@/shared/ui/AuthElements/AuthImages/AuthImage.vue'
+import AuthMobileImage from '@/shared/ui/AuthElements/AuthImages/AuthMobileImage.vue'
 
-const { mdAndDown, smAndDown, sm, smAndUp } = useDisplay()
+const { mdAndDown, smAndUp } = useDisplay()
 
 const visible = ref<boolean>(false)
 
@@ -114,7 +117,6 @@ const formData = reactive<FormData>({
 })
 
 const router = useRouter()
-const message = ref<string | null>(null)
 
 interface FormData {
   firstName: string
@@ -153,7 +155,7 @@ const isButtonDisabled = computed(() => {
 <style scoped>
 .page-container {
   display: flex;
-  background-color: #FAFAFA;
+  background-color: #fafafa;
   align-items: center;
   min-height: 100vh;
 }
@@ -165,28 +167,19 @@ a {
 .main-container {
   display: flex;
   align-items: center;
-  align-self:center;
+  align-self: center;
   justify-content: center;
-
 }
 
 .v-btn {
-  background-color: #302E2F;
+  background-color: #302e2f;
   color: white;
   height: 5vh;
   font-size: 1rem;
 }
 
-
 .v-card-text {
   font-size: 0.8rem;
-}
-
-.responsive-image {
-  width: 100%;
-  height: 100vh;
-  max-width: 60vw;
-  min-width: 0vw;
 }
 
 @media (max-width: 1200px) {
@@ -194,9 +187,7 @@ a {
     width: 0;
   }
   .info--card {
-  font-size: 0.6rem;
+    font-size: 0.6rem;
+  }
 }
-}
-
-
 </style>

@@ -44,7 +44,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/lk',
-    component: () => import("@/pages/LK.vue"),
+    component: () => import("@/pages/Profile/ui/Profile.vue"),
     meta: { breadcrumb: 'Личный кабинет' }
   },
   {

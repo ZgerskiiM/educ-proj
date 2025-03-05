@@ -1,11 +1,11 @@
 <template>
-  <v-card @click="$emit('click')"
+  <v-card @click="$emit('click', courseData.id)"
     :class="smAndDown ? 'course-block-card d-flex flex-column' : 'course-block-card d-flex align-center'"
     width="100%"
     flat
     elevation="1">
     <v-img
-      src="/public/main--menu3.png"
+      :src="courseData.imagePath"
       class="responsive-image rounded-t"
       :aspect-ratio="16/9"
       cover
@@ -15,11 +15,11 @@
       :class="smAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'">
       <div class="d-flex align-center justify-space-between">
         <div class="text-h6">
-          <span class="font-weight-bold">Блок 1 /</span> <span class="font-weight-light">Бриошь</span>
+          <span class="font-weight-bold">Блок {{ courseData.number }} /</span> <span class="font-weight-light">{{ courseData.title }}</span>
         </div>
 
         <div :class="smAndDown ? 'font-weight-light grey--text progress-small' : 'font-weight-light mt-8 mr-10 grey--text'">
-          Пройдено 8/9
+          Пройдено {{ courseData.progress.completed }}/{{ courseData.progress.total }}
           <v-icon small>mdi-chevron-right</v-icon>
         </div>
       </div>
@@ -28,7 +28,7 @@
       <div v-if="!smAndDown" class="chip d-flex flex-wrap gap-2 mt-2">
         <v-chip
           class="custom-chip1 my-1"
-          text=" 10 часов"
+          :text="courseData.duration"
           label
         >
         </v-chip>
@@ -39,7 +39,7 @@
           label
           color="#333132"
         >
-          9 уроков
+          {{ courseData.lessons }} уроков
         </v-chip>
 
         <v-chip
@@ -47,14 +47,14 @@
           class="custom-chip3 my-1 ml-2"
           label
         >
-          11 технологических карт
+          {{ courseData.cards }} технологических карт
         </v-chip>
       </div>
 
       <div v-else class="chip-container w-100 mt-2 ">
         <v-chip
           class="custom-chip1 equal-width-chip"
-          text="10 часов"
+          :text="courseData.duration"
           label
         >
         </v-chip>
@@ -65,7 +65,7 @@
           label
           color="#333132"
         >
-          9 уроков
+          {{ courseData.lessons }} уроков
         </v-chip>
 
         <v-chip
@@ -73,7 +73,7 @@
           class="custom-chip3 equal-width-chip"
           label
         >
-          11 технологических <br> карт
+          {{ courseData.cards }} технологических <br> карт
         </v-chip>
       </div>
     </div>
@@ -82,8 +82,71 @@
 
 <script lang="ts" setup>
   import { useDisplay } from 'vuetify';
+  import { ref, computed } from 'vue';
 
-  const { smAndDown, smAndUp } = useDisplay()
+  const { smAndDown } = useDisplay();
+
+  // Массив данных курсов
+  const coursesData = ref([
+    {
+      id: 1,
+      number: '1',
+      title: 'Бриошь',
+      imagePath: '/public/main--menu3.png',
+      progress: {
+        completed: 8,
+        total: 9
+      },
+      duration: '10 часов',
+      lessons: 9,
+      cards: 11
+    },
+    {
+      id: 2,
+      number: '2',
+      title: 'Хлеб на закваске',
+      imagePath: '/public/course-sourdough.jpg',
+      progress: {
+        completed: 5,
+        total: 12
+      },
+      duration: '15 часов',
+      lessons: 12,
+      cards: 8
+    },
+    {
+      id: 3,
+      number: '3',
+      title: 'Пироги и пирожки',
+      imagePath: '/public/course-pies.jpg',
+      progress: {
+        completed: 3,
+        total: 7
+      },
+      duration: '8 часов',
+      lessons: 7,
+      cards: 5
+    }
+  ]);
+
+  // Принимаем ID курса, который нужно отобразить
+  const props = defineProps<{
+    courseId?: number | string
+  }>();
+
+  // Определение событий
+  defineEmits(['click']);
+
+  // Вычисляем данные курса, которые нужно отобразить
+  const courseData = computed(() => {
+    // Если передан ID, находим соответствующий курс
+    if (props.courseId) {
+      const found = coursesData.value.find(course => course.id === props.courseId);
+      return found || coursesData.value[0]; // Если не найден, берем первый
+    }
+    // Если ID не передан, берем первый курс
+    return coursesData.value[0];
+  });
 </script>
 
 <style lang="css" scoped>
