@@ -534,7 +534,7 @@
                   <v-card-text>
                     <div class="d-flex justify-space-between mb-4">
                       <h2 class="text-h5">Уроки курса</h2>
-                      <v-btn color="primary" prepend-icon="mdi-plus" @click="addNewLesson">
+                      <v-btn  prepend-icon="mdi-plus" @click="addNewLesson">
                         Добавить урок
                       </v-btn>
                     </div>
@@ -600,7 +600,6 @@
                                 Удалить
                               </v-btn>
                               <v-btn
-                                color="success"
                                 prepend-icon="mdi-content-save"
                               >
                                 Сохранить
@@ -694,7 +693,7 @@
                     </v-row>
 
                     <div class="d-flex justify-end mt-4">
-                      <v-btn color="primary" large>
+                      <v-btn large>
                         Сохранить настройки
                       </v-btn>
                     </div>
@@ -710,7 +709,7 @@
               <v-btn icon @click="currentPage = 'courses'" class="mr-3">
                 <v-icon>mdi-arrow-left</v-icon>
               </v-btn>
-              <h1 class="text-h4">Статистика курса: {{ currentCourseStats.title }}</h1>
+              <h1 class="">Статистика курса: {{ currentCourseStats.title }}</h1>
             </div>
 
             <v-row>
@@ -808,11 +807,11 @@
                 </template>
 
                 <template v-slot:item.actions="{ item }">
-                  <v-btn x-small text color="primary" class="mr-2">
+                  <v-btn x-small text  class="mr-2">
                     <v-icon x-small left>mdi-eye</v-icon>
                     Детали
                   </v-btn>
-                  <v-btn x-small text color="error">
+                  <v-btn x-small text >
                     <v-icon x-small left>mdi-trash-can</v-icon>
                     Удалить
                   </v-btn>
@@ -858,7 +857,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn text @click="priceDialog = false">Отмена</v-btn>
-            <v-btn color="primary" @click="savePrice">Сохранить</v-btn>
+            <v-btn  @click="savePrice">Сохранить</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -889,7 +888,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn text @click="adminDialog = false">Отмена</v-btn>
-            <v-btn color="primary" @click="addAdmin">Добавить</v-btn>
+            <v-btn  @click="addAdmin">Добавить</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -937,7 +936,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn text @click="grantAccessDialog = false">Отмена</v-btn>
-            <v-btn color="primary" @click="grantCourseAccess">Предоставить доступ</v-btn>
+            <v-btn  @click="grantCourseAccess">Предоставить доступ</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -1001,7 +1000,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn text @click="newCourseDialog = false">Отмена</v-btn>
-            <v-btn color="primary" @click="addNewCourse">Создать курс</v-btn>
+            <v-btn  @click="addNewCourse">Создать курс</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -1502,6 +1501,10 @@ onMounted(() => {
   .chart {
     width: 100%;
     height: 350px;
+  }
+
+  .v-btn {
+    background-color: #31331
   }
 
   .logo__img {

@@ -85,7 +85,7 @@
                 <div class="lesson-sidebar">
                         <v-expansion-panels class= "mt-6 w-100">
                             <v-expansion-panel class="w-100"
-                                v-for="i in 3"
+                                v-for="i in 2"
                                 :key="i"
                                 text="Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad
                             Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad Lorem ipisasdad

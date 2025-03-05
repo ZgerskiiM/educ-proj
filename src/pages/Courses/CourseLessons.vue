@@ -1,29 +1,33 @@
 <template>
-    <div class="page-wrapper"
-    style="background-color: #F3F3F3;">
+    <div class="page-wrapper h-100">
     <Header/>
     <v-container
     :width="mdAndDown ? '100vw' : '80vw'"
     >
-    <h2 class="font-weight-medium pb-0 mb-0">Пекарская витрина:</h2>
-    <h1 class="mt-0 pt-0">От булок до хлеба</h1>
-    <h3 class="mb-4 font-weight-regular">Авторский курс от Максима Бабича</h3>
+    <h2 class="font-weight-medium">Пекарская витрина: от Булок до Хлеба</h2>
+    <h3 class=" mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
     <v-breadcrumbs
-    class="mb-3 ml-0 pl-0 font-weight-light"
+    class=" ml-0 pl-0 font-weight-light"
     color="#F48A21"
-    :items="['Главная', 'Пекарская витрина', 'Уроки']"
+    :items="['Главная', 'Пекарская витрина']"
     />
-    <v-card-title class="course-title font-weight-bold pt-0 pl-0 mb-4"
+    <v-card-title class="course-title font-weight-bold pt-0 pl-0"
     style=" color: #333132"
     >
         Блок 1 / Бриошь
     </v-card-title>
     <v-container
-    :class="mdAndDown ? 'd-flex flex-row flex-wrap ga-5 ml-0 pl-0 mr-0 pr-0' : 'd-flex flex-row ga-5 ml-0 pl-0 align-center' ">
+    :class="mdAndDown ? 'd-flex flex-row flex-wrap ga-5 ml-0 pl-0 mr-0 pr-0' : 'd-flex flex-row flex-wrap ga-5 ml-0 pl-0 align-center' ">
       <LessonCard @click="navigateToCourse(1)"/>
       <LessonCard @click="navigateToCourse(1)"/>
       <LessonCard @click="navigateToCourse(1)"/>
       <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+      <LessonCard @click="navigateToCourse(1)"/>
+
 
 </v-container>
 </v-container>
@@ -51,10 +55,6 @@ h1 {
     color: #333132;
     font-size: 3rem;
 
-}
-
-template {
-  background-color: black;
 }
 
 h2 {

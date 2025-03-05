@@ -2,7 +2,8 @@
   <v-card @click="$emit('click')"
     :class="smAndDown ? 'course-block-card d-flex flex-column' : 'course-block-card d-flex align-center'"
     width="100%"
-    flat>
+    flat
+    elevation="1">
     <v-img
       src="/public/main--menu3.png"
       class="responsive-image rounded-t"
@@ -88,7 +89,6 @@
 <style lang="css" scoped>
 .v-card {
     height: 1vh;
-    background-color: #F5F5F5;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 

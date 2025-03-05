@@ -3,7 +3,7 @@
       @click="$emit('click')"
       class="course-lessons rounded-lg"
       :width="mdAndDown ? '50vw' : '30vw'"
-      flat
+      elevation="1"
     >
       <v-img
         src="/public/main--menu.JPG"
@@ -34,7 +34,7 @@
   }
 
   .v-card {
-      min-height: 1vh; 
+      min-height: 1vh;
       height: auto;
       background-color: #FFFFFF;
       transition: transform 0.3s ease, box-shadow 0.3s ease;

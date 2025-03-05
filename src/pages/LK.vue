@@ -4,16 +4,16 @@
 
       <v-main class="bg-grey-lighten-5">
         <v-container width="80vw">
-          <v-row class="mb-6">
+          <v-row class="mb-2">
             <v-col cols="12">
-              <h1 class="text-h4 font-weight-bold">Личный кабинет</h1>
+              <h1 class="font-weight-medium">Личный кабинет</h1>
             </v-col>
           </v-row>
 
-          <v-card class="profile--card mb-8" rounded="lg" elevation="5" >
+          <v-card class="profile--card mb-8 border-md" flat rounded="xl" color="#FAFAFA" >
   <v-card-text>
     <v-row>
-      <v-col cols="12" md="4" class="d-flex flex-column">
+      <v-col cols="12" md="4" class="d-flex flex-column" >
         <v-avatar size="160" class="mb-4">
           <v-img :src="user.photo" alt="Фото профиля"></v-img>
         </v-avatar>
@@ -37,7 +37,7 @@
           <div class="d-flex justify-space-between align-center mb-4">
             <div class="">Личная информация</div>
             <v-btn
-              color="primary"
+              color="#31331"
               prepend-icon="mdi-pencil"
               size="small"
               variant="text"
@@ -47,9 +47,9 @@
             </v-btn>
           </div>
 
-          <v-list>
+          <v-list color="#FAFAFA" >
             <v-list-item>
-              <template v-slot:prepend>
+              <template v-slot:prepend >
                 <v-icon icon="mdi-account" class="mr-2"></v-icon>
               </template>
               <v-list-item-title>Имя</v-list-item-title>
@@ -152,12 +152,11 @@
                 sm="6"
                 lg="3"
               >
-                <v-card rounded="lg" elevation="1" class=" d-flex flex-column" >
+                <v-card rounded="lg" elevation="1" class="cabinet-card d-flex flex-column overflow-x	" >
                   <div class="position-relative">
                     <v-img
                       :src="course.image"
                       height="250"
-
                       cover
                       class="rounded-t-lg"
                       :alt="course.title"
@@ -206,7 +205,7 @@
               </v-col>
 
               <v-col v-if="filteredCourses.length === 0" cols="12">
-                <v-card rounded="lg" elevation="0" class="pa-6 pt-16 text-center">
+                <v-card rounded="lg" elevation="0" class="d-flex flex-column align-center justify-center">
                   <v-icon icon="mdi-book-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
                   <div class=" mb-2">
                     {{ getNoCourseMessage() }}
@@ -229,10 +228,10 @@
                 sm="6"
                 lg="3"
               >
-                <v-card  class="sertificate-card" rounded="lg" elevation="1">
+                <v-card rounded="lg" class="cabinet-card" elevation="1">
                   <v-img
                     :src="certificate.image"
-                    height="250"
+                    height="200"
                     cover
                     contain
                     class="bg-grey-lighten-4 mb-5"
@@ -245,12 +244,12 @@
                     Выдан: {{ certificate.issueDate }}
                   </v-card-subtitle>
 
-                  <v-card-actions>
+                  <v-card-actions class="mt-3">
                     <v-btn
                       color="#333132"
                       prepend-icon="mdi-download"
                       variant="tonal"
-                      class="flex-grow-1"
+                      size="small"
                       @click="downloadCertificate(certificate.id)"
                     >
                       Скачать
@@ -259,7 +258,7 @@
                     <v-btn
                       color="#333132"
                       prepend-icon="mdi-open-in-new"
-                      class="flex-grow-1"
+                      size="small"
                       @click="openCertificate(certificate.id)"
                     >
                       Открыть
@@ -269,10 +268,10 @@
               </v-col>
 
               <v-col v-if="certificates.length === 0" cols="12">
-                <v-card rounded="lg" elevation="0" class="pa-6 text-center">
+                <v-card rounded="lg" elevation="0" class="d-flex flex-column align-center justify-center">
                   <v-icon icon="mdi-certificate-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-                  <div class="text-h6 mb-2">У вас пока нет сертификатов</div>
-                  <div class="text-body-2 mb-4 text-grey">Завершите курс, чтобы получить сертификат</div>
+                  <div class="mb-2">У вас пока нет сертификатов</div>
+                  <div class="mb-4 text-grey">Завершите курс, чтобы получить сертификат</div>
                 </v-card>
               </v-col>
             </v-row>
@@ -340,6 +339,24 @@ function handlePhotoUpload(file) {
     },
     {
       id: 3,
+      title: 'Выпечка 1233',
+      image: '/public/main--menu3.png',
+      progress: 10,
+      lessonsCompleted: 2,
+      totalLessons: 15,
+      certificateAvailable: false
+    },
+    {
+      id: 4,
+      title: 'Выпечка 1233',
+      image: '/public/main--menu3.png',
+      progress: 10,
+      lessonsCompleted: 2,
+      totalLessons: 15,
+      certificateAvailable: false
+    },
+    {
+      id: 5,
       title: 'Выпечка 1233',
       image: '/public/main--menu3.png',
       progress: 10,
@@ -418,6 +435,15 @@ function handlePhotoUpload(file) {
   </script>
 
   <style scoped>
+.cabinet-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cabinet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
   .progress-container {
     position: absolute;
     top: 0;
