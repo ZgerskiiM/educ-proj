@@ -9,10 +9,10 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/register',
     component: () => import("@/pages/AuthPages/RegisterPage/RegisterPage.vue"),
-    // Если не нужно показывать этот маршрут в хлебных крошках, можно и не задавать meta
   },
   {
     path: '/login',
+    name: "login",
     component: () => import("@/pages/AuthPages/LoginPage/LoginPage.vue")
   },
   {
@@ -30,26 +30,26 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/course',
     component: () => import("@/pages/Courses/CourseBlocks.vue"),
-    meta: { breadcrumb: 'Курсы' }
+    meta: { requiresAuth: true }
   },
   {
     path: '/blocks',
     component: () => import("@/pages/Courses/CourseLessons.vue"),
-    meta: { breadcrumb: 'Занятия' }
+    meta: { requiresAuth: true }
   },
   {
     path: '/lesson',
     component: () => import("@/pages/Courses/LessonPage.vue"),
-    meta: { breadcrumb: 'Урок' }
+    meta: { requiresAuth: true }
   },
   {
     path: '/lk',
     component: () => import("@/pages/Profile/ui/Profile.vue"),
-    meta: { breadcrumb: 'Личный кабинет' }
+    meta: { requiresAuth: true }
   },
   {
     path: '/admin',
     component: () => import("@/pages/admin/AdminPanel.vue"),
-    meta: { breadcrumb: 'Админ-панель' }
+    meta: { requiresAuth: true, requiredRole: 'ADMIN'}
   },
 ]

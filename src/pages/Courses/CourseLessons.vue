@@ -2,7 +2,7 @@
   <div class="page-wrapper h-100">
     <Header />
     <v-container :width="mdAndDown ? '100vw' : '80vw'">
-      <h2 class="font-weight-medium">Пекарская витрина: от Булок до Хлеба</h2>
+      <h2 class="mt-5 font-weight-medium">Пекарская витрина: от Булок до Хлеба</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
       <v-breadcrumbs
         class="ml-0 pl-0 font-weight-light"

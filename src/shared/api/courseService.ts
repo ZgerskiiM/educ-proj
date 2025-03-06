@@ -1,18 +1,20 @@
 // src/shared/api/courseService.js
 import axios from 'axios';
+import { AuthService } from '@/app/features/auth/model/Auth';
 
 const API_URL = 'http://localhost:8080/admin';
 
 // Функция для получения актуального токена при каждом запросе
 const getAuthToken = () => {
-  return localStorage.getItem('token');
+  return AuthService.getToken();
+  ;
 };
 
 
 export const courseService = {
   // Получение всех курсов
   async fetchAllCourses() {
-    const response = await axios.get(`${API_URL}/courses/${11}`, {
+    const response = await axios.get(`${API_URL}/courses`, {
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
       }

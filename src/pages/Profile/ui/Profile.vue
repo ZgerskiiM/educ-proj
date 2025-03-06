@@ -16,7 +16,7 @@
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
 
-        <ProfileCard v-model="userData" class="mb-8" />
+        <ProfileCard v-model="userData" class="mb-8"  @logout="handleLogout" />
 
         <CourseList
           :courses="purchasedCourses"
@@ -41,6 +41,7 @@ import Header from '@/shared/ui/PagesElem/Header.vue';
 import ProfileCard from '@/entities/User/ui/ProfileCard.vue';
 import CourseList from '@/widgets/CourseList/index.vue';
 import CertificateList from '@/widgets/CertificateList/index.vue';
+import { AuthService } from '@/app/features/auth/model/Auth';
 import { useDisplay } from 'vuetify'
 
 const { mdAndDown } = useDisplay()
@@ -58,7 +59,7 @@ const userData = ref({
 
 // Функция для получения токена из localStorage
 const getAuthToken = () => {
-  return localStorage.getItem('token');
+  return AuthService.getToken();
 };
 
 // Функция для загрузки данных пользователя с API
@@ -185,6 +186,17 @@ const certificates = ref([
     image: '/public/main--menu3.png'
   }
 ]);
+
+function handleLogout() {
+  // Дополнительные действия при выходе, например, очистка состояния приложения
+  userData.value = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    imageUrl: ''
+  };
+
+}
 </script>
 
 <style scoped>
@@ -217,6 +229,10 @@ const certificates = ref([
 
 .course-description {
   min-height: 40px;
+}
+
+h1 {
+  color:#333132;
 }
 
 .sertificate-card {

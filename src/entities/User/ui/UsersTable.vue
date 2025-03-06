@@ -59,10 +59,10 @@
 
   const userHeaders = ref([
     { text: 'Аватар', value: 'avatar', sortable: false },
-    { text: 'Имя', value: 'name' },
+    { text: 'Имя', value: 'firstName' },
+    { text: 'Имя', value: 'lastName' },
     { text: 'Email', value: 'email' },
     { text: 'Роль', value: 'role' },
-    { text: 'Дата регистрации', value: 'registeredDate' },
     { text: 'Действия', value: 'actions', sortable: false }
   ]);
   </script>

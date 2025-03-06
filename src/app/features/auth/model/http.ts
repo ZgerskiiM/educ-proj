@@ -81,7 +81,10 @@ async function refreshToken() {
 http.interceptors.request.use(
   async (config) => {
     // Пропускаем запросы авторизации без проверки токена
-    if (config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh')) {
+    if (config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh')
+      || config.url?.includes('/auth/signup') || config.url?.includes('/auth/verify')
+      || config.url?.includes('/auth/verify')  || config.url?.includes('/auth/reset-password')
+      || config.url?.includes('/auth/r-password')){
       return config;
     }
 

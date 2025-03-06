@@ -1,5 +1,5 @@
 <template>
-  <v-card class="profile--card d-flex justify-center align-center align-md-center"  rounded="xl">
+  <v-card class="profile--card d-flex justify-center align-center align-md-center" rounded="xl">
     <v-card-text>
       <v-row>
         <v-col cols="12" md="4" class="d-flex flex-column justify-center align-center align-md-center">
@@ -60,6 +60,19 @@
                 <v-list-item-subtitle>{{ modelValue.email }}</v-list-item-subtitle>
               </v-list-item>
             </v-list>
+
+            <!-- Кнопка выхода из аккаунта -->
+            <div class="d-flex justify-end mt-4">
+              <v-btn
+                color="error"
+                variant="text"
+                prepend-icon="mdi-logout"
+                size="small"
+                @click="logout"
+              >
+                Выйти из аккаунта
+              </v-btn>
+            </div>
           </div>
 
           <!-- Редактирование профиля -->
@@ -117,12 +130,14 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const props = defineProps({
   modelValue: { type: Object, required: true }
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(['update:modelValue', 'logout']);
 
 const isEditing = ref(false);
 const editedData = ref({ ...props.modelValue });
@@ -145,5 +160,19 @@ function saveChanges() {
 function cancelEditing() {
   editedData.value = { ...props.modelValue };
   isEditing.value = false;
+}
+
+function logout() {
+  // Очищаем токен из localStorage
+  localStorage.removeItem('token');
+
+  // Очищаем другие данные пользователя, если они есть
+  localStorage.removeItem('user');
+
+  // Emit событие для уведомления родительского компонента
+  emit('logout');
+
+  // Перенаправляем на страницу входа
+  router.push('/login');
 }
 </script>

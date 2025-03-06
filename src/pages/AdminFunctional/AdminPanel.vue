@@ -944,7 +944,6 @@
         </v-card>
       </v-dialog>
 
-      <!-- Диалог создания нового курса -->
       <v-dialog v-model="newCourseDialog" max-width="800">
         <v-card>
           <v-card-title>Создание нового курса</v-card-title>

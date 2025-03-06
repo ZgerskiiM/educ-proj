@@ -23,32 +23,74 @@
   </template>
 
   <script setup>
-  import { ref } from 'vue';
+  import { ref, onMounted } from 'vue';
   import AddAdminButton from '@/features/user/AddAdminButton.vue';
   import UsersFilter from '@/features/user/UsersFilter.vue';
   import UsersTable from '@/entities/user/ui/UsersTable.vue';
+  import { getUserService } from '@/shared/api/getUserService.ts'
 
   const userSearch = ref('');
   const userRole = ref('Все роли');
 
-  const users = ref([
-    {
-      id: 1,
-      name: 'Иван Иванов',
-      email: 'ivan@example.com',
-      avatar: '/images/avatars/user1.jpg',
-      role: 'Администратор',
-      registeredDate: '2023-01-15'
-    },
-    {
-      id: 2,
-      name: 'Мария Сидорова',
-      email: 'maria@example.com',
-      avatar: '/images/avatars/user2.jpg',
-      role: 'Пользователь',
-      registeredDate: '2023-02-20'
-    }
+  // Состояние загрузки и уведомлений
+  const isLoading = ref(false);
+  const snackbar = ref({
+    show: false,
+    text: '',
+    color: 'success'
+  });
+
+
+  const users = ref([]);
+
+  // Заголовки таблицы
+  const courseHeaders = ref([
+    { text: 'Изображение', value: 'imageUrl', sortable: false },
+    { text: 'Название', value: 'title' },
+    { text: 'Цена', value: 'price' },
+    { text: 'Сложность', value: 'difficulty' },
+    { text: 'Статус', value: 'status' },
+    { text: 'Действия', value: 'actions', sortable: false }
   ]);
+
+  // Загрузка курсов при монтировании компонента
+  onMounted(async () => {
+    await fetchUsers();
+  });
+
+  // Получение списка всех курсов
+  const fetchUsers = async () => {
+  try {
+    isLoading.value = true;
+    const response = await getUserService.fetchAllUsers();
+
+    if (Array.isArray(response)) {
+      users.value = response;
+    } else if (response && typeof response === 'object') {
+      // Проверяем различные структуры ответа API
+      if (Array.isArray(response.content)) {
+        users.value = response.content;
+      } else if (Array.isArray(response.items)) {
+        users.value = response.items;
+      } else if (Array.isArray(response.data)) {
+        users.value = response.data;
+      } else {
+        // Если не нашли массив в ответе, устанавливаем пустой массив
+        console.error('Данные не содержат массив:', response);
+        users.value = [];
+      }
+    } else {
+      console.error('Неизвестный формат ответа:', response);
+      users.value = [];
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке курсов:', error);
+    users.value = []; // Всегда устанавливаем пустой массив в случае ошибки
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 
   const openNewAdminDialog = () => {
     console.log('Opening new admin dialog');
