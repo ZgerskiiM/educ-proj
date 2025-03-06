@@ -306,7 +306,6 @@
             </v-data-table>
           </div>
 
-          <!-- Отчеты -->
           <div v-if="currentPage === 'reports'">
             <h1 class="font-weight-regular">Отчеты</h1>
 

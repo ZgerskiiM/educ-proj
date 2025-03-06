@@ -49,7 +49,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/admin',
-    component: () => import("@/pages/AdminFunctional/AdminPanel.vue"),
+    component: () => import("@/pages/admin/AdminPanel.vue"),
     meta: { breadcrumb: 'Админ-панель' }
   },
 ]
