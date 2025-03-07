@@ -11,7 +11,6 @@ const getAuthToken = () => {
 };
 
 export const getUserService = {
-  // Получение всех курсов
   async fetchAllUsers() {
     const response = await axios.get(`${API_URL}/users`, {
       headers: {
@@ -21,6 +20,24 @@ export const getUserService = {
     return response.data;
   },
 
+  async grantCourseAccess(email, courseId) {
+    const response = await axios.post(`${API_URL}/users/${email}/courses/${courseId}`, null, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    return response.data;
+  },
+
+  // Получение всех курсов (для выбора в диалоге)
+  async fetchAllCourses() {
+    const response = await axios.get(`${API_URL}/courses`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    return response.data;
+  },
 
   async fetchCourse(userId) {
     const response = await axios.get(`${API_URL}/users/${userId}`, {

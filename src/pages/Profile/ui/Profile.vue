@@ -34,38 +34,69 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import Header from '@/shared/ui/PagesElem/Header.vue';
 import ProfileCard from '@/entities/User/ui/ProfileCard.vue';
 import CourseList from '@/widgets/CourseList/index.vue';
 import CertificateList from '@/widgets/CertificateList/index.vue';
 import { AuthService } from '@/app/features/auth/model/Auth';
-import { useDisplay } from 'vuetify'
+import { useDisplay } from 'vuetify';
+import { getUserCourses } from '@/shared/api/UserService';  // Правильный путь импорта
 
-const { mdAndDown } = useDisplay()
-
+const { mdAndDown } = useDisplay();
 const courseFilter = ref('all');
 const isLoading = ref(false);
-
-// Создаем реактивный объект с данными пользователя
 const userData = ref({
   firstName: '',
   lastName: '',
   email: '',
-  imageUrl: 'https://randomuser.me/api/portraits/women/28.jpg' // Дефолтное изображение
+  imageUrl: 'https://randomuser.me/api/portraits/women/28.jpg'
 });
 
-// Функция для получения токена из localStorage
 const getAuthToken = () => {
   return AuthService.getToken();
 };
 
-// Функция для загрузки данных пользователя с API
+
+// Объявляем переменную для хранения курсов
+const purchasedCourses = ref([]);
+
+// Функция для загрузки курсов пользователя
+async function fetchUserCourses() {
+  try {
+    isLoading.value = true;
+
+    // Проверяем наличие токена перед запросом
+    const token = AuthService.getToken();
+    if (!token) {
+      console.log('Пользователь не авторизован');
+      purchasedCourses.value = []; // Пустой массив, если нет токена
+      return;
+    }
+
+    const courses = await getUserCourses();
+
+    purchasedCourses.value = courses.map(course => ({
+      id: course.id,
+      title: course.title,
+      imageUrl: course.imageUrl || '/public/main--menu3.png',
+      progress: course.progress || 0,
+      lessonsCompleted: course.lessonsCompleted || 0,
+      totalLessons: course.totalLessons || 0,
+      certificateAvailable: course.certificateAvailable || false
+    }));
+  } catch (error) {
+    console.error('Ошибка при получении курсов пользователя:', error);
+    purchasedCourses.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+}
+
 const API_URL = 'http://localhost:8080';
 
-
+// Функция для получения данных пользователя с API
 async function fetchUserData() {
   try {
     isLoading.value = true;
@@ -75,7 +106,6 @@ async function fetchUserData() {
       }
     });
 
-    // Обновляем данные пользователя
     userData.value = {
       firstName: response.data.firstName || '',
       lastName: response.data.lastName || '',
@@ -89,13 +119,38 @@ async function fetchUserData() {
   }
 }
 
+// Загружаем данные при монтировании компонента
 onMounted(() => {
   fetchUserData();
+  fetchUserCourses(); // Добавляем загрузку курсов
 });
 
+
+// Сертификаты
+const certificates = ref([
+  {
+    id: 1,
+    courseName: 'Римская пицца',
+    issueDate: '15.02.2025',
+    image: '/public/main--menu3.png'
+  }
+]);
+
+function handleLogout() {
+  // Дополнительные действия при выходе, например, очистка состояния приложения
+  userData.value = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    imageUrl: ''
+  };
+
+}
+
+// Добавьте этот код в <script setup>
 // Опции фильтра курсов
 const courseFilterOptions = [
-  { value: 'all', label: 'Все' },
+  { value: 'all', label: 'Все курсы' },
   { value: 'not-started', label: 'Не начатые' },
   { value: 'in-progress', label: 'В процессе' },
   { value: 'completed', label: 'Завершенные' }
@@ -127,76 +182,6 @@ const courseEmptyState = computed(() => {
     actionRoute: '/catalog'
   };
 });
-
-// Купленные курсы
-const purchasedCourses = ref([
-  {
-    id: 1,
-    title: 'Основы работы с бриошью',
-    image: '/public/main--menu3.png',
-    progress: 75,
-    lessonsCompleted: 15,
-    totalLessons: 20,
-    certificateAvailable: false
-  },
-  {
-    id: 2,
-    title: 'Римская пицца',
-    image: '/public/main--menu3.png',
-    progress: 100,
-    lessonsCompleted: 18,
-    totalLessons: 18,
-    certificateAvailable: true
-  },
-  {
-    id: 3,
-    title: 'Выпечка 1233',
-    image: '/public/main--menu3.png',
-    progress: 10,
-    lessonsCompleted: 2,
-    totalLessons: 15,
-    certificateAvailable: false
-  },
-  {
-    id: 4,
-    title: 'Выпечка 1233',
-    image: '/public/main--menu3.png',
-    progress: 10,
-    lessonsCompleted: 2,
-    totalLessons: 15,
-    certificateAvailable: false
-  },
-  {
-    id: 5,
-    title: 'Выпечка 1233',
-    image: '/public/main--menu3.png',
-    progress: 10,
-    lessonsCompleted: 2,
-    totalLessons: 15,
-    certificateAvailable: false
-  }
-]);
-
-// Сертификаты
-const certificates = ref([
-  {
-    id: 1,
-    courseName: 'Римская пицца',
-    issueDate: '15.02.2025',
-    image: '/public/main--menu3.png'
-  }
-]);
-
-function handleLogout() {
-  // Дополнительные действия при выходе, например, очистка состояния приложения
-  userData.value = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    imageUrl: ''
-  };
-
-}
 </script>
 
 <style scoped>

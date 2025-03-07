@@ -1,23 +1,14 @@
 <template>
   <div class="page-container">
-    <v-img
-      class="responsive-image d-none d-sm-flex"
-      src="/public/main--menu3.png"
-      :aspect-ratio="16/9"
-      cover
-    ></v-img>
+    <AuthImage />
+
     <v-container class="main-container">
       <form
-        @submit.prevent="handleVerify"
+        @submit.prevent="handleSignup"
         class="align-md-center d-flex flex-column"
         :class="mdAndDown ? 'w-66' : 'w-50'"
       >
-      <v-img
-      class="responsive-image-second"
-      src="/school_вектор.png"
-      height="15vh"
-      v-show="sm"
-      ></v-img>
+        <AuthMobileImage />
         <div>Отправили код-подтверждение на {{ formData.email }}</div>
         <v-text-field
           class="w-100 font-weight-light"
@@ -56,7 +47,9 @@ import { reactive, onMounted } from 'vue';
 import { AuthService } from '@/app/features/auth/model/Auth';
 import { useRoute } from 'vue-router';
 import { useRouter } from 'vue-router';
-import { useDisplay } from 'vuetify'
+import { useDisplay } from 'vuetify';
+import AuthImage from '@/shared/ui/AuthElements/AuthImages/AuthImage.vue';
+import AuthMobileImage from '@/shared/ui/AuthElements/AuthImages/AuthMobileImage.vue';
 
 const { mdAndDown, smAndDown, sm, smAndUp } = useDisplay()
 
@@ -144,50 +137,39 @@ onMounted(() => {
 <style scoped>
 .page-container {
   display: flex;
-  justify-content: center;
+  background-color: #fafafa;
   align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  margin: 0;
+  min-height: 100vh;
 }
 
-.auth-card {
+a {
+  color: #000000;
+}
+
+.main-container {
   display: flex;
-  justify-content: row;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
 }
 
 .v-btn {
-  background-color: #4C64FF;
+  background-color: #302e2f;
   color: white;
-  border-radius: 0.4vw;
-  height: 4.5vh;
+  height: 5vh;
+  font-size: 1rem;
 }
 
-.v-card {
-  background-color: white;
+.v-card-text {
+  font-size: 0.8rem;
 }
 
-.info-card {
-  background-color: #333333;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: start;
-  font-size: 0.6vw;
-  border-radius: 0.5vw;
-}
-
-.info-icon {
-  font-size: 24px;
-}
-
-.info-text {
-  line-height: 1.6;
-}
-
-.link {
-  color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
+@media (max-width: 1200px) {
+  .responsive-image {
+    width: 0;
+  }
+  .info--card {
+    font-size: 0.6rem;
+  }
 }
 </style>

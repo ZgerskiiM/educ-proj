@@ -1,48 +1,127 @@
 <template>
-    <div class="page-wrapper">
+  <div class="page-wrapper">
     <Header/>
     <v-container
-    :width="mdAndDown ? '100vw' : '80vw'"
+      :width="mdAndDown ? '100vw' : '80vw'"
     >
-    <h2 class="mt-5 font-weight-medium">Пекарская витрина: от Булок до Хлеба</h2>
-    <h3 class=" mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
-    <v-breadcrumbs
-    class=" ml-0 pl-0 font-weight-light"
-    color="#F48A21"
-    :items="['Главная', 'Пекарская витрина']"
-    />
-    <v-card-title class="course-title font-weight-bold pt-0 pl-0 mb-2"
-    style=" color: #333132"
-    >
+      <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
+      <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
+      <v-breadcrumbs
+        class="ml-0 pl-0 font-weight-light"
+        color="#F48A21"
+        :items="['Главная', courseTitle]"
+      />
+      <v-card-title class="course-title font-weight-bold pt-0 pl-0 mb-2"
+        style="color: #333132"
+      >
         Программа курса
-    </v-card-title>
-    <v-container class="d-flex flex-column ga-7 ml-0 pl-0 align-center">
-<CourseCard @click="navigateToCourse(1)"/>
-<CourseCard/>
-<CourseCard/>
+      </v-card-title>
 
-</v-container>
-</v-container>
-</div>
+      <!-- Индикатор загрузки -->
+      <div v-if="loading" class="d-flex justify-center my-5">
+        <v-progress-circular indeterminate color="#F48A21"></v-progress-circular>
+      </div>
+
+      <!-- Сообщение об ошибке -->
+      <v-alert v-if="error" type="error" class="my-3">
+        {{ error }}
+      </v-alert>
+
+      <!-- Список блоков курса -->
+      <v-container v-if="!loading && !error" class="d-flex flex-column ga-7 ml-0 pl-0 align-center">
+        <CourseCard
+          v-for="(block, index) in courseBlocks"
+          :key="block.blockId"
+          :course-data="formatBlockData(block, index + 1)"
+          @click="navigateToLesson(courseId, block.blockId)"
+        />
+
+        <!-- Если блоков нет -->
+        <v-alert v-if="courseBlocks.length === 0" type="info" class="my-3">
+          Для этого курса еще не добавлены блоки
+        </v-alert>
+      </v-container>
+    </v-container>
+  </div>
 </template>
 
-
-
 <script lang="ts" setup>
-import Header from "@/shared/ui/PagesElem/Header.vue"
+import { ref, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
+import Header from "@/shared/ui/PagesElem/Header.vue";
 import CourseCard from "@/shared/ui/PagesElem/CourseCard.vue";
-import { useDisplay } from 'vuetify'
+import { courseUserService } from '@/shared/api/courseUserService';
 
-const { mdAndDown } = useDisplay()
+const { mdAndDown } = useDisplay();
+const router = useRouter();
+const route = useRoute();
 
-import { useRouter } from 'vue-router'
+// Состояние
+const loading = ref(false);
+const error = ref('');
+const courseTitle = ref('Пекарская витрина: от Булок до Хлеба');
+const courseBlocks = ref([]);
+const courseId = ref(null);
 
-const router = useRouter()
+// Функция для получения данных курса
+const fetchCourseData = async (id) => {
+  if (!id) return;
 
-const navigateToCourse = (courseId) => {
-  router.push(`/course/${courseId}`)
-}
+  loading.value = true;
+  error.value = '';
 
+  try {
+    const response = await courseUserService.fetchCourseWithBlocks(id);
+    courseTitle.value = response.courseTitle || 'Курс без названия';
+    courseBlocks.value = response.blocks || [];
+  } catch (err) {
+    console.error('Ошибка при загрузке курса:', err);
+    error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
+    courseBlocks.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Форматирование данных блока для компонента CourseCard
+const formatBlockData = (block, number) => {
+  return {
+    id: block.blockId,
+    number: number.toString(),
+    title: block.blockTitle,
+    imagePath: block.imageUrl, // Заглушка для изображений
+    progress: {
+      completed: block.completedLessons,
+      total: block.lessonsCount
+    },
+    duration: `${block.lessonsCount * 1.5} часов`, // Приблизительная длительность
+    lessons: block.lessonsCount,
+    cards: Math.round(block.lessonsCount * 1.2) // Примерное количество карт
+  };
+};
+
+// Навигация к уроку
+const navigateToLesson = (courseId, blockId) => {
+  router.push(`/course/${courseId}/block/${blockId}`);
+};
+
+// Получаем ID курса из URL и загружаем данные
+onMounted(() => {
+  const id = route.params.courseId;
+  if (id) {
+    courseId.value = id;
+    fetchCourseData(id);
+  }
+});
+
+// Следим за изменением ID курса в URL
+watch(() => route.params.courseId, (newId) => {
+  if (newId && newId !== courseId.value) {
+    courseId.value = newId;
+    fetchCourseData(newId);
+  }
+});
 </script>
 
 <style scoped>

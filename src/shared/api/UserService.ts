@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { AuthService } from '@/app/features/auth/model/Auth';
 
 const API_URL = 'http://localhost:8080';
 
@@ -6,7 +7,7 @@ const API_URL = 'http://localhost:8080';
 export const getUserData = async () => {
   try {
     // Получаем токен из localStorage
-    const token = localStorage.getItem('token');
+    const token = AuthService.getToken();
 
     // Проверяем, что токен существует
     if (!token) {
@@ -37,6 +38,62 @@ export const checkUserRole = async (requiredRole) => {
   } catch (error) {
     console.error('Error checking user role:', error);
     return false;
+  }
+};
+
+export const hasAccessToCourse = async (courseId) => {
+  try {
+    const token = AuthService.getToken();
+
+    if (!token) return false;
+
+    // Получаем все курсы пользователя
+    const response = await axios.get(`${API_URL}/users/courses`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Проверяем, есть ли курс в списке доступных
+    const userCourses = response.data;
+    return userCourses.some(course => course.id === parseInt(courseId));
+  } catch (error) {
+    console.error('Error checking course access:', error);
+    return false;
+  }
+};
+
+// Функция для получения курсов пользователя
+export const getUserCourses = async () => {
+  try {
+    const token = AuthService.getToken();
+
+    if (!token) {
+      throw new Error('Authentication token is missing');
+    }
+
+    const response = await axios.get(`${API_URL}/users/courses`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Исправляем дублирование протокола в URL
+    const processedCourses = response.data.map(course => {
+      if (course.imageUrl) {
+        // Исправляем дублирование https:// в URL
+        course.imageUrl = course.imageUrl.replace(/https:\/\/https:\/\//, 'https://');
+
+        // Логирование для отладки
+        console.log(`Исправленный URL для курса ${course.id}:`, course.imageUrl);
+      }
+      return course;
+    });
+
+    return processedCourses;
+  } catch (error) {
+    console.error('Error fetching user courses:', error);
+    throw error;
   }
 };
 

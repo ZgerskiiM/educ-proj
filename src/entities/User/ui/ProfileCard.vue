@@ -46,7 +46,7 @@
 
               <v-list-item>
                 <template v-slot:prepend>
-                  <v-icon icon="mdi-account-box" class="mr-2"></v-icon>
+                  <v-icon  class="mr-2"></v-icon>
                 </template>
                 <v-list-item-title>Фамилия</v-list-item-title>
                 <v-list-item-subtitle>{{ modelValue.lastName }}</v-list-item-subtitle>
@@ -75,7 +75,6 @@
             </div>
           </div>
 
-          <!-- Редактирование профиля -->
           <v-form v-else>
             <div class="d-flex justify-space-between align-center mb-4">
               <div class="">Редактирование профиля</div>
@@ -103,6 +102,7 @@
               variant="outlined"
               class="mb-3"
               density="comfortable"
+              disabled
             ></v-text-field>
 
             <div class="d-flex gap-3 ga-2">
@@ -131,6 +131,11 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { AuthService } from '@/app/features/auth/model/Auth';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8080';
+
 
 const router = useRouter();
 const props = defineProps({
@@ -142,19 +147,81 @@ const emit = defineEmits(['update:modelValue', 'logout']);
 const isEditing = ref(false);
 const editedData = ref({ ...props.modelValue });
 
+const getAuthToken = () => {
+  return AuthService.getToken();
+};
+
+async function saveChanges() {
+  try {
+    // Получаем токен авторизации
+    const token = getAuthToken();
+
+    if (!token) {
+      alert('Вы не авторизованы');
+      return;
+    }
+
+    // 1. Сначала обновляем имя и фамилию
+    await axios({
+      method: 'POST',
+      url: `${API_URL}/users/update-user`,
+      params: {
+        newFirstName: editedData.value.firstName,
+        newLastName: editedData.value.lastName
+      },
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // 2. Если изображение было изменено, загружаем его
+    if (imageChanged.value && imageFile.value) {
+      const formData = new FormData();
+      formData.append('file', imageFile.value);
+
+      const photoResponse = await axios.post(
+        `${API_URL}/users/me/upload`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      // Обновляем URL изображения из ответа
+      editedData.value.imageUrl = photoResponse.data.imageUrl;
+    }
+
+    // Обновляем модель в родительском компоненте
+    emit('update:modelValue', { ...editedData.value });
+    isEditing.value = false;
+    alert('Профиль успешно обновлен');
+
+  } catch (error) {
+    console.error('Ошибка при обновлении профиля:', error);
+    alert('Не удалось обновить профиль');
+  }
+}
+
+// Для отслеживания изменения изображения
+const imageFile = ref(null);
+const imageChanged = ref(false);
+
+// Обновленная функция загрузки фото
 function handlePhotoUpload(file) {
   if (file) {
+    imageFile.value = file;
+    imageChanged.value = true;
+
+    // Для предпросмотра
     const reader = new FileReader();
     reader.onload = (e) => {
       editedData.value.imageUrl = e.target.result;
     };
     reader.readAsDataURL(file);
   }
-}
-
-function saveChanges() {
-  emit('update:modelValue', { ...editedData.value });
-  isEditing.value = false;
 }
 
 function cancelEditing() {

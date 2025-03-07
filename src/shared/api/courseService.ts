@@ -10,7 +10,6 @@ const getAuthToken = () => {
   ;
 };
 
-
 export const courseService = {
   // Получение всех курсов
   async fetchAllCourses() {
@@ -22,6 +21,33 @@ export const courseService = {
     return response.data;
   },
 
+  async uploadCourseImage(courseId, imageFile) {
+    try {
+      const formData = new FormData();
+
+      // Именно 'imageFile', как ожидает сервер
+      formData.append('imageFile', imageFile);
+
+      console.log('Отправка файла:', imageFile.name, 'размер:', imageFile.size);
+
+      const response = await axios.post(
+        `${API_URL}/courses/${courseId}/image`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${getAuthToken()}`,
+            // Важно НЕ устанавливать Content-Type вручную для multipart/form-data
+            // Браузер сам должен сгенерировать правильный boundary
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Ошибка при загрузке изображения:', error);
+      throw error;
+    }
+  },
   // Получение отдельного курса
   async fetchCourse(courseId) {
     const response = await axios.get(`${API_URL}/courses/${11}`, {
@@ -55,33 +81,76 @@ export const courseService = {
   },
 
   // Обновление курса
-  async updateCourse(courseId, courseData) {
-    const params = new URLSearchParams();
+// Обновление курса - новая реализация
+async updateCourse(courseId, courseData) {
+  try {
+    let payload;
 
-    if (courseData.id) params.append('id', courseData.id);
-    if (courseData.blockId) params.append('blockId', courseData.blockId);
-    if (courseData.title) params.append('title', courseData.title);
-    if (courseData.description) params.append('description', courseData.description);
-    if (courseData.videoUrl) params.append('videoUrl', courseData.videoUrl);
-    if (courseData.sheetUrl) params.append('sheetUrl', courseData.sheetUrl);
+    if (courseData.imageFile) {
+      // Если есть файл изображения, используем FormData
+      const formData = new FormData();
+      formData.append('id', courseData.id);
+      formData.append('title', courseData.title);
+      formData.append('price', courseData.price);
+      formData.append('difficulty', courseData.difficulty);
+      formData.append('status', courseData.status);
+      formData.append('imageFile', courseData.imageFile);
 
-    const response = await axios.put(`${API_URL}/courses/${courseId}`, params, {
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
+      payload = formData;
+
+      const response = await axios.put(`${API_URL}/courses/${courseId}`, payload, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      return response.data;
+    } else {
+      // Если нет файла, используем URLSearchParams
+      const params = new URLSearchParams();
+      params.append('id', courseData.id);
+      params.append('title', courseData.title);
+      params.append('price', courseData.price);
+      params.append('difficulty', courseData.difficulty);
+      params.append('status', courseData.status);
+
+      if (courseData.imageUrl) {
+        params.append('imageUrl', courseData.imageUrl);
       }
-    });
-    return response.data;
-  },
+
+      payload = params;
+
+      const response = await axios.put(`${API_URL}/courses/${courseId}`, payload, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+
+      return response.data;
+    }
+  } catch (error) {
+    console.error(`Ошибка при обновлении курса с ID ${courseId}:`, error);
+    throw error;
+  }
+},
 
   // Удаление курса
   async deleteCourse(courseId) {
-    const response = await axios.delete(`${API_URL}/courses/${courseId}`, {
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`
-      }
-    });
-    return response.data;
+    console.log(`Отправка запроса на удаление курса с ID ${courseId}`);
+
+    try {
+      const response = await axios.delete(`${API_URL}/courses/${courseId}`, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Ошибка при удалении курса с ID ${courseId}:`, error);
+      throw error;
+    }
   },
 
   // Вариант с загрузкой файла изображения
@@ -93,7 +162,7 @@ export const courseService = {
     formData.append('status', courseData.status || 'PENDING');
 
     if (imageFile) {
-      formData.append('image', imageFile);
+      formData.append('imageFile', imageFile); // Изменено с 'image' на 'imageFile'
     } else if (courseData.imageUrl) {
       formData.append('imageUrl', courseData.imageUrl);
     }
@@ -106,5 +175,66 @@ export const courseService = {
     });
 
     return response.data;
+  },
+  // Добавляем в courseService.js
+
+// Получение блоков курса
+async getBlocksByCourseId(blockId) {
+  const response = await axios.get(`${API_URL}/blocks/${blockId}`, {
+    headers: {
+      'Authorization': `Bearer ${getAuthToken()}`
+    }
+  });
+  return response.data;
+},
+
+
+// Создание нового блока
+async createBlock(blockData) {
+  const params = new URLSearchParams();
+
+  if (blockData.title) params.append('title', blockData.title);
+  if (blockData.courseId !== undefined) params.append('courseId', blockData.courseId);
+  if (blockData.imageUrl) params.append('imageUrl', blockData.imageUrl);
+
+  const response = await axios.post(`${API_URL}/blocks`, params, {
+    headers: {
+      'Authorization': `Bearer ${getAuthToken()}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+  return response.data;
+},
+
+// Создание блока с изображением
+async createBlockWithImage(blockData, imageFile) {
+  const formData = new FormData();
+  formData.append('title', blockData.title);
+  formData.append('courseId', blockData.courseId);
+
+  if (imageFile) {
+    formData.append('imageFile', imageFile);
+  } else if (blockData.imageUrl) {
+    formData.append('imageUrl', blockData.imageUrl);
   }
-};
+
+  const response = await axios.post(`${API_URL}/blocks`, formData, {
+    headers: {
+      'Authorization': `Bearer ${getAuthToken()}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return response.data;
+},
+
+// Удаление блока
+async deleteBlock(blockId) {
+  const response = await axios.delete(`${API_URL}/blocks/${blockId}`, {
+    headers: {
+      'Authorization': `Bearer ${getAuthToken()}`
+    }
+  });
+  return response.data;
+}
+
+}

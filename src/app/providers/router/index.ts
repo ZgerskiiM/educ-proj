@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from "./routes";
 import { AuthService } from '@/app/features/auth/model/Auth';
+import { hasAccessToCourse } from '@/shared/api/UserService'; // Импортируйте функцию проверки доступа
 
 
 const router = createRouter({
@@ -8,7 +9,7 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   console.log('Navigating to:', to.path, 'Meta:', to.meta);
 
   // Если маршрут требует авторизации
@@ -40,6 +41,27 @@ router.beforeEach((to, from, next) => {
 
         // Используйте абсолютный путь, чтобы избежать проблем с именами маршрутов
         next('/');
+        return;
+      }
+    }
+
+    // Проверка доступа к курсу (если это страница курса)
+    if (to.name === 'CourseBlocks' && to.params.courseId) {
+      console.log('Checking course access for course ID:', to.params.courseId);
+
+      try {
+        const hasAccess = await hasAccessToCourse(to.params.courseId);
+        console.log('Has access to course:', hasAccess);
+
+        if (!hasAccess) {
+          console.log('Course access denied, redirecting to access-denied');
+          localStorage.setItem('accessError', 'У вас нет доступа к этому курсу');
+          next('/lk');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking course access:', error);
+        next('/lk');
         return;
       }
     }

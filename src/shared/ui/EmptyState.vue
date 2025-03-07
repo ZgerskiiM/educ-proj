@@ -4,7 +4,8 @@
       <v-icon :icon="icon" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
       <div class="mb-2">{{ title }}</div>
       <div class="mb-6 text-grey">{{ description }}</div>
-      <v-btn v-if="actionText" :color="actionColor" :to="actionRoute">{{ actionText }}</v-btn>
+      <v-btn v-if="actionText" :color="actionColor" :to="actionRoute"
+      disabled>{{ actionText }}</v-btn>
     </v-card>
   </template>
 

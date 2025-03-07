@@ -6,11 +6,12 @@
     </div>
 
     <CourseFilterTabs
+      v-if="filterOptions && filterOptions.length"
       v-model="localFilterValue"
       :options="filterOptions"
     />
 
-    <v-row>
+    <v-row v-if="filteredCourses.length > 0">
       <v-col
         v-for="course in filteredCourses"
         :key="course.id"
@@ -20,24 +21,25 @@
       >
         <CourseCard :course="course" />
       </v-col>
-
-      <v-col v-if="filteredCourses.length === 0" cols="12">
-        <EmptyState
-          :icon="emptyState.icon"
-          :title="emptyState.title"
-          :description="emptyState.description"
-          :action-text="emptyState.actionText"
-          :action-route="emptyState.actionRoute"
-        />
-      </v-col>
     </v-row>
+
+    <!-- Пустое состояние -->
+    <div v-else class="text-center py-8">
+      <EmptyState
+        :icon="emptyState.icon"
+        :title="emptyState.title"
+        :description="emptyState.description"
+        :action-text="emptyState.actionText"
+        :action-route="emptyState.actionRoute"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue';
 import CourseCard from '@/entities/Course/ui/CourseCard.vue';
-import CourseFilterTabs from '@/features/CourseFilter/ui/CourseFilterTabs.vue'; // Исправлен путь импорта
+import CourseFilterTabs from '@/features/CourseFilter/ui/CourseFilterTabs.vue';
 import EmptyState from '@/shared/ui/EmptyState.vue';
 
 const props = defineProps({
@@ -45,7 +47,17 @@ const props = defineProps({
   courses: { type: Array, required: true },
   filterValue: { type: String, required: true },
   filterOptions: { type: Array, required: true },
-  emptyState: { type: Object, required: true }
+  emptyState: {
+    type: Object,
+    default: () => ({
+      icon: 'mdi-school-outline',
+      title: 'У вас пока нет курсов',
+      description: 'Вы можете найти интересные курсы в нашем каталоге',
+      actionText: 'Перейти в каталог',
+      actionRoute: '/catalog',
+      actionDisabled: { type: Boolean, default: false }
+    })
+  }
 });
 
 const emit = defineEmits(['update:filter-value']);
@@ -76,5 +88,3 @@ const filteredCourses = computed(() => {
   }
 });
 </script>
-
-

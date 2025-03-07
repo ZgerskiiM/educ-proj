@@ -2,7 +2,7 @@
     <v-card rounded="lg" elevation="1" class="cabinet-card d-flex flex-column overflow-x">
       <div class="position-relative">
         <v-img
-          :src="course.image"
+          :src="course.imageUrl"
           height="250"
           cover
           class="rounded-t-lg"

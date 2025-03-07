@@ -1,9 +1,11 @@
 <template>
-  <v-card @click="$emit('click', courseData.id)"
+  <v-card
+    @click="$emit('click', courseData.id)"
     :class="smAndDown ? 'course-block-card d-flex flex-column' : 'course-block-card d-flex align-center'"
     width="100%"
     flat
-    elevation="1">
+    elevation="1"
+  >
     <v-img
       :src="courseData.imagePath"
       class="responsive-image rounded-t"
@@ -12,10 +14,12 @@
     />
 
     <div
-      :class="smAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'">
+      :class="smAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'"
+    >
       <div class="d-flex align-center justify-space-between">
         <div class="text-h6">
-          <span class="font-weight-bold">Блок {{ courseData.number }} /</span> <span class="font-weight-light">{{ courseData.title }}</span>
+          <span class="font-weight-bold">Блок {{ courseData.number }} /</span>
+          <span class="font-weight-light">{{ courseData.title }}</span>
         </div>
 
         <div :class="smAndDown ? 'font-weight-light grey--text progress-small' : 'font-weight-light mt-8 mr-10 grey--text'">
@@ -35,7 +39,7 @@
 
         <v-chip
           style="background-color: #FFE68E;"
-          class=" custom-chip2 my-1 ml-2"
+          class="custom-chip2 my-1 ml-2"
           label
           color="#333132"
         >
@@ -51,6 +55,7 @@
         </v-chip>
       </div>
 
+      <!-- Мобильная версия чипов -->
       <div v-else class="chip-container w-100 mt-2 ">
         <v-chip
           class="custom-chip1 equal-width-chip"
@@ -81,73 +86,34 @@
 </template>
 
 <script lang="ts" setup>
-  import { useDisplay } from 'vuetify';
-  import { ref, computed } from 'vue';
+import { useDisplay } from 'vuetify';
 
-  const { smAndDown } = useDisplay();
+const { smAndDown } = useDisplay();
 
-  // Массив данных курсов
-  const coursesData = ref([
-    {
-      id: 1,
+// Принимаем данные курса напрямую из родительского компонента
+const props = defineProps({
+  courseData: {
+    type: Object,
+    required: true,
+    default: () => ({
+      id: 0,
       number: '1',
-      title: 'Бриошь',
-      imagePath: '/public/main--menu3.png',
+      title: 'Загрузка...',
+      imagePath: '/public/placeholder.jpg',
       progress: {
-        completed: 8,
-        total: 9
+        completed: 0,
+        total: 0
       },
-      duration: '10 часов',
-      lessons: 9,
-      cards: 11
-    },
-    {
-      id: 2,
-      number: '2',
-      title: 'Хлеб на закваске',
-      imagePath: '/public/course-sourdough.jpg',
-      progress: {
-        completed: 5,
-        total: 12
-      },
-      duration: '15 часов',
-      lessons: 12,
-      cards: 8
-    },
-    {
-      id: 3,
-      number: '3',
-      title: 'Пироги и пирожки',
-      imagePath: '/public/course-pies.jpg',
-      progress: {
-        completed: 3,
-        total: 7
-      },
-      duration: '8 часов',
-      lessons: 7,
-      cards: 5
-    }
-  ]);
+      duration: '0 часов',
+      lessons: 0,
+      cards: 0
+    })
+  }
+});
 
-  // Принимаем ID курса, который нужно отобразить
-  const props = defineProps<{
-    courseId?: number | string
-  }>();
-
-  // Определение событий
-  defineEmits(['click']);
-
-  // Вычисляем данные курса, которые нужно отобразить
-  const courseData = computed(() => {
-    // Если передан ID, находим соответствующий курс
-    if (props.courseId) {
-      const found = coursesData.value.find(course => course.id === props.courseId);
-      return found || coursesData.value[0]; // Если не найден, берем первый
-    }
-    // Если ID не передан, берем первый курс
-    return coursesData.value[0];
-  });
+defineEmits(['click']);
 </script>
+
 
 <style lang="css" scoped>
 .v-card {
