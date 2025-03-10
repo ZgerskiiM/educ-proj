@@ -6,18 +6,25 @@
     >
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
-      <v-breadcrumbs
-        class="ml-0 pl-0 font-weight-light"
-        color="#F48A21"
-      >
-        <v-breadcrumbs-item to="/lk">Личный кабинет</v-breadcrumbs-item>
-        <v-breadcrumbs-item disabled>{{ courseTitle }}</v-breadcrumbs-item>
-      </v-breadcrumbs>
-      <v-card-title class="course-title font-weight-bold pt-0 pl-0 mb-2"
-        style="color: #333132"
-      >
-        Программа курса
-      </v-card-title>
+      <div v-if="!mdAndDown" class="breadcrumbs-container">
+                <v-breadcrumbs
+                    class="mb-1 pl-0 font-weight-light"
+                    color="#F48A21"
+                >
+                    <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
+                    <v-breadcrumbs-item disabled :to="`/course`">{{ courseTitle }}</v-breadcrumbs-item>
+                </v-breadcrumbs>
+            </div>
+            <div v-else class="back-button-container pt-4 pb-2 pl-0 ml-0">
+            <v-btn
+              variant="outlined"
+              density="comfortable"
+              :to="`/lk`"
+              class="back-button text-none"
+            >
+              В профиль
+            </v-btn>
+          </div>
 
       <!-- Индикатор загрузки -->
       <div v-if="loading" class="d-flex justify-center my-5">

@@ -17,7 +17,7 @@
                     class="mb-1 pl-0 font-weight-light"
                     color="#F48A21"
                 >
-                    <v-breadcrumbs-item to="/lk">Личный кабинет</v-breadcrumbs-item>
+                    <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
                     <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseTitle }}</v-breadcrumbs-item>
                     <v-breadcrumbs-item :to="`/course/${courseId}/blocks/${blockId}`">Уроки</v-breadcrumbs-item>
                     <v-breadcrumbs-item disabled>{{ lessonData.lessonTitle }}</v-breadcrumbs-item>
@@ -27,7 +27,7 @@
             <v-btn
               variant="outlined"
               density="comfortable"
-              @click="navigateToLessons"
+              :to="`/course/${courseId}/blocks/${blockId}`"
               class="back-button text-none"
             >
               К урокам

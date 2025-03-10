@@ -4,14 +4,26 @@
     <v-container :width="mdAndDown ? '100vw' : '80vw'">
       <h2 class="mt-5 font-weight-medium">{{ courseName }}</h2>
       <h3 class="mb-2 font-weight-regular">{{ courseAuthor }}</h3>
-      <v-breadcrumbs
-        class="ml-0 pl-0 font-weight-light"
-        color="#F48A21"
-      >
-        <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
-        <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseName }}</v-breadcrumbs-item>
-        <v-breadcrumbs-item disabled>{{ blockTitle }}</v-breadcrumbs-item>
-      </v-breadcrumbs>
+      <div v-if="!mdAndDown" class="breadcrumbs-container">
+                <v-breadcrumbs
+                    class="mb-1 pl-0 font-weight-light"
+                    color="#F48A21"
+                >
+                    <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
+                    <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseName }}</v-breadcrumbs-item>
+                    <v-breadcrumbs-item disabled :to="`/course/${courseId}/blocks`">Уроки</v-breadcrumbs-item>
+                </v-breadcrumbs>
+            </div>
+            <div v-else class="back-button-container pt-4 pb-2 pl-0 ml-0">
+            <v-btn
+              variant="outlined"
+              density="comfortable"
+              :to="`/course/${courseId}`"
+              class="back-button text-none"
+            >
+              К блокам
+            </v-btn>
+          </div>
 
       <v-card-title class="course-title font-weight-bold pt-0 pl-0" style="color: #333132">
         Блок {{ blockNumber }} / {{ blockTitle }}
