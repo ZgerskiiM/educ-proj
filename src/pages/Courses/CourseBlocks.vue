@@ -52,6 +52,8 @@ import { useDisplay } from 'vuetify';
 import Header from "@/shared/ui/PagesElem/Header.vue";
 import CourseCard from "@/shared/ui/PagesElem/CourseCard.vue";
 import { courseUserService } from '@/shared/api/courseUserService';
+import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'; // Путь может быть другим, в зависимости от структуры проекта
+
 
 const { mdAndDown } = useDisplay();
 const router = useRouter();
@@ -84,26 +86,41 @@ const fetchCourseData = async (id) => {
   }
 };
 
+const fixImageUrl = (url) => {
+  if (!url) {
+    return '/public/default-lesson.jpg';
+  }
+
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
+
+  console.log('Исправленный URL:', fixedUrl);
+
+  return fixedUrl;
+};
+
 // Форматирование данных блока для компонента CourseCard
 const formatBlockData = (block, number) => {
   return {
     id: block.blockId,
     number: number.toString(),
     title: block.blockTitle,
-    imagePath: block.imageUrl, // Заглушка для изображений
+    imagePath: fixImageUrl(block.imageUrl), // Заглушка для изображений
     progress: {
       completed: block.completedLessons,
       total: block.lessonsCount
     },
-    duration: `${block.lessonsCount * 1.5} часов`, // Приблизительная длительность
+    duration: `${block.lessonsCount * 2.5} минут`, // Приблизительная длительность
     lessons: block.lessonsCount,
-    cards: Math.round(block.lessonsCount * 1.2) // Примерное количество карт
+    cards: Math.round(block.lessonsCount) // Примерное количество карт
   };
 };
 
+
+
 // Навигация к уроку
 const navigateToLesson = (courseId, blockId) => {
-  router.push(`/course/${courseId}/block/${blockId}`);
+  router.push(`/course/${courseId}/blocks/${blockId}`);
 };
 
 // Получаем ID курса из URL и загружаем данные
@@ -164,8 +181,8 @@ template {
 }
 
 .page-wrapper {
-    background-color: #fafafa;
-    height: 100vh;
+  background-color: #fff8f2;
+  height: 100vh;
 }
 
 .responsive-image {

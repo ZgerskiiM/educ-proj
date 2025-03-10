@@ -2,7 +2,7 @@
   <v-layout>
       <div class="user-header mb-16">
       <v-app-bar
-          class="upper-wrapper justify-center"
+          class="upper-wrapper justify-center rounded-xl ma-2"
           density="default"
           elevation="0"
           scroll-threshold="10"
@@ -12,12 +12,15 @@
               <div class="logo">
                   <img src="/public/school_вектор_полный_w.png" class="logo__img" />
               </div>
+
               <v-btn
                 icon
                 color="white"
                 @click="handleProfileClick"
               >
+
                   <v-icon size="x-large">mdi-account-circle-outline</v-icon>
+
               </v-btn>
           </div>
       </v-container>

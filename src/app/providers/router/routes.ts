@@ -36,17 +36,20 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/course/:courseId',
     name: 'CourseBlocks',
     component: () => import('@/pages/Courses/CourseBlocks.vue'),
-    meta: { requiresAuth: true } // Если требуется авторизация
+    meta: { requiresAuth: true },
   },
   {
-    path: '/blocks',
-    component: () => import("@/pages/Courses/CourseLessons.vue"),
+    path: '/course/:courseId/blocks/:blocksId/lessons/:lessonId',
+    name: 'LessonContent',
+    component: () => import('@/pages/Courses/LessonPage.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/lesson',
-    component: () => import("@/pages/Courses/LessonPage.vue"),
-    meta: { requiresAuth: true }
+    path: '/course/:courseId/blocks/:blocksId',
+    name: 'BlockLessons',
+    component: () => import('@/pages/Courses/CourseLessons.vue'),
+    meta: { requiresAuth: true },
+    alias: '/c/:courseId/b/:blocksId'
   },
   {
     path: '/lk',

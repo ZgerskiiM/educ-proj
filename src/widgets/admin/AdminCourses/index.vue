@@ -96,7 +96,6 @@
       @update="updateCourse"
     />
 
-    <!-- Диалог подтверждения удаления -->
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
         <v-card-title class="text-h5">Подтверждение удаления</v-card-title>
@@ -209,7 +208,7 @@ const fetchCourses = async () => {
 
     // Проверяем наличие ID у каждого курса и выводим предупреждение, если ID отсутствует
     courses.value = coursesData.map(course => {
-      if (course.id === undefined) {
+      if (course.courseId === undefined) {
         console.warn('Курс без ID:', course);
       }
       return course;
@@ -271,7 +270,7 @@ const editCourse = (course) => {
 const confirmDeleteCourse = (course) => {
   console.log('Курс для удаления:', course);
 
-  if (!course || course.id === undefined) {
+  if (!course || course.courseId === undefined) {
     showError('Ошибка: курс не содержит ID');
     console.error('Курс без ID:', course);
     return;
@@ -309,8 +308,6 @@ const createCourse = async (course) => {
   }
 };
 
-// Обновление курса
-// Обновление курса
 // Обновление курса в родительском компоненте
 const updateCourse = async (updatedCourse) => {
   try {
@@ -342,37 +339,45 @@ const deleteLoading = ref(false);
 
 
 // Удаление курса - исправленная функция
+// Функция для удаления курса
+// Функция для удаления курса
+// Удаление курса - исправленная функция
 const deleteCourse = async () => {
-  console.log('Удаляемый курс:', courseToDelete.value);
+  if (!courseToDelete.value) {
+    showError('Ошибка: курс для удаления не выбран');
+    return;
+  }
 
-  if (!courseToDelete.value || courseToDelete.value.id === undefined) {
+  const courseId = courseToDelete.value.courseId;
+
+  // Проверка ID
+  if (!courseId) {
+    console.error('Данные курса:', courseToDelete.value);
     showError('Ошибка: не указан ID курса для удаления');
     return;
   }
 
   try {
     isLoading.value = true;
+    console.log('Отправка запроса на удаление курса с ID:', courseId);
 
-    // Используем ID курса из объекта courseToDelete
-    const courseId = courseToDelete.value.id;
-
-    // Вызываем API для удаления курса
     await courseService.deleteCourse(courseId);
 
-    // Обновляем локальный список курсов после успешного удаления
-    courses.value = courses.value.filter(course => course.id !== courseId);
-
-    showSuccess(`Курс "${courseToDelete.value.title}" успешно удален`);
+    // Закрываем диалог
     deleteDialog.value = false;
+
+    // Обновляем список курсов
+    await fetchCourses();
+
+    showSuccess('Курс успешно удален');
   } catch (error) {
     console.error('Ошибка при удалении курса:', error);
-    showError('Ошибка при удалении курса: ' + (error.response?.data?.message || error.message));
+    showError('Не удалось удалить курс: ' + (error.response?.data?.message || error.message));
   } finally {
     isLoading.value = false;
     courseToDelete.value = null;
   }
 };
-
 // Вспомогательные функции для уведомлений
 const showSuccess = (text) => {
   snackbar.value = {

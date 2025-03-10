@@ -76,11 +76,15 @@ export const getUserCourses = async () => {
       headers: {
         'Authorization': `Bearer ${token}`
       }
-    });
+    }
+  );
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     // Исправляем дублирование протокола в URL
     const processedCourses = response.data.map(course => {
       if (course.imageUrl) {
+
         // Исправляем дублирование https:// в URL
         course.imageUrl = course.imageUrl.replace(/https:\/\/https:\/\//, 'https://');
 
@@ -89,11 +93,107 @@ export const getUserCourses = async () => {
       }
       return course;
     });
-
     return processedCourses;
   } catch (error) {
     console.error('Error fetching user courses:', error);
     throw error;
+  }
+};
+
+
+
+export const getBlockLessons = async (blockId) => {
+  try {
+    const token = AuthService.getToken();
+
+    if (!token) return false;
+
+    // Получаем все курсы пользователя
+    const response = await axios.get(`${API_URL}/users/blocks/${blockId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+    });
+      return response.data
+  } catch (error) {
+    console.error('Ошибка при получении данных блока:', error);
+    throw error;
+  }
+};
+
+// Создаем набор для отслеживания выполняющихся запросов
+const pendingLessonRequests = new Set();
+
+import { LessonStateService } from './LessonStateService';
+
+export const markLessonAsStarted = async (lessonId) => {
+  const requestKey = `start-${lessonId}`;
+
+  // Если урок уже отмечен как начатый или запрос выполняется, пропускаем
+  if (LessonStateService.isLessonStarted(lessonId) ||
+      LessonStateService.isRequestInProgress(requestKey)) {
+    console.log('Урок уже начат или запрос в процессе:', lessonId);
+    return Promise.resolve({});
+  }
+
+  // Отмечаем, что запрос выполняется
+  LessonStateService.startRequest(requestKey);
+
+  try {
+    const token = AuthService.getToken();
+    if (!token) throw new Error('Authentication token is missing');
+
+    const response = await axios.post(`${API_URL}/users/lessons/${lessonId}/start`, {}, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    // Отмечаем урок как начатый
+    LessonStateService.markLessonAsStarted(lessonId);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error marking lesson as started:', error);
+    throw error;
+  } finally {
+    // Завершаем запрос
+    LessonStateService.finishRequest(requestKey);
+  }
+};
+
+export const markLessonAsComplete = async (lessonId) => {
+  const requestKey = `complete-${lessonId}`;
+
+  // Если урок уже отмечен как завершенный или запрос выполняется, пропускаем
+  if (LessonStateService.isLessonCompleted(lessonId) ||
+      LessonStateService.isRequestInProgress(requestKey)) {
+    console.log('Урок уже завершен или запрос в процессе:', lessonId);
+    return Promise.resolve({});
+  }
+
+  // Отмечаем, что запрос выполняется
+  LessonStateService.startRequest(requestKey);
+
+  try {
+    const token = AuthService.getToken();
+    if (!token) throw new Error('Authentication token is missing');
+
+    // Добавляем небольшую задержку для надежности
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const response = await axios.post(`${API_URL}/users/lessons/${lessonId}/complete`, {}, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    // Отмечаем урок как завершенный
+    LessonStateService.markLessonAsCompleted(lessonId);
+
+    return response.data;
+  } catch (error) {
+    console.error('Error marking lesson as complete:', error);
+    throw error;
+  } finally {
+    // Завершаем запрос
+    LessonStateService.finishRequest(requestKey);
   }
 };
 

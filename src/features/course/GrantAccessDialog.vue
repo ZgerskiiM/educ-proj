@@ -71,36 +71,39 @@
 
   // Загрузка списка курсов
   const fetchCourses = async () => {
-    loadingCourses.value = true;
-    try {
-      const response = await getUserService.fetchAllCourses();
-      let coursesData = [];
+  loadingCourses.value = true;
+  try {
+    const response = await getUserService.fetchAllCourses();
+    console.log('Ответ API fetchAllCourses:', response);
 
-      if (Array.isArray(response)) {
-        coursesData = response;
-      } else if (response && typeof response === 'object') {
-        if (Array.isArray(response.content)) {
-          coursesData = response.content;
-        } else if (Array.isArray(response.items)) {
-          coursesData = response.items;
-        } else if (Array.isArray(response.data)) {
-          coursesData = response.data;
-        }
+    let coursesData = [];
+
+    if (Array.isArray(response)) {
+      coursesData = response;
+    } else if (response && typeof response === 'object') {
+      if (Array.isArray(response.content)) {
+        coursesData = response.content;
+      } else if (Array.isArray(response.items)) {
+        coursesData = response.items;
+      } else if (Array.isArray(response.data)) {
+        coursesData = response.data;
       }
-
-      // Убедимся, что у каждого курса есть корректный числовой ID
-      courses.value = coursesData.filter(course => {
-        return course && course.id !== undefined && !isNaN(Number(course.id));
-      });
-
-      console.log('Доступные курсы:', courses.value);
-    } catch (error) {
-      console.error('Ошибка при загрузке курсов:', error);
-      courses.value = [];
-    } finally {
-      loadingCourses.value = false;
     }
-  };
+
+    // Преобразуем courseId в id для совместимости с компонентом
+    courses.value = coursesData.map(course => ({
+      ...course,
+      id: course.courseId || course.id // Используем courseId как id, или оставляем существующий id если он есть
+    }));
+
+    console.log('Преобразованные курсы для UI:', courses.value);
+  } catch (error) {
+    console.error('Ошибка при загрузке курсов:', error);
+    courses.value = [];
+  } finally {
+    loadingCourses.value = false;
+  }
+};
 
   // Предоставление доступа
   const grantAccess = async () => {

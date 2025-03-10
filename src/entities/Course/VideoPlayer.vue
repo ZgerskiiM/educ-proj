@@ -1,9 +1,8 @@
 <template>
-    <div class="video-container" ref="videoContainer">
+    <div class="video-container mb-5" ref="videoContainer">
         <video ref="videoPlayer" @timeupdate="updateProgress" @loadedmetadata="onVideoLoaded" @ended="isPlaying = false"
             @click="togglePlay">
-            <source src="https://file-examples.com/wp-content/uploads/2018/04/file_example_AVI_480_750kB.avi"
-                type="video/avi">
+            <source :src="fixImageUrl(videoUrl)" :type="videoType">
             </source>
         </video>
 
@@ -48,7 +47,50 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed, defineProps } from 'vue'
+
+// Определение пропсов
+const props = defineProps({
+    videoUrl: {
+        type: String,
+        default: ''
+    }
+});
+
+const videoType = computed(() => {
+    if (!props.videoUrl) return 'video/avi';
+
+    // Определяем тип видео на основе расширения файла
+    const extension = props.videoUrl.split('.').pop().toLowerCase();
+    switch (extension) {
+        case 'mp4':
+            return 'video/mp4';
+        case 'webm':
+            return 'video/webm';
+        case 'ogg':
+            return 'video/ogg';
+        case 'avi':
+            return 'video/avi';
+        case 'mov':
+            return 'video/quicktime';
+        default:
+            return 'video/mp4'; // По умолчанию предполагаем mp4
+    }
+});
+
+const fixImageUrl = (url) => {
+  if (!url) {
+    return '/public/default-lesson.jpg';
+  }
+
+  // Исправляем только дублирование протокола, не трогая русские символы
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
+
+  console.log('Исправленный URL:', fixedUrl);
+
+  return fixedUrl;
+};
 
 const videoPlayer = ref(null)
 const videoContainer = ref(null)
@@ -261,7 +303,7 @@ p {
 video {
     display: block;
     background-color: #333132;
-    object-fit: contain;
+    object-fit: cover;
     width: 100%;
     height: 100%;
     cursor: pointer;

@@ -1,6 +1,5 @@
-<!-- Компонент для отображения пустого состояния -->
 <template>
-    <v-card rounded="lg" elevation="0" class="d-flex flex-column align-center justify-center">
+    <v-card rounded="lg" elevation="1" class="empty-card d-flex flex-column align-center justify-center">
       <v-icon :icon="icon" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
       <div class="mb-2">{{ title }}</div>
       <div class="mb-6 text-grey">{{ description }}</div>
@@ -9,7 +8,7 @@
     </v-card>
   </template>
 
-  <script setup>
+<script setup>
   defineProps({
     icon: { type: String, required: true },
     title: { type: String, required: true },
@@ -18,4 +17,12 @@
     actionRoute: { type: String, default: '' },
     actionColor: { type: String, default: '#333132' }
   })
-  </script>
+</script>
+
+<style lang="css" scoped>
+
+.empty-card {
+  min-height: 42vh;
+}
+
+</style>

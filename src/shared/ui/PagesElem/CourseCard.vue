@@ -1,7 +1,7 @@
 <template>
   <v-card
     @click="$emit('click', courseData.id)"
-    :class="smAndDown ? 'course-block-card d-flex flex-column' : 'course-block-card d-flex align-center'"
+    :class="smAndDown ? 'course-block-card d-flex flex-column rounded-sm' : 'rounded-lg	 course-block-card d-flex align-center'"
     width="100%"
     flat
     elevation="1"
@@ -12,13 +12,12 @@
       :aspect-ratio="16/9"
       cover
     />
-
     <div
       :class="smAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'"
     >
       <div class="d-flex align-center justify-space-between">
         <div class="text-h6">
-          <span class="font-weight-bold">Блок {{ courseData.number }} /</span>
+          <span class="font-weight-bold">Блок {{ courseData.number }} / </span>
           <span class="font-weight-light">{{ courseData.title }}</span>
         </div>
 
@@ -89,6 +88,20 @@
 import { useDisplay } from 'vuetify';
 
 const { smAndDown } = useDisplay();
+
+const fixImageUrl = (url) => {
+  if (!url) {
+    return '/public/default-lesson.jpg';
+  }
+
+  // Исправляем только дублирование протокола, не трогая русские символы
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
+
+  console.log('Исправленный URL:', fixedUrl);
+
+  return fixedUrl;
+};
 
 // Принимаем данные курса напрямую из родительского компонента
 const props = defineProps({

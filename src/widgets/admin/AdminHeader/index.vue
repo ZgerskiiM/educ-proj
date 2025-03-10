@@ -3,7 +3,7 @@
       <v-app-bar-nav-icon @click="$emit('toggle-drawer')"></v-app-bar-nav-icon>
       <div class="logo">
         <v-btn>
-          <img src="/public/school_вектор_полный_w.png" class="logo__img" />
+          <img src="/public/logo-another.png" class="logo__img" />
         </v-btn>
       </div>
       <v-toolbar-title>Панель администратора</v-toolbar-title>

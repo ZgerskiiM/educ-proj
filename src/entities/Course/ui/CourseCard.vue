@@ -39,7 +39,9 @@
 
       <v-card-actions class="mt-auto">
         <v-btn
+          variant="flat"
           block
+          class="card-btn-text text-none	font-weight-regular w-50"
           color="#333132"
           prepend-icon="mdi-play"
           :to="`/course/${course.id}`"
@@ -70,5 +72,9 @@
 .cabinet-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-btn-text {
+  font-size: 1rem;
 }
 </style>

@@ -1,8 +1,9 @@
 <template>
-  <v-app>
-    <Header />
+        <Header />
 
-    <v-main class="bg-grey-lighten-5">
+  <v-app>
+
+    <v-main>
       <v-container
     :width="mdAndDown ? '100vw' : '80vw'"
     >
@@ -16,7 +17,8 @@
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
 
-        <ProfileCard v-model="userData" class="mb-8"  @logout="handleLogout" />
+        <ProfileCard v-model="userData" class="mb-8"
+         @logout="handleLogout" />
 
         <CourseList
           :courses="purchasedCourses"
@@ -145,7 +147,10 @@ function handleLogout() {
     imageUrl: ''
   };
 
+  localStorage.removeItem("jwt_token");
+
 }
+
 
 // Добавьте этот код в <script setup>
 // Опции фильтра курсов
@@ -194,6 +199,11 @@ const courseEmptyState = computed(() => {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+.v-main {
+  background-color: #fff8f2  ;
+}
+
+
 .progress-container {
   position: absolute;
   top: 0;
@@ -230,7 +240,7 @@ h1 {
 }
 
 .profile--card {
-  max-height: 40vh;
+  max-height: 5vh;
   min-height: 1vh;
 }
 
@@ -238,6 +248,15 @@ h1 {
   .profile--card {
     max-height: 70vh;
     min-height: 1vh;
+  }
+}
+
+
+
+/* Стили для мобильных устройств */
+@media (max-width: 959px) {
+  .profile--card {
+    max-height: 70vh; /* Для мобильных устройств */
   }
 }
 

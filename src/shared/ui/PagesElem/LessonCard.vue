@@ -15,7 +15,10 @@
     <div class="pa-4">
       <div class="card-text d-flex flex-wrap">
         <span class="font-weight-bold mr-1">{{ courseData.number }} /</span>
-        <span class="font-weight-regular">{{ courseData.title }}</span>
+        <span class="font-weight-light">{{ courseData.title }}</span>
+      </div>
+      <div v-if="courseData.progress" class="progress-badge mt-2" :class="progressClass">
+        {{ progressText }}
       </div>
     </div>
   </v-card>
@@ -23,58 +26,63 @@
 
 <script lang="ts" setup>
 import { useDisplay } from 'vuetify'
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 const { mdAndDown } = useDisplay()
 
-// Массив данных внутри компонента (имитация данных с сервера)
-const coursesData = ref([
-  {
-    id: 1,
-    number: '01',
-    title: 'Основы работы с бриошью',
-    imagePath: '/public/main--menu.JPG'
-  },
-  {
-    id: 2,
-    number: '02',
-    title: 'Продвинутые техники вязания',
-    imagePath: '/public/course-advanced.jpg'
-  },
-  {
-    id: 3,
-    number: '03',
-    title: 'Создание узоров и орнаментов',
-    imagePath: '/public/course-patterns.jpg'
+// Принимаем данные урока
+const props = defineProps({
+  courseData: {
+    type: Object,
+    required: true
   }
-])
+})
 
-// Принимаем ID курса, который нужно отобразить
-const props = defineProps<{
-  courseId?: number | string
-}>()
-
-// Вычисляем данные курса, которые нужно отобразить
-const courseData = computed(() => {
-  // Если передан ID, находим соответствующий курс
-  if (props.courseId) {
-    const found = coursesData.value.find(course => course.id === props.courseId)
-    return found || coursesData.value[0] // Если не найден, берем первый
+// Определяем текст и класс для статуса прогресса
+const progressText = computed(() => {
+  switch(props.courseData.progress) {
+    case 'IN_PROGRESS': return 'В процессе';
+    case 'COMPLETED': return 'Завершено';
+    default: return 'Не начато';
   }
-  // Если ID не передан, берем первый курс
-  return coursesData.value[0]
+})
+
+const progressClass = computed(() => {
+  switch(props.courseData.progress) {
+    case 'IN_PROGRESS': return 'progress-in-progress';
+    case 'COMPLETED': return 'progress-completed';
+    default: return 'progress-not-started';
+  }
 })
 
 defineEmits(['click'])
-
-// В будущем здесь может быть функция для загрузки данных с сервера
-// async function fetchCoursesData() {
-//   // API запрос
-//   // coursesData.value = await response.json()
-// }
 </script>
 
 <style lang="css" scoped>
+
+.progress-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.progress-in-progress {
+  background-color: #fff3e0;
+  color: #F48A21;
+}
+
+.progress-completed {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.progress-not-started {
+  background-color: #f5f5f5;
+  color: #9e9e9e;
+}
+
 .card-text {
     font-size: 0.9rem;
     word-break: break-word;

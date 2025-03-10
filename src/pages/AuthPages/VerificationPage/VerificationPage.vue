@@ -51,7 +51,7 @@ import { useDisplay } from 'vuetify';
 import AuthImage from '@/shared/ui/AuthElements/AuthImages/AuthImage.vue';
 import AuthMobileImage from '@/shared/ui/AuthElements/AuthImages/AuthMobileImage.vue';
 
-const { mdAndDown, smAndDown, sm, smAndUp } = useDisplay()
+const { mdAndDown, smAndUp } = useDisplay()
 
 const router = useRouter();
 const route = useRoute();
@@ -115,7 +115,7 @@ const handleVerify = async () => {
   try {
     const result = await AuthService.verify(formData.email, formData.verificationCode);
     console.log('Данные для сервера:', result);
-    router.push('/');
+    router.push('/login');
   } catch (error: any) {
     if (error.response) {
       console.log('Данные для сервера:', formData.email, formData.verificationCode);

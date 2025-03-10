@@ -10,13 +10,11 @@
   }
 
 .profile--card {
-  max-height: 5vh;
-  min-height: 1vh;
+  max-height: 20vh;
+  min-height: 10vh;
 }
 
-.v-card {
-  min-height: 45vh;
-}
+
 
 .block-card {
   min-height: 16vh;
@@ -61,4 +59,3 @@
 .info-card {
   min-height: 5vh
 }
-

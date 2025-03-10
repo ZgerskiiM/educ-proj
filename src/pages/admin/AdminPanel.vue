@@ -48,3 +48,9 @@
   currentPage.value = page;
 };
   </script>
+
+<style>
+.v-btn {
+  font-weight: 300;
+}
+</style>

@@ -39,20 +39,22 @@
           persistent
           :density="smAndUp ? 'comfortable' : 'compact'"
           variant="outlined"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :append-inner-icon="visiblePassword ? 'mdi-eye-off' : 'mdi-eye'"
           v-model="formData.password"
-          :type="visible ? 'text' : 'password'"
-          @click:append-inner="visible = !visible"
+          :type="visiblePassword ? 'text' : 'password'"
+          @click:append-inner="visiblePassword = !visiblePassword"
         />
         <v-text-field
           class="w-100 mb-0 font-weight-light"
           label="Повторите пароль"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          v-model="formData.password"
-          :type="visible ? 'text' : 'password'"
-          @click:append-inner="visible = !visible"
+          :append-inner-icon="visibleConfirm ? 'mdi-eye-off' : 'mdi-eye'"
+          v-model="formData.confirmPassword"
+          :type="visibleConfirm ? 'text' : 'password'"
+          @click:append-inner="visibleConfirm = !visibleConfirm"
+          :error-messages="passwordMatchError"
+          @input="validatePasswordMatch"
         />
         <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light">
           Уже есть аккаунт? &nbsp
@@ -107,10 +109,13 @@ import AuthMobileImage from '@/shared/ui/AuthElements/AuthImages/AuthMobileImage
 
 const { mdAndDown, smAndUp } = useDisplay()
 
-const visible = ref<boolean>(false)
+const visiblePassword = ref<boolean>(false)
+const visibleConfirm = ref<boolean>(false)
+const passwordMatchError = ref<string>('')
 
 const formData = reactive<FormData>({
   password: '',
+  confirmPassword: '',
   email: '',
   firstName: '',
   lastName: '',
@@ -122,10 +127,25 @@ interface FormData {
   firstName: string
   lastName: string
   password: string
+  confirmPassword: string
   email: string
 }
 
+const validatePasswordMatch = () => {
+  if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
+    passwordMatchError.value = 'Пароли не совпадают'
+  } else {
+    passwordMatchError.value = ''
+  }
+}
+
 const handleSignup = async () => {
+  // Проверяем совпадение паролей перед отправкой
+  if (formData.password !== formData.confirmPassword) {
+    passwordMatchError.value = 'Пароли не совпадают'
+    return
+  }
+
   try {
     const result = await AuthService.signup(
       formData.email,
@@ -148,7 +168,12 @@ const handleSignup = async () => {
 }
 
 const isButtonDisabled = computed(() => {
-  return !formData.email || !formData.password || !formData.firstName || !formData.lastName
+  return !formData.email ||
+         !formData.password ||
+         !formData.firstName ||
+         !formData.lastName ||
+         formData.password !== formData.confirmPassword ||
+         !!passwordMatchError.value
 })
 </script>
 
