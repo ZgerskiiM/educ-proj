@@ -4,12 +4,11 @@
     <v-container :width="mdAndDown ? '100vw' : '80vw'">
       <h2 class="mt-5 font-weight-medium">{{ courseName }}</h2>
       <h3 class="mb-2 font-weight-regular">{{ courseAuthor }}</h3>
-      <!-- Обновленные хлебные крошки с правильными ссылками -->
       <v-breadcrumbs
         class="ml-0 pl-0 font-weight-light"
         color="#F48A21"
       >
-        <v-breadcrumbs-item to="/">Главная</v-breadcrumbs-item>
+        <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
         <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseName }}</v-breadcrumbs-item>
         <v-breadcrumbs-item disabled>{{ blockTitle }}</v-breadcrumbs-item>
       </v-breadcrumbs>
@@ -41,7 +40,7 @@
               title: lesson.lessonTitle,
               imagePath: fixImageUrl(lesson.imageUrl),
             }"
-            @click="navigateToLesson(lesson.lessonId)"
+            @click="navigateToLesson(lesson.lessonId, lesson.imageUrl)"
           />
         </template>
       </v-container>
@@ -111,9 +110,17 @@ const fetchBlockData = async () => {
 }
 
 // Обновленная функция навигации к уроку с сохранением иерархии маршрута
-const navigateToLesson = (lessonId) => {
-  router.push(`/course/${courseId.value}/blocks/${blocksId.value}/lessons/${lessonId}`)
-}
+const navigateToLesson = (lessonId, imageUrl) => {
+  // Сохраняем URL изображения в localStorage
+  if (imageUrl) {
+    const fixedImageUrl = fixImageUrl(imageUrl);
+    console.log(`Сохраняем изображение урока ${lessonId}:`, fixedImageUrl);
+    localStorage.setItem(`lesson_image_${lessonId}`, fixedImageUrl);
+  }
+
+  // Переходим на страницу урока
+  router.push(`/course/${courseId.value}/blocks/${blocksId.value}/lessons/${lessonId}`);
+};
 
 // Загружаем данные при монтировании компонента
 onMounted(() => {

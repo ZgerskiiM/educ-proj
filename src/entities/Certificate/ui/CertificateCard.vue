@@ -24,19 +24,10 @@
     </v-card-text>
     <v-card-actions class="mt-auto d-flex align-center justify-center ml-2 mr-2">
       <v-btn
-        class="card-btn-text text-none font-weight-regular w-50"
-        color="#333132"
-        prepend-icon="mdi-open-in-new"
-        variant="flat"
-        @click="$emit('open', certificate.id)"
-      >
-        Открыть
-      </v-btn>
-      <v-btn
         color="#333132"
         variant="outlined"
         prepend-icon="mdi-download"
-        class="card-btn-text text-none	font-weight-regular w-50"
+        class="card-btn-text text-none	font-weight-regular w-100"
         @click="$emit('download', certificate.id)"
       >
         Скачать

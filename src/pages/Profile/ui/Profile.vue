@@ -1,8 +1,6 @@
 <template>
-        <Header />
-
   <v-app>
-
+    <Header />
     <v-main>
       <v-container
     :width="mdAndDown ? '100vw' : '80vw'"
@@ -31,6 +29,8 @@
           :certificates="certificates"
         />
       </v-container>
+      <AppFooter/>
+
     </v-main>
   </v-app>
 </template>
@@ -44,7 +44,8 @@ import CourseList from '@/widgets/CourseList/index.vue';
 import CertificateList from '@/widgets/CertificateList/index.vue';
 import { AuthService } from '@/app/features/auth/model/Auth';
 import { useDisplay } from 'vuetify';
-import { getUserCourses } from '@/shared/api/UserService';  // Правильный путь импорта
+import { getUserCourses } from '@/shared/api/UserService';
+import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue';
 
 const { mdAndDown } = useDisplay();
 const courseFilter = ref('all');

@@ -17,7 +17,7 @@
                     class="mb-1 pl-0 font-weight-light"
                     color="#F48A21"
                 >
-                    <v-breadcrumbs-item to="/">Главная</v-breadcrumbs-item>
+                    <v-breadcrumbs-item to="/lk">Личный кабинет</v-breadcrumbs-item>
                     <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseTitle }}</v-breadcrumbs-item>
                     <v-breadcrumbs-item :to="`/course/${courseId}/blocks/${blockId}`">Уроки</v-breadcrumbs-item>
                     <v-breadcrumbs-item disabled>{{ lessonData.lessonTitle }}</v-breadcrumbs-item>
@@ -37,7 +37,10 @@
                 <div class="content-wrapper flex-column">
                     <div class="video-block mb-0 pt-0">
                         <h2 class="font-weight-medium mb-3">{{ lessonData.lessonTitle }}</h2>
-                        <VideoPlayer :video-url="lessonData.videoUrl" />
+                        <VideoPlayer
+                        :video-url="lessonData.videoUrl"
+                        :poster-image="lessonImageUrl"
+                        />
                         <div class="nav--buttons pt-0 mt-0 mb-1 d-flex justify-end">
                           <v-btn
                             class="text-none rounded-lg"
@@ -56,13 +59,13 @@
                         </v-btn>
 
                         <v-btn
-    class="text-none rounded-lg ml-4"
-    :width="mdAndDown ? '40vw' : 'regular'"
-    variant="outlined"
-    color="#333132"
-    @click="isLastLesson ? completeLastLesson() : navigateToNextLesson()"
-    :loading="completingLesson"
->
+                          class="text-none rounded-lg ml-4"
+                          :width="mdAndDown ? '40vw' : 'regular'"
+                          variant="outlined"
+                          color="#333132"
+                          @click="isLastLesson ? completeLastLesson() : navigateToNextLesson()"
+                          :loading="completingLesson"
+                      >
     <template v-if="mdAndDown">
         {{ isLastLesson ? 'Завершить' : 'Следующий' }}
         <v-icon>mdi-arrow-right</v-icon>
@@ -114,7 +117,48 @@ const { mdAndDown } = useDisplay();
 const route = useRoute();
 const router = useRouter();
 
+const lessonImageUrl = ref('');
 
+
+const fixImageUrl = (url) => {
+  if (!url) {
+    return '/public/default-lesson.jpg';
+  }
+
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
+
+
+  return fixedUrl;
+};
+
+onMounted(async () => {
+  const currentLessonId = route.params.lessonId;
+
+  // Получаем сохраненный URL изображения из localStorage
+  const savedImageUrl = localStorage.getItem(`lesson_image_${currentLessonId}`);
+
+  if (savedImageUrl) {
+    console.log('Получено изображение урока из localStorage:', savedImageUrl);
+    lessonImageUrl.value = savedImageUrl;
+
+    // Удаляем из хранилища после использования
+    localStorage.removeItem(`lesson_image_${currentLessonId}`);
+  }
+
+  // Выполняем загрузку данных урока и списка уроков
+  await Promise.all([
+    fetchLessonData(),
+    fetchAllLessons()
+  ]);
+
+  // Если изображение не было получено из localStorage, используем из данных урока
+  if (!lessonImageUrl.value && lessonData.value.imageUrl) {
+    lessonImageUrl.value = fixImageUrl(lessonData.value.imageUrl);
+  }
+});
+
+// В начале script setup
 
 // Состояние
 const loading = ref(true);
@@ -123,7 +167,8 @@ const lessonData = ref({
     lessonTitle: '',
     videoUrl: '',
     description: '',
-    sheetUrl: ''
+    sheetUrl: '',
+    imageUrl: '',
 });
 
 // Параметры навигации
@@ -182,18 +227,32 @@ const startLesson = async (lessonId) => {
 // Навигация к следующему уроку
 const navigateToNextLesson = async () => {
   if (completingLesson.value) {
+    console.log('Переход уже выполняется, пропускаем');
     return;
   }
 
   if (!nextLessonId.value) {
+    console.log('Нет следующего урока');
     return;
   }
 
   completingLesson.value = true;
 
   try {
+    // Сохраняем информацию о картинке следующего урока перед переходом
+    const nextLesson = allLessons.value.find(
+      lesson => (lesson.id || lesson.lessonId) === nextLessonId.value
+    );
+
+    if (nextLesson && (nextLesson.imageUrl || nextLesson.lessonImage)) {
+      const nextImageUrl = fixImageUrl(nextLesson.imageUrl || nextLesson.lessonImage);
+      console.log('Сохраняем изображение следующего урока:', nextImageUrl);
+      localStorage.setItem(`lesson_image_${nextLessonId.value}`, nextImageUrl);
+    }
+
     // Отмечаем урок как завершенный
     await markLessonAsComplete(lessonId.value);
+    console.log('Урок отмечен как завершенный');
 
     // Дожидаемся завершения запроса
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -201,9 +260,12 @@ const navigateToNextLesson = async () => {
     // Проверяем, что компонент все еще смонтирован
     if (nextLessonId.value) {
       const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`;
+      console.log('Переход к следующему уроку:', nextUrl);
 
       // Очищаем состояние текущего урока перед переходом
-      LessonStateService.resetLessonState(lessonId.value);
+      if (typeof LessonStateService !== 'undefined') {
+        LessonStateService.resetLessonState(lessonId.value);
+      }
 
       // Переходим к следующему уроку
       router.push(nextUrl);
@@ -290,6 +352,9 @@ const completingLesson = ref(false);
 // Навигация к следующему уроку с отметкой о завершении
 
 
+
+
+
 // Получение данных урока
 const fetchLessonData = async () => {
   loading.value = true;
@@ -297,11 +362,18 @@ const fetchLessonData = async () => {
 
   try {
     const currentLessonId = route.params.lessonId;
+    console.log('Загрузка данных для урока:', currentLessonId);
 
     const data = await courseService.getLessonDetails(currentLessonId);
+    console.log('Получены данные урока:', data);
 
     // Обновляем данные в интерфейсе
     lessonData.value = data;
+
+    // Обновляем URL изображения, если его еще нет
+    if (!lessonImageUrl.value && data.imageUrl) {
+      lessonImageUrl.value = fixImageUrl(data.imageUrl);
+    }
 
     // Отмечаем урок как начатый после загрузки данных
     await startLesson(currentLessonId);
@@ -330,6 +402,31 @@ watch(() => route.params.lessonId, (newLessonId, oldLessonId) => {
   }
 }, { immediate: true });
 
+watch(() => route.params.lessonId, (newLessonId) => {
+  if (newLessonId) {
+    // Пытаемся получить картинку из localStorage
+    const savedImageUrl = localStorage.getItem(`lesson_image_${newLessonId}`);
+
+    if (savedImageUrl) {
+      console.log('Получено изображение урока из localStorage при переходе:', savedImageUrl);
+      lessonImageUrl.value = savedImageUrl;
+      localStorage.removeItem(`lesson_image_${newLessonId}`);
+    } else {
+      // Если картинки нет в localStorage, ищем в списке уроков
+      const currentLesson = allLessons.value.find(
+        lesson => (lesson.id || lesson.lessonId) === newLessonId
+      );
+
+      if (currentLesson && (currentLesson.imageUrl || currentLesson.lessonImage)) {
+        lessonImageUrl.value = fixImageUrl(currentLesson.imageUrl || currentLesson.lessonImage);
+      } else {
+        // Если не нашли, сбрасываем URL изображения (будет обновлен в fetchLessonData)
+        lessonImageUrl.value = '';
+      }
+    }
+  }
+}, { immediate: true });
+
 // Получение всех уроков блока (для навигации)
 const fetchAllLessons = async () => {
     try {
@@ -342,9 +439,29 @@ const fetchAllLessons = async () => {
 
 // Навигация к предыдущему уроку
 const navigateToPreviousLesson = () => {
-    if (previousLessonId.value) {
-        router.push(`/course/${courseId.value}/blocks/${blockId.value}/lessons/${previousLessonId.value}`);
-    }
+  if (!previousLessonId.value) {
+    console.log('Нет предыдущего урока');
+    return;
+  }
+
+  // Сохраняем информацию о картинке предыдущего урока перед переходом
+  const prevLesson = allLessons.value.find(
+    lesson => (lesson.id || lesson.lessonId) === previousLessonId.value
+  );
+
+  if (prevLesson && (prevLesson.imageUrl || prevLesson.lessonImage)) {
+    const prevImageUrl = fixImageUrl(prevLesson.imageUrl || prevLesson.lessonImage);
+    console.log('Сохраняем изображение предыдущего урока:', prevImageUrl);
+    localStorage.setItem(`lesson_image_${previousLessonId.value}`, prevImageUrl);
+  }
+
+  // Очищаем состояние текущего урока перед переходом, если сервис доступен
+  if (typeof LessonStateService !== 'undefined') {
+    LessonStateService.resetLessonState(lessonId.value);
+  }
+
+  // Переходим к предыдущему уроку
+  router.push(`/course/${courseId.value}/blocks/${blockId.value}/lessons/${previousLessonId.value}`);
 };
 
 onBeforeUnmount(() => {
@@ -356,10 +473,10 @@ onBeforeUnmount(() => {
 
 // Загрузка данных при монтировании компонента
 onMounted(async () => {
-    await Promise.all([
-        fetchLessonData(),
-        fetchAllLessons()
-    ]);
+  await Promise.all([
+    fetchLessonData(),
+    fetchAllLessons()
+  ]);
 });
 
 </script>
@@ -369,9 +486,11 @@ p {
     font-size: 1.1rem
 }
 
+
+
 .page-wrapper {
   background-color: #fff8f2;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .panel-text {

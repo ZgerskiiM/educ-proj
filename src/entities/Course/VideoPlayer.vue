@@ -1,10 +1,16 @@
 <template>
     <div class="video-container mb-5" ref="videoContainer">
-        <video ref="videoPlayer" @timeupdate="updateProgress" @loadedmetadata="onVideoLoaded" @ended="isPlaying = false"
-            @click="togglePlay">
-            <source :src="fixImageUrl(videoUrl)" :type="videoType">
-            </source>
-        </video>
+            <video
+                ref="videoPlayer"
+                @timeupdate="updateProgress"
+                @loadedmetadata="onVideoLoaded"
+                @ended="isPlaying = false"
+                @click="togglePlay"
+                :poster="posterImage"
+            >
+                <source :src="fixImageUrl(videoUrl)" :type="videoType">
+                </source>
+            </video>
         <div class="video-controls" :class="{ 'controls-visible': controlsVisible }">
             <div class="video-progress">
                 <div class="progress-bar" :style="{ width: `${progressPercent}%` }"></div>
@@ -46,10 +52,14 @@ import { ref, onMounted, onUnmounted, computed, defineProps } from 'vue'
 
 // Определение пропсов
 const props = defineProps({
-    videoUrl: {
-        type: String,
-        default: ''
-    }
+  videoUrl: {
+    type: String,
+    default: ''
+  },
+  posterImage: { // Новый проп для изображения
+    type: String,
+    default: ''
+  }
 });
 
 const videoType = computed(() => {
@@ -81,7 +91,6 @@ const fixImageUrl = (url) => {
   // Исправляем только дублирование протокола, не трогая русские символы
   let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
   fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
-
 
   return fixedUrl;
 };
@@ -233,6 +242,8 @@ onMounted(() => {
     }
 })
 
+
+
 onUnmounted(() => {
     // Удаление обработчиков событий при уничтожении компонента
     window.removeEventListener('keydown', handleKeyDown)
@@ -250,7 +261,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-
 p {
     font-size: 1.1rem
 }
@@ -261,7 +271,6 @@ p {
 
 .content-wrapper {
     gap: 6vw;
-
 }
 
 .lesson-sidebar {
@@ -282,25 +291,40 @@ p {
     flex-grow: 1;
 }
 
+/* Новый обертывающий контейнер для видео */
+.video-wrapper {
+    width: 100%;
+    position: relative;
+    margin-bottom: 2vw;
+}
+
 .video-container {
     position: relative;
     width: 100%;
-    height: 67vh;
+    padding-top: 56.25%; /* Соотношение сторон 16:9 (9/16 = 0.5625) */
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background-color: #333132;;
-    margin-bottom: 2vw;
-    aspect-ratio: 16/9;
+    background-color: #333132;
 }
 
 video {
-    display: block;
-    background-color: #333132;
-    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    background-color: #333132;
+    object-fit: cover;
     cursor: pointer;
+    transition: object-fit 0.3s ease; /* Добавляем плавный переход */
+}
+
+.video-container:fullscreen video {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* В полноэкранном режиме используем contain */
 }
 
 .big-play-button {
@@ -340,6 +364,14 @@ video {
 
 .controls-visible {
     opacity: 1;
+}
+
+@media (min-width: 1024px) {
+    .video-container {
+        height: 0;
+        padding-top: calc(40vh + 15vw); /* Комбинация vh и vw для более адаптивной высоты */
+        max-height: 70vh; /* Максимальная высота относительно вьюпорта */
+    }
 }
 
 .video-container:hover .video-controls {
@@ -444,6 +476,7 @@ video {
 .video-container:fullscreen {
     width: 100%;
     height: 100%;
+    padding-top: 0; /* Сбрасываем padding в полноэкранном режиме */
     border-radius: 0;
     background-color: black;
     display: flex;
@@ -452,6 +485,7 @@ video {
 }
 
 .video-container:fullscreen video {
+    position: relative; /* Сбрасываем absolut-позиционирование */
     max-width: 100%;
     max-height: 100%;
 }
@@ -486,13 +520,13 @@ video {
     margin-top: 1.5vh;
 }
 
-@media (max-width: 821px ) {
+@media (max-width: 821px) {
+    /* Сохраняем соотношение сторон 16:9 на мобильных устройствах */
     .video-container {
-    width: 100%;
-    height: 100%;
+        width: 100%;
+        padding-top: 56.25%; /* 16:9 */
     }
 }
-
 
 @media (max-width: 819px) {
     .content-wrapper {
@@ -516,10 +550,7 @@ video {
         width: 40px;
     }
 
-    .video-container {
-        aspect-ratio: 16/9;
-    }
-
+    /* Элементы управления адаптированы для мобильных устройств */
     .big-play-button {
         width: 60px;
         height: 60px;
@@ -529,25 +560,44 @@ video {
         font-size: 44px !important;
     }
 
+    .video-controls {
+        padding: 10px;
+    }
+
+    .video-progress {
+        height: 4px;
+        margin-bottom: 8px;
+    }
+
+    .progress-seek {
+        height: 15px;
+        top: -5px;
+    }
+
+    .control-btn {
+        font-size: 18px;
+        padding: 4px;
+        margin-right: 5px;
+    }
+
     h1 {
-    font-size: 1.4rem;
+        font-size: 1.4rem;
     }
 
     h2 {
-    font-size: 1.1rem;
+        font-size: 1.1rem;
     }
 
     h3 {
-    font-size: 0.9rem;
+        font-size: 0.9rem;
     }
 
     .course-title {
-    font-size: 1.2rem;
+        font-size: 1.2rem;
     }
 
     .v-breadcrumbs {
-    font-size: 0.62rem;
+        font-size: 0.62rem;
     }
 }
-
 </style>

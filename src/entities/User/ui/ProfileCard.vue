@@ -1,5 +1,6 @@
 <template>
-  <div v-if="!mdAndDown && !isEditing" class="desktop-buttons mt-2 mb-2 ">
+<div v-if="!mdAndDown && !isEditing" class="desktop-buttons mt-2 mb-2 d-flex">
+  <div class="d-flex">
     <v-btn
       class="profile-card--button font-weight-light text-none"
       variant="outlined"
@@ -19,6 +20,19 @@
       Выйти
     </v-btn>
   </div>
+
+  <v-btn
+    class="profile-card--button font-weight-light text-none ml-auto"
+    color="primary"
+    variant="outlined"
+    prepend-icon="mdi-face-agent"
+    href="https://t.me/babichbaker_course"
+    target="_blank"
+  >
+    Связаться с поддержкой
+  </v-btn>
+</div>
+
   <v-card class="profile--card mb-5  rounded-xm">
     <v-card-text>
       <v-row>
@@ -121,29 +135,30 @@
               v-model="editedData.firstName"
               label="Имя"
               variant="outlined"
-              class="mb-3"
-              density="comfortable"
+              class="mb-1"
+              density="compact"
             ></v-text-field>
 
             <v-text-field
               v-model="editedData.lastName"
               label="Фамилия"
               variant="outlined"
-              class="mb-3"
-              density="comfortable"
+              class="mb-1"
+              density="compact"
             ></v-text-field>
 
             <v-text-field
               v-model="editedData.email"
               label="Email"
               variant="outlined"
-              class="mb-3"
-              density="comfortable"
+              class="mb-1"
+              density="compact"
               disabled
             ></v-text-field>
 
             <div class="d-flex gap-3">
               <v-btn
+                class="profile-card--button font-weight-light text-none"
                 color="#333132"
                 @click="saveChanges"
               >
@@ -154,7 +169,7 @@
                 color="grey"
                 variant="outlined"
                 @click="cancelEditing"
-                class="ml-2"
+                class="ml-2 profile-card--button font-weight-light text-none"
               >
                 Отмена
               </v-btn>

@@ -9,8 +9,10 @@
       <v-breadcrumbs
         class="ml-0 pl-0 font-weight-light"
         color="#F48A21"
-        :items="['Главная', courseTitle]"
-      />
+      >
+        <v-breadcrumbs-item to="/lk">Личный кабинет</v-breadcrumbs-item>
+        <v-breadcrumbs-item disabled>{{ courseTitle }}</v-breadcrumbs-item>
+      </v-breadcrumbs>
       <v-card-title class="course-title font-weight-bold pt-0 pl-0 mb-2"
         style="color: #333132"
       >
