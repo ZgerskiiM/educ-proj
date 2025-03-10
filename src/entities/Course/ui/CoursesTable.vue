@@ -11,7 +11,6 @@
           <v-img :src="item.image" alt="Course image"></v-img>
         </v-avatar>
       </template>
-
       <template v-slot:item.price="{ item }">
         <div v-if="item.discountPrice">
           <span class="text-decoration-line-through">{{ item.price }} ₽</span>
@@ -21,11 +20,9 @@
           {{ item.price }} ₽
         </div>
       </template>
-
       <template v-slot:item.status="{ item }">
         <status-chip :status="item.status" />
       </template>
-
       <template v-slot:item.actions="{ item }">
         <v-btn icon small @click="$emit('view-stats', item)" class="mr-2">
           <v-icon small>mdi-chart-line</v-icon>

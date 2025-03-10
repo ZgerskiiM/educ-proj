@@ -72,7 +72,6 @@ async function fetchUserCourses() {
     // Проверяем наличие токена перед запросом
     const token = AuthService.getToken();
     if (!token) {
-      console.log('Пользователь не авторизован');
       purchasedCourses.value = []; // Пустой массив, если нет токена
       return;
     }

@@ -89,7 +89,6 @@ export const getUserCourses = async () => {
         course.imageUrl = course.imageUrl.replace(/https:\/\/https:\/\//, 'https://');
 
         // Логирование для отладки
-        console.log(`Исправленный URL для курса ${course.id}:`, course.imageUrl);
       }
       return course;
     });
@@ -132,7 +131,6 @@ export const markLessonAsStarted = async (lessonId) => {
   // Если урок уже отмечен как начатый или запрос выполняется, пропускаем
   if (LessonStateService.isLessonStarted(lessonId) ||
       LessonStateService.isRequestInProgress(requestKey)) {
-    console.log('Урок уже начат или запрос в процессе:', lessonId);
     return Promise.resolve({});
   }
 
@@ -166,7 +164,6 @@ export const markLessonAsComplete = async (lessonId) => {
   // Если урок уже отмечен как завершенный или запрос выполняется, пропускаем
   if (LessonStateService.isLessonCompleted(lessonId) ||
       LessonStateService.isRequestInProgress(requestKey)) {
-    console.log('Урок уже завершен или запрос в процессе:', lessonId);
     return Promise.resolve({});
   }
 

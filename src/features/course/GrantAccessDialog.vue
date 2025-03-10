@@ -74,7 +74,6 @@
   loadingCourses.value = true;
   try {
     const response = await getUserService.fetchAllCourses();
-    console.log('Ответ API fetchAllCourses:', response);
 
     let coursesData = [];
 
@@ -96,7 +95,6 @@
       id: course.courseId || course.id // Используем courseId как id, или оставляем существующий id если он есть
     }));
 
-    console.log('Преобразованные курсы для UI:', courses.value);
   } catch (error) {
     console.error('Ошибка при загрузке курсов:', error);
     courses.value = [];
@@ -118,7 +116,7 @@
     }
 
     const courseId = Number(selectedCourseId.value.id);
-    console.log('Предоставление доступа к курсу:', {
+    console.log('', {
       email: userEmail.value,
       courseId: courseId,
       course: selectedCourseId.value

@@ -167,14 +167,12 @@ const lessonStarted = ref(false);
 const startLesson = async (lessonId) => {
   // Проверяем состояние из сервиса
   if (LessonStateService.isLessonStarted(lessonId)) {
-    console.log('Урок уже отмечен как начатый, пропускаем');
     lessonStarted.value = true;
     return;
   }
 
   try {
     await markLessonAsStarted(lessonId);
-    console.log('Урок отмечен как начатый:', lessonId);
     lessonStarted.value = true;
   } catch (error) {
     console.error('Ошибка при отметке начала урока:', error);
@@ -184,12 +182,10 @@ const startLesson = async (lessonId) => {
 // Навигация к следующему уроку
 const navigateToNextLesson = async () => {
   if (completingLesson.value) {
-    console.log('Переход уже выполняется, пропускаем');
     return;
   }
 
   if (!nextLessonId.value) {
-    console.log('Нет следующего урока');
     return;
   }
 
@@ -198,7 +194,6 @@ const navigateToNextLesson = async () => {
   try {
     // Отмечаем урок как завершенный
     await markLessonAsComplete(lessonId.value);
-    console.log('Урок отмечен как завершенный');
 
     // Дожидаемся завершения запроса
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -206,7 +201,6 @@ const navigateToNextLesson = async () => {
     // Проверяем, что компонент все еще смонтирован
     if (nextLessonId.value) {
       const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`;
-      console.log('Переход к следующему уроку:', nextUrl);
 
       // Очищаем состояние текущего урока перед переходом
       LessonStateService.resetLessonState(lessonId.value);
@@ -232,7 +226,6 @@ const isLastLesson = computed(() => {
 // Функция для завершения последнего урока
 const completeLastLesson = async () => {
   if (completingLesson.value) {
-    console.log('Завершение уже выполняется, пропускаем');
     return;
   }
 
@@ -241,7 +234,6 @@ const completeLastLesson = async () => {
   try {
     // Отмечаем урок как завершенный
     await markLessonAsComplete(lessonId.value);
-    console.log('Последний урок отмечен как завершенный');
 
     // Дожидаемся завершения запроса
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -264,11 +256,9 @@ const completeLastLesson = async () => {
 
 // Сбрасываем состояние отметки начала при смене урока
 watch(() => route.params.lessonId, (newLessonId, oldLessonId) => {
-  console.log('Изменился ID урока в URL:', oldLessonId, '->', newLessonId);
   lessonStarted.value = false; // Сбрасываем флаг начала урока
 
   if (newLessonId && newLessonId !== oldLessonId) {
-    console.log('Загружаем данные нового урока');
     // Сначала обнуляем текущие данные, чтобы показать загрузку
     lessonData.value = {
       lessonTitle: '',
@@ -286,16 +276,11 @@ watch(() => route.params.lessonId, (newLessonId, oldLessonId) => {
 }, { immediate: true });
 
 watch(allLessons, () => {
-  console.log('Все уроки в блоке:', allLessons.value);
-  console.log('ID текущего урока:', lessonId.value);
-  console.log('Индекс текущего урока:', currentLessonIndex.value);
-  console.log('ID предыдущего урока:', previousLessonId.value);
-  console.log('ID следующего урока:', nextLessonId.value);
+
 }, { immediate: true });
 
 watch([() => route.params.courseId, () => route.params.blocksId], ([newCourseId, newBlockId]) => {
   if (newCourseId && newBlockId) {
-    console.log('Изменились ID курса или блока, перезагружаем уроки');
     fetchAllLessons();
   }
 });
@@ -312,10 +297,8 @@ const fetchLessonData = async () => {
 
   try {
     const currentLessonId = route.params.lessonId;
-    console.log('Загрузка данных для урока:', currentLessonId);
 
     const data = await courseService.getLessonDetails(currentLessonId);
-    console.log('Получены данные урока:', data);
 
     // Обновляем данные в интерфейсе
     lessonData.value = data;
@@ -332,9 +315,7 @@ const fetchLessonData = async () => {
 };
 
 watch(() => route.params.lessonId, (newLessonId, oldLessonId) => {
-  console.log('Изменился ID урока в URL:', oldLessonId, '->', newLessonId);
   if (newLessonId && newLessonId !== oldLessonId) {
-    console.log('Загружаем данные нового урока');
     // Сначала обнуляем текущие данные, чтобы показать загрузку
     lessonData.value = {
       lessonTitle: '',

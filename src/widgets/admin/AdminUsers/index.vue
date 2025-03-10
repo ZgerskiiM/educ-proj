@@ -118,21 +118,7 @@ const onAccessGranted = ({ email, courseId, courseName }) => {
   showSuccess(`Доступ к курсу "${courseName}" успешно предоставлен пользователю ${email}`);
 };
 
-const applyFilters = () => {
-  console.log('Applying user filters');
-};
 
-const viewUserDetails = (user) => {
-  console.log('View user details:', user.id);
-};
-
-const removeAdmin = (user) => {
-  console.log('Remove admin role from user:', user.id);
-};
-
-const makeAdmin = (user) => {
-  console.log('Make user an admin:', user.id);
-};
 
 // Вспомогательные функции для отображения уведомлений
 const showSuccess = (text) => {

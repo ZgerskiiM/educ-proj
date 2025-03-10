@@ -83,7 +83,6 @@ const fixImageUrl = (url) => {
   let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
   fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
 
-  console.log('Исправленный URL:', fixedUrl);
 
   return fixedUrl;
 };
@@ -98,8 +97,7 @@ const fetchBlockData = async () => {
     const data = await getBlockLessons(blocksId.value)
 
     // Логируем для отладки
-    console.log('Полученные данные блока:', data);
-    console.log('Уроки в блоке:', data.lessons);
+
 
     // Обновляем состояние
     blockTitle.value = data.blockTitle

@@ -153,7 +153,6 @@ const handleSignup = async () => {
       formData.firstName,
       formData.lastName,
     )
-    console.log('Регистрация успешна:', result)
     router.push({ path: '/verify', query: { email: formData.email } })
   } catch (error: any) {
     if (error.response) {

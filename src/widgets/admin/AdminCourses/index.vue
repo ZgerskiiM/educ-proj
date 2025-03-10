@@ -187,7 +187,6 @@ const fetchCourses = async () => {
   try {
     isLoading.value = true;
     const response = await courseService.fetchAllCourses();
-    console.log('Ответ API fetchAllCourses:', response);
 
     let coursesData = [];
 
@@ -268,7 +267,6 @@ const editCourse = (course) => {
 
 // Подтверждение удаления курса
 const confirmDeleteCourse = (course) => {
-  console.log('Курс для удаления:', course);
 
   if (!course || course.courseId === undefined) {
     showError('Ошибка: курс не содержит ID');
@@ -287,7 +285,6 @@ const createCourse = async (course) => {
 
     // Создаем курс и получаем ответ сервера
     const newCourse = await courseService.createCourseWithImage(course, course.imageFile);
-    console.log('Ответ сервера после создания курса:', newCourse);
 
     // Важно! Добавляем новый курс в список с ID, полученным от сервера
     if (newCourse && newCourse.id !== undefined) {
@@ -317,11 +314,10 @@ const updateCourse = async (updatedCourse) => {
     }
 
     isLoading.value = true;
-    console.log('Отправка запроса на обновление курса:', updatedCourse);
 
     // Обновляем метод в courseService
     const result = await courseService.updateCourse(updatedCourse.id, updatedCourse);
-    console.log('Результат обновления курса:', result);
+    console.log('', result);
 
     // Обновляем список курсов
     await fetchCourses();
@@ -359,7 +355,6 @@ const deleteCourse = async () => {
 
   try {
     isLoading.value = true;
-    console.log('Отправка запроса на удаление курса с ID:', courseId);
 
     await courseService.deleteCourse(courseId);
 

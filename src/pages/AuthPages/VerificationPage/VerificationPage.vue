@@ -96,11 +96,9 @@ const startResendTimer = () => {
 const resendCode = async () => {
   try {
     const reset = await AuthService.resend(formData.email);
-    console.log('Данные для сервера:', reset);
     startResendTimer();
   } catch (error: any) {
     if (error.response) {
-      console.log('Данные для сервера:', formData.email);
       console.error('Ошибка сервера:', error.response.data);
       console.error('Код статуса:', error.response.status);
     } else if (error.request) {
@@ -114,11 +112,9 @@ const resendCode = async () => {
 const handleVerify = async () => {
   try {
     const result = await AuthService.verify(formData.email, formData.verificationCode);
-    console.log('Данные для сервера:', result);
     router.push('/login');
   } catch (error: any) {
     if (error.response) {
-      console.log('Данные для сервера:', formData.email, formData.verificationCode);
       console.error('Ошибка сервера:', error.response.data);
       console.error('Код статуса:', error.response.status);
     } else if (error.request) {

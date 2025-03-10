@@ -28,7 +28,6 @@ export const courseService = {
       // Именно 'imageFile', как ожидает сервер
       formData.append('imageFile', imageFile);
 
-      console.log('Отправка файла:', imageFile.name, 'размер:', imageFile.size);
 
       const response = await axios.post(
         `${API_URL}/courses/${courseId}/image`,
@@ -118,7 +117,6 @@ async updateCourse(courseId, courseData) {
 
   // Удаление курса
   async deleteCourse(courseId) {
-    console.log(`Отправка запроса на удаление курса с ID ${courseId}`);
 
     if (!courseId) {
       throw new Error('ID курса не указан');
@@ -165,7 +163,6 @@ async updateCourse(courseId, courseData) {
 // Получение блоков курса
 async getBlocksByCourseId(courseId) {
   try {
-    console.log('Запрос блоков для курса ID:', courseId);
 
     const response = await axios.get(`${API_URL}/courses/${courseId}/details`, {
       headers: {
@@ -173,7 +170,6 @@ async getBlocksByCourseId(courseId) {
       }
     });
 
-    console.log('Ответ API курса с блоками:', response.data);
 
     // Проверяем наличие данных и поля blocks
     if (!response.data || !response.data.blocks) {
@@ -354,8 +350,7 @@ async updateLesson(lessonId, lessonData) {
 // Загрузка изображения для урока
 async uploadLessonImage(lessonId, imageFile) {
   try {
-    console.log('Загрузка изображения для урока:', lessonId);
-    console.log('Файл:', imageFile?.name, imageFile?.size);
+
 
     const formData = new FormData();
     formData.append('imageFile', imageFile);  // Используем 'imageFile' как имя параметра
@@ -377,8 +372,7 @@ async uploadLessonImage(lessonId, imageFile) {
 // Загрузка видео для урока
 async uploadLessonVideo(lessonId, videoFile) {
   try {
-    console.log('Загрузка видео для урока:', lessonId);
-    console.log('Файл:', videoFile?.name, videoFile?.size);
+
 
     const formData = new FormData();
     formData.append('videoFile', videoFile);  // Используем 'videoFile' как имя параметра
@@ -404,8 +398,7 @@ async uploadLessonVideo(lessonId, videoFile) {
 // Загрузка изображения для блока
 async uploadBlockImage(blockId, imageFile) {
   try {
-    console.log('Загрузка изображения для блока:', blockId);
-    console.log('Файл:', imageFile?.name, imageFile?.size);
+
 
     const formData = new FormData();
     formData.append('imageFile', imageFile);  // Используем 'imageFile' как имя параметра
@@ -494,7 +487,6 @@ async reorderBlocks(courseId, blocksOrder) {
       order: parseInt(block.order, 10)  // Преобразуем в целое число
     }));
 
-    console.log('Отправляем данные для переупорядочивания:', payload);
 
     // Отправляем данные как массив в теле запроса
     const response = await axios({

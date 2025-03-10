@@ -501,7 +501,6 @@ const difficultyOptions = [
 
 const onBlockOrderChanged = async () => {
   try {
-    console.log('Старый порядок блоков:', [...blocks.value]);
 
     // Явно создаем массив с нужными полями
     const reorderedBlocks = [];
@@ -513,7 +512,6 @@ const onBlockOrderChanged = async () => {
       });
     });
 
-    console.log('Новый порядок блоков для отправки:', reorderedBlocks);
 
     // Отправляем запрос
     await courseService.reorderBlocks(editedCourse.value.id, reorderedBlocks);
@@ -558,7 +556,6 @@ const uploadLessonImageNow = async () => {
   try {
     // Вызываем метод для загрузки изображения урока
     const response = await courseService.uploadLessonImage(editedLesson.value.id, lessonImageFile.value);
-    console.log('Изображение урока загружено:', response);
 
     // Обновляем URL изображения в интерфейсе
     // Исправляем возможное дублирование протокола
@@ -593,7 +590,6 @@ const uploadLessonVideoNow = async () => {
   try {
     // Вызываем метод для загрузки видео урока
     const response = await courseService.uploadLessonVideo(editedLesson.value.id, lessonVideoFile.value);
-    console.log('Видео урока загружено:', response);
 
     alert('Видео успешно загружено');
   } catch (error) {
@@ -617,7 +613,6 @@ const uploadBlockImageNow = async () => {
   uploadingBlockImage.value = true;
   try {
     const response = await courseService.uploadBlockImage(editedBlock.value.id, blockImageFile.value);
-    console.log('Изображение успешно загружено:', response);
 
     // Обновляем URL изображения в интерфейсе
     if (response.imageFile) {
@@ -729,7 +724,6 @@ const uploadEditBlockImageNow = async () => {
   uploadingEditBlockImage.value = true;
   try {
     const response = await courseService.uploadBlockImage(editedBlock.value.id, editBlockImageFile.value);
-    console.log('Изображение блока загружено:', response);
 
     // Исправляем URL перед установкой
     const imageUrl = fixImageUrl(response.imageUrl || response.url || response);
@@ -910,9 +904,7 @@ const editLessonHandler = async (lesson) => {
 
 // Обработчик загрузки видео
 const handleLessonVideoUpload = async () => {
-  console.log('handleLessonVideoUpload вызван');
-  console.log('Файл:', lessonVideoFile.value);
-  console.log('ID урока:', editedLesson.value.id);
+
 
   if (!lessonVideoFile.value) {
     alert('Пожалуйста, выберите файл видео');
@@ -927,7 +919,6 @@ const handleLessonVideoUpload = async () => {
   uploadingVideo.value = true;
   try {
     const response = await courseService.uploadLessonVideo(editedLesson.value.id, lessonVideoFile.value);
-    console.log('Видео успешно загружено:', response);
     alert('Видео успешно загружено');
 
     // Обновляем данные урока, чтобы отобразить новое видео
@@ -1094,11 +1085,9 @@ const handleImageUpload = () => {
   const file = imageFile.value;
 
   if (!file) {
-    console.log('Файл не выбран');
     return;
   }
 
-  console.log('Загрузка файла:', file.name, 'размер:', file.size);
 
   // Убедитесь, что у курса есть ID
   const courseId = editedCourse.value.id;
@@ -1109,7 +1098,6 @@ const handleImageUpload = () => {
 
   courseService.uploadCourseImage(courseId, file)
     .then(response => {
-      console.log('Изображение успешно загружено', response);
       // Обновляем URL изображения в форме
       editedCourse.value.imageFile = response.imageFile;
     })

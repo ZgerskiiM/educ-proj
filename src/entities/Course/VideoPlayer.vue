@@ -5,20 +5,17 @@
             <source :src="fixImageUrl(videoUrl)" :type="videoType">
             </source>
         </video>
-
         <div class="video-controls" :class="{ 'controls-visible': controlsVisible }">
             <div class="video-progress">
                 <div class="progress-bar" :style="{ width: `${progressPercent}%` }"></div>
                 <input type="range" class="progress-seek" min="0" max="100" step="0.1" v-model="progressPercent"
                     @input="seek">
             </div>
-
             <div class="controls-main">
                 <button class="control-btn" @click.stop="togglePlay">
                     <v-icon v-if="!isPlaying">mdi-play</v-icon>
                     <v-icon v-else>mdi-pause</v-icon>
                 </button>
-
                 <div class="volume-control">
                     <button class="control-btn" @click.stop="toggleMute">
                         <v-icon v-if="isMuted">mdi-volume-off</v-icon>
@@ -28,11 +25,9 @@
                     <input type="range" class="volume-slider" min="0" max="1" step="0.1" v-model="volume"
                         @input="changeVolume">
                 </div>
-
                 <div class="time-display">
                     {{ formatTime(currentTime) }} / {{ formatTime(duration) }}
                 </div>
-
                 <button class="control-btn fullscreen-btn" @click.stop="toggleFullscreen">
                     <v-icon v-if="isFullscreen">mdi-fullscreen-exit</v-icon>
                     <v-icon v-else>mdi-fullscreen</v-icon>
@@ -87,7 +82,6 @@ const fixImageUrl = (url) => {
   let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
   fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
 
-  console.log('Исправленный URL:', fixedUrl);
 
   return fixedUrl;
 };

@@ -67,11 +67,9 @@ interface FormData {
 const handleReset = async () => {
   try {
     const result = await AuthService.resetRequest(formData.email)
-    console.log('Данные для сервера:', result)
     router.push('/')
   } catch (error: any) {
     if (error.response) {
-      console.log('Данные для сервера:', formData.email)
       console.error('Ошибка сервера:', error.response.data)
       console.error('Код статуса:', error.response.status)
     } else if (error.request) {

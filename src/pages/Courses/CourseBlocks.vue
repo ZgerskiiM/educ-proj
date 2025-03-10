@@ -94,7 +94,6 @@ const fixImageUrl = (url) => {
   let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
   fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
 
-  console.log('Исправленный URL:', fixedUrl);
 
   return fixedUrl;
 };

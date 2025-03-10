@@ -22,6 +22,5 @@
   ];
 
   const generateReport = () => {
-    console.log('Generating report of type:', reportType.value);
   };
   </script>

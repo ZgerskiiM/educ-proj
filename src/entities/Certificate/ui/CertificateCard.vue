@@ -8,37 +8,30 @@
         class="rounded-t-lg bg-grey-lighten-4"
         :alt="`Сертификат: ${certificate.courseName}`"
       ></v-img>
-
       <div class="certificate-badge">
       </div>
     </div>
-
     <v-card-title class="text-truncate">{{ certificate.courseName }}</v-card-title>
-
     <v-card-text class="py-1">
       <div class="d-flex align-center mb-2">
         <v-icon icon="mdi-calendar" size="small" class="mr-1"></v-icon>
         <span class="font-weight-light">Выдан: {{ certificate.issueDate }}</span>
       </div>
-
       <div class="text-caption">
         <v-icon icon="mdi-certificate" size="small" class="mr-1"></v-icon>
         <span>Профессиональный сертификат</span>
       </div>
     </v-card-text>
-
     <v-card-actions class="mt-auto d-flex align-center justify-center ml-2 mr-2">
       <v-btn
         class="card-btn-text text-none font-weight-regular w-50"
         color="#333132"
         prepend-icon="mdi-open-in-new"
         variant="flat"
-
         @click="$emit('open', certificate.id)"
       >
         Открыть
       </v-btn>
-
       <v-btn
         color="#333132"
         variant="outlined"
