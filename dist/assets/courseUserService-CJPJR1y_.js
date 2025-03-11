@@ -1,1 +1,0 @@
-import{I as s,A as t}from"./index-Bej0i4H5.js";const o="http://localhost:8080",r=()=>t.getToken(),n={async fetchCourseWithBlocks(e){return(await s.get(`${o}/users/courses/${e}`,{headers:{Authorization:`Bearer ${r()}`}})).data}};export{n as c};

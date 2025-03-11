@@ -210,7 +210,7 @@ import { useDisplay } from 'vuetify';
 import { AuthService } from '@/app/features/auth/model/Auth';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://45.12.228.30:8080';
 const { mdAndDown } = useDisplay();
 
 const router = useRouter();

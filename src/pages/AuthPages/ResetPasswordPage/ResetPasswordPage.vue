@@ -7,12 +7,13 @@
         class="align-md-center d-flex flex-column"
         :class="mdAndDown ? 'w-66' : 'w-50'"
       >
+        <AuthMobileImage />
         <v-card-title
           class="align-md-center justify-center d-flex pl-0 pb-0 mb-3 font-weight-regular"
         >
           Воccтановление
         </v-card-title>
-        <AuthMobileImage />
+
         <v-text-field
           class="w-100 font-weight-light mb-3"
           v-model="formData.email"
