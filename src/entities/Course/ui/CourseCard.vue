@@ -8,7 +8,7 @@
           class="rounded-t-lg"
           :alt="course.title"
         ></v-img>
-        <div class="progress-container">
+        <!-- <div class="progress-container">
           <v-tooltip location="top" :text="`Прогресс: ${course.progress}%`">
             <template v-slot:activator="{ props }">
               <v-progress-linear
@@ -20,13 +20,13 @@
               ></v-progress-linear>
             </template>
           </v-tooltip>
-        </div>
+        </div> -->
       </div>
       <v-card-title class="text-truncate">{{ course.title }}</v-card-title>
       <v-card-text class="py-1">
         <div class="d-flex align-center mb-2">
-          <v-icon icon="mdi-book-open-variant" size="small" class="mr-1"></v-icon>
-          <span class="text-caption">{{ course.lessonsCompleted }} из {{ course.totalLessons }} уроков</span>
+          <!-- <v-icon icon="mdi-book-open-variant" size="small" class="mr-1"></v-icon>
+          <span class="text-caption">{{ course.lessonsCompleted }} из {{ course.totalLessons }} уроков</span> -->
         </div>
         <div class="text-caption text-truncate-2 course-description">
           {{ course.description }}

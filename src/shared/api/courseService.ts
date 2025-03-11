@@ -60,11 +60,14 @@ export const courseService = {
   // Создание нового курса
   async createCourse(courseData) {
     // Используем URLSearchParams для формата application/x-www-form-urlencoded
+
     const params = new URLSearchParams();
     params.append('title', courseData.title);
     params.append('price', courseData.price);
     params.append('difficulty', courseData.difficulty);
     params.append('status', courseData.status || 'PENDING');
+    params.append('chat', courseData.chat);
+
 
     if (courseData.imageUrl) {
       params.append('imageUrl', courseData.imageUrl);
@@ -95,6 +98,7 @@ async updateCourse(courseId, courseData) {
     formData.append('price', courseData.price);
     formData.append('difficulty', courseData.difficulty);
     formData.append('status', courseData.status);
+    formData.append('chat', courseData.chat);
 
     const payload = formData;
 
@@ -142,6 +146,10 @@ async updateCourse(courseId, courseData) {
     formData.append('price', courseData.price);
     formData.append('difficulty', courseData.difficulty);
     formData.append('status', courseData.status || 'PENDING');
+    formData.append('chat', courseData.chat);
+    console.log(courseData)
+
+
 
     if (imageFile) {
       formData.append('imageFile', imageFile); // Изменено с 'image' на 'imageFile'

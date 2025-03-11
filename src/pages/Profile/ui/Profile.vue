@@ -129,14 +129,7 @@ onMounted(() => {
 
 
 // Сертификаты
-const certificates = ref([
-  {
-    id: 1,
-    courseName: 'Римская пицца',
-    issueDate: '15.02.2025',
-    image: '/public/main--menu3.png'
-  }
-]);
+const certificates = ref('');
 
 function handleLogout() {
   // Дополнительные действия при выходе, например, очистка состояния приложения

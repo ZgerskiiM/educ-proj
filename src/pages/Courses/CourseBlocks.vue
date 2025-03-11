@@ -6,9 +6,17 @@
     >
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
+        <v-btn
+          class="font-weight-regular text-none"
+          variant="outlined"
+          color="#313131"
+          @click="navigateToSupport">
+          <v-icon>mdi-pencil</v-icon>
+          Чат курса
+        </v-btn>
       <div v-if="!mdAndDown" class="breadcrumbs-container">
                 <v-breadcrumbs
-                    class="mb-1 pl-0 font-weight-light"
+                    class="mb-1 pl-0 font-weight-regular"
                     color="#F48A21"
                 >
                     <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
@@ -68,12 +76,14 @@ const { mdAndDown } = useDisplay();
 const router = useRouter();
 const route = useRoute();
 
+
 // Состояние
 const loading = ref(false);
 const error = ref('');
 const courseTitle = ref('Пекарская витрина: от Булок до Хлеба');
 const courseBlocks = ref([]);
 const courseId = ref(null);
+const сourseSupport = ref('');
 
 // Функция для получения данных курса
 const fetchCourseData = async (id) => {
@@ -86,6 +96,7 @@ const fetchCourseData = async (id) => {
     const response = await courseUserService.fetchCourseWithBlocks(id);
     courseTitle.value = response.courseTitle || 'Курс без названия';
     courseBlocks.value = response.blocks || [];
+    сourseSupport.value = response.chat
   } catch (err) {
     console.error('Ошибка при загрузке курса:', err);
     error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
@@ -126,6 +137,22 @@ const formatBlockData = (block, number) => {
 
 
 
+const defaultSupportLink = 'https://t.me/babichbaker_course';
+
+const navigateToSupport = () => {
+  // Проверяем, что ссылка существует, не пустая и не содержит слово "null"
+  const isValidLink = сourseSupport &&
+                      сourseSupport.value &&
+                      typeof сourseSupport.value === 'string' &&
+                      сourseSupport.value.trim() !== '' &&
+                      !сourseSupport.value.includes('null');
+
+  // Если ссылка валидная, используем её, иначе используем дефолтную
+  const telegramLink = isValidLink ? сourseSupport.value : defaultSupportLink;
+
+  // Открываем ссылку в новом окне
+  window.open(telegramLink, '_blank');
+}
 // Навигация к уроку
 const navigateToLesson = (courseId, blockId) => {
   router.push(`/course/${courseId}/blocks/${blockId}`);
@@ -154,6 +181,8 @@ watch(() => route.params.courseId, (newId) => {
 .course-title {
     font-size: 1.8rem;
 }
+
+
 
 h1 {
     color: #333132;

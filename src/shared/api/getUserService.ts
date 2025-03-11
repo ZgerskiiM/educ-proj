@@ -7,7 +7,6 @@ const API_URL = 'http://localhost:8080/admin';
 // Функция для получения актуального токена при каждом запросе
 const getAuthToken = () => {
   return AuthService.getToken();
-  ;
 };
 
 export const getUserService = {
@@ -48,8 +47,6 @@ export const getUserService = {
     return response.data;
   },
 
-
-
   // Вариант с загрузкой файла изображения
   async createCourseWithImage(courseData, imageFile) {
     const formData = new FormData();
@@ -71,6 +68,36 @@ export const getUserService = {
       }
     });
 
+    return response.data;
+  },
+
+  // Назначение роли администратора пользователю
+  async assignAdminRole(email) {
+    const response = await axios.put(`${API_URL}/${email}/role`, null, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    return response.data;
+  },
+
+  // Удаление роли администратора у пользователя
+  async removeAdminRole(email) {
+    const response = await axios.delete(`${API_URL}/${email}/role`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+    return response.data;
+  },
+
+  // Проверка статуса администратора
+  async checkAdminStatus(email) {
+    const response = await axios.get(`${API_URL}/${email}/status`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
     return response.data;
   }
 };

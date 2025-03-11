@@ -20,22 +20,14 @@
         <!-- Правый блок -->
         <div class="text-md-right text-left">
           <div>
-            <v-btn
-              variant="text"
-              class="text-none font-weight-light text-body-2 px-0 px-md-2 justify-start justify-md-end"
-              to="/privacy-policy"
-            >
+            <a href="https://t.me/babichbaker_course" target="_blank" class="footer-text text-none text-decoration-none font-weight-light " rel="noopener">
               Политика конфиденциальности
-            </v-btn>
+            </a>
           </div>
           <div>
-            <v-btn
-              variant="text"
-              class="text-none font-weight-light text-body-2 px-0 px-md-2 justify-start justify-md-end"
-              to="/terms-of-service"
-            >
+            <a href="https://t.me/babichbaker_course" target="_blank" class="footer-text text-none text-decoration-none font-weight-light " rel="noopener">
               Договор оферты
-            </v-btn>
+            </a>
           </div>
 
           <div class="footer-text font-weight-light mb-3 mt-3">Следите за школой</div>
@@ -79,6 +71,10 @@ const currentYear = ref(new Date().getFullYear());
 
 .footer-text {
   font-size: 0.9rem;
+}
+
+a {
+  color: #313131;
 }
 
 @media (max-width: 821px) {

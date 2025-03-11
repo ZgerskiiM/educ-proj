@@ -21,6 +21,11 @@
                 type="number"
                 required
               ></v-text-field>
+              <v-text-field
+                v-model="newCourse.chat"
+                label="Ссылка на поддержку для блока"
+                type="text"
+              ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
               <v-select
@@ -80,6 +85,7 @@ const difficultyOptions = [
 const defaultCourse = {
   title: '',
   price: 0,
+  chat: null,
   difficulty: 'MEDIUM',
   status: 'PENDING',
   imageFile: null
@@ -124,7 +130,6 @@ const saveCourse = async () => {
       newCourse.value.imageFile = imageFile.value;
     }
 
-    // Отправляем данные родительскому компоненту для сохранения
     emit('save', {...newCourse.value});
     closeDialog();
   } catch (error) {

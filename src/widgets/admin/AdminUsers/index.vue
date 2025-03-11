@@ -41,6 +41,25 @@
       </template>
     </v-snackbar>
   </div>
+
+  <v-dialog v-model="newAdminDialogOpen" max-width="500px">
+  <v-card>
+    <v-card-title>Добавить нового администратора</v-card-title>
+    <v-card-text>
+      <v-text-field
+        v-model="newAdminEmail"
+        label="Email пользователя"
+        placeholder="user@example.com"
+        :rules="[v => !!v || 'Email обязателен', v => /.+@.+\..+/.test(v) || 'Email должен быть корректным']"
+      ></v-text-field>
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="blue darken-1" text @click="newAdminDialogOpen = false">Отмена</v-btn>
+      <v-btn color="blue darken-1" text @click="addNewAdmin">Добавить</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
 </template>
 
 <script setup>
@@ -50,6 +69,60 @@ import UsersFilter from '@/features/user/UsersFilter.vue';
 import UsersTable from '@/entities/user/ui/UsersTable.vue';
 import GrantAccessDialog from '@/features/course/GrantAccessDialog.vue';
 import { getUserService } from '@/shared/api/getUserService.ts';
+
+// Остальной существующий код...
+
+// Состояние диалога добавления админа
+const newAdminDialogOpen = ref(false);
+const newAdminEmail = ref('');
+
+// Функция для открытия диалога добавления админа
+const openNewAdminDialog = () => {
+  newAdminEmail.value = '';
+  newAdminDialogOpen.value = true;
+};
+
+// Функция для назначения пользователя администратором
+const makeAdmin = async (email) => {
+  try {
+    isLoading.value = true;
+    await getUserService.assignAdminRole(email);
+    showSuccess(`Пользователь ${email} успешно назначен администратором`);
+    await fetchUsers(); // Обновляем список пользователей
+  } catch (error) {
+    console.error('Ошибка при назначении администратора:', error);
+    showError(`Не удалось назначить администратора: ${error.message || 'Неизвестная ошибка'}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Функция для добавления нового администратора
+const addNewAdmin = async () => {
+  if (!newAdminEmail.value || !newAdminEmail.value.includes('@')) {
+    showError('Пожалуйста, введите корректный email');
+    return;
+  }
+
+  await makeAdmin(newAdminEmail.value);
+  newAdminDialogOpen.value = false;
+};
+
+// Функция для удаления прав администратора
+const removeAdmin = async (email) => {
+  try {
+    isLoading.value = true;
+    await getUserService.removeAdminRole(email);
+    showSuccess(`Права администратора успешно удалены у пользователя ${email}`);
+    await fetchUsers(); // Обновляем список пользователей
+  } catch (error) {
+    console.error('Ошибка при удалении прав администратора:', error);
+    showError(`Не удалось удалить права администратора: ${error.message || 'Неизвестная ошибка'}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 
 const userSearch = ref('');
 const userRole = ref('Все роли');
@@ -105,9 +178,7 @@ const fetchUsers = async () => {
   }
 };
 
-const openNewAdminDialog = () => {
-  console.log('Opening new admin dialog');
-};
+
 
 const openGrantAccessDialog = (email = '') => {
   selectedUserEmail.value = email;

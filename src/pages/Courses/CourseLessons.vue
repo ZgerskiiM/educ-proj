@@ -2,7 +2,7 @@
   <div class="page-wrapper ">
     <Header />
     <v-container :width="mdAndDown ? '100vw' : '80vw'">
-      <h2 class="mt-5 font-weight-medium">{{ courseName }}</h2>
+      <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">{{ courseAuthor }}</h3>
       <div v-if="!mdAndDown" class="breadcrumbs-container">
                 <v-breadcrumbs
@@ -10,7 +10,7 @@
                     color="#F48A21"
                 >
                     <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
-                    <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseName }}</v-breadcrumbs-item>
+                    <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseTitle }}</v-breadcrumbs-item>
                     <v-breadcrumbs-item disabled :to="`/course/${courseId}/blocks`">Уроки</v-breadcrumbs-item>
                 </v-breadcrumbs>
             </div>
@@ -67,6 +67,7 @@ import LessonCard from '@/shared/ui/PagesElem/LessonCard.vue'
 import { getBlockLessons } from '@/shared/api/UserService'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { courseUserService} from '@/shared/api/courseUserService'
 
 const { mdAndDown } = useDisplay()
 const route = useRoute()
@@ -76,8 +77,11 @@ const router = useRouter()
 const courseId = computed(() => route.params.courseId)
 const blocksId = computed(() => route.params.blocksId)
 
+
+const courseTitle = ref('');
+const courseBlocks = ref([]);
+
 // Данные курса
-const courseName = ref('Пекарская витрина: от Булок до Хлеба')
 const courseAuthor = ref('Авторский курс от Максима Бабича')
 const blockNumber = ref('1')
 const blockTitle = ref('')
@@ -97,6 +101,34 @@ const fixImageUrl = (url) => {
 
   return fixedUrl;
 };
+
+const fetchCourseData = async (id) => {
+  if (!id) return;
+
+  loading.value = true;
+  error.value = '';
+
+  try {
+    const response = await courseUserService.fetchCourseWithBlocks(id);
+    courseTitle.value = response.courseTitle || 'Курс без названия';
+    courseBlocks.value = response.blocks || [];
+  } catch (err) {
+    console.error('Ошибка при загрузке курса:', err);
+    error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
+    courseBlocks.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  const id = route.params.courseId;
+  if (id) {
+    courseId.value = id;
+    fetchCourseData(id);
+  }
+});
+
 
 // Функция для загрузки данных блока
 const fetchBlockData = async () => {

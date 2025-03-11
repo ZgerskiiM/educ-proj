@@ -20,7 +20,7 @@
               variant="text"
             >
               <div class="d-flex align-center">
-                <span class="profile-text mr-2">Профиль</span>
+                <span class="profile-text mr-2 font-weight-regular">Профиль</span>
                 <v-img
                   src="/user.png"
                   height="35"

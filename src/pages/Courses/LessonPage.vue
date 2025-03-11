@@ -71,7 +71,7 @@
         <v-icon>mdi-arrow-right</v-icon>
     </template>
     <template v-else>
-        {{ isLastLesson ? 'Завершить курс' : 'Следующий урок' }}
+        {{ isLastLesson ? 'Завершить блок' : 'Следующий урок' }}
     </template>
 </v-btn>
                         </div>
@@ -112,12 +112,15 @@ import VideoPlayer from "@/entities/Course/VideoPlayer.vue";
 import { courseService } from '@/shared/api/courseService';
 import { markLessonAsComplete, markLessonAsStarted } from '@/shared/api/UserService';
 import { LessonStateService } from '@/shared/api/LessonStateService';
+import { courseUserService } from '@/shared/api/courseUserService';
 
 const { mdAndDown } = useDisplay();
 const route = useRoute();
 const router = useRouter();
 
 const lessonImageUrl = ref('');
+
+const courseTitle = ref('');
 
 
 const fixImageUrl = (url) => {
@@ -158,8 +161,32 @@ onMounted(async () => {
   }
 });
 
-// В начале script setup
+const fetchCourseData = async (id) => {
+  if (!id) return;
 
+  loading.value = true;
+  error.value = '';
+
+  try {
+    const response = await courseUserService.fetchCourseWithBlocks(id);
+    courseTitle.value = response.courseTitle || 'Курс без названия';
+    courseBlocks.value = response.blocks || [];
+  } catch (err) {
+    console.error('Ошибка при загрузке курса:', err);
+    error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
+    courseBlocks.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  const id = route.params.courseId;
+  if (id) {
+    courseId.value = id;
+    fetchCourseData(id);
+  }
+});
 // Состояние
 const loading = ref(true);
 const error = ref('');
@@ -175,7 +202,6 @@ const lessonData = ref({
 const courseId = computed(() => route.params.courseId);
 const blockId = computed(() => route.params.blocksId);
 const lessonId = computed(() => route.params.lessonId);
-const courseTitle = ref('Пекарская витрина: от Булок до Хлеба');
 
 // Навигация между уроками
 const allLessons = ref([]);

@@ -29,6 +29,11 @@
                     type="number"
                     required
                   ></v-text-field>
+                  <v-text-field
+                    v-model="editedCourse.chat"
+                    label="Чат для поддержки"
+                    type="text"
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-select
@@ -641,6 +646,7 @@ const editedCourse = ref({
   id: null,
   title: '',
   price: 0,
+  chat: null,
   difficulty: 'MEDIUM',
   status: 'PENDING',
   imageUrl: ''
@@ -662,7 +668,8 @@ const initializeFormData = () => {
     price: props.course.price || 0,
     difficulty: props.course.difficulty || 'MEDIUM',
     status: props.course.status || 'PENDING',
-    imageUrl: props.course.imageUrl || ''
+    imageUrl: props.course.imageUrl || '',
+    chat: props.course.chat,
   };
 
   // Инициализируем данные для нового блока
@@ -684,7 +691,8 @@ watch(() => props.course, (newCourse) => {
       price: newCourse.price || 0,
       difficulty: newCourse.difficulty || 'MEDIUM',
       status: newCourse.status || 'PENDING',
-      imageUrl: newCourse.imageUrl || ''
+      imageUrl: newCourse.imageUrl || '',
+      chat: newCourse.chat,
     };
 
     // Обновляем courseId для нового блока
@@ -1066,7 +1074,8 @@ const saveCourse = async () => {
         title: editedCourse.value.title,
         price: editedCourse.value.price,
         difficulty: editedCourse.value.difficulty,
-        status: editedCourse.value.status
+        status: editedCourse.value.status,
+        chat: editedCourse.value.chat,
       }
     );
 

@@ -12,7 +12,7 @@
           <admin-dashboard v-if="currentPage === 'dashboard'" :stats="stats" />
           <admin-courses v-if="currentPage === 'courses'" />
           <admin-users v-if="currentPage === 'users'" />
-          <admin-reports v-if="currentPage === 'reports'" />
+          <!-- <admin-reports v-if="currentPage === 'reports'" /> -->
         </v-container>
       </v-main>
     </v-app>
@@ -25,7 +25,7 @@
   import AdminDashboard from '@/widgets/admin/AdminDashboard/index.vue';
   import AdminCourses from '@/widgets/admin/AdminCourses/index.vue';
   import AdminUsers from '@/widgets/admin/AdminUsers/index.vue';
-  import AdminReports from '@/widgets/admin/AdminReports/index.vue';
+  // import AdminReports from '@/widgets/admin/AdminReports/index.vue';
 
   const drawer = ref(true);
   const currentPage = ref('dashboard');
@@ -34,7 +34,7 @@
   { title: 'Панель управления', icon: 'mdi-view-dashboard', value: 'dashboard' },
   { title: 'Курсы', icon: 'mdi-book-open-page-variant', value: 'courses' },
   { title: 'Пользователи', icon: 'mdi-account-group', value: 'users' },
-  { title: 'Отчеты', icon: 'mdi-file-chart', value: 'reports' },
+  // { title: 'Отчеты (Еще в разработке)', icon: 'mdi-file-chart', value: 'reports' },
 ];
 
   const stats = ref({
