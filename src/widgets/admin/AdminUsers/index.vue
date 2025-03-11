@@ -70,7 +70,6 @@ import UsersTable from '@/entities/user/ui/UsersTable.vue';
 import GrantAccessDialog from '@/features/course/GrantAccessDialog.vue';
 import { getUserService } from '@/shared/api/getUserService.ts';
 
-// Остальной существующий код...
 
 // Состояние диалога добавления админа
 const newAdminDialogOpen = ref(false);
