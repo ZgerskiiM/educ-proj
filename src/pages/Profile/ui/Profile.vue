@@ -96,7 +96,7 @@ async function fetchUserCourses() {
   }
 }
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://45.12.228.30:8080';
 
 // Функция для получения данных пользователя с API
 async function fetchUserData() {

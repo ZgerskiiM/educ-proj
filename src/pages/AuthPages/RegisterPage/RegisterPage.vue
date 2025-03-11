@@ -82,8 +82,7 @@
             mdi-information-outline
           </v-icon>
           <v-card-text
-            class="info--card font-weight-light px-3 py-2 mr-5"
-            style="text-align: justify"
+            class="info--card font-weight-light px-3 py-2 mr-2"
           >
             Создавая профиль, нажимая на кнопку, вы даёте
             <a href="Согласие на обработку персональных данных">
@@ -91,7 +90,7 @@
             </a>
             и рассылку информационных сообщений
             <a href="https://www.consultant.ru/document/cons_doc_LAW_61801/" class="link">
-              согласно закону</a>О персональных данных от 27.07.2006 №152-ФЗ
+              согласно закону</a> О персональных данных от 27.07.2006 №152-ФЗ
           </v-card-text>
         </v-card>
       </form>
