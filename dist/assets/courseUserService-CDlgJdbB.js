@@ -1,1 +1,0 @@
-import{I as s,A as t}from"./index-_IANILbF.js";const r="http://45.12.228.30:8080",o=()=>t.getToken(),n={async fetchCourseWithBlocks(e){return(await s.get(`${r}/users/courses/${e}`,{headers:{Authorization:`Bearer ${o()}`}})).data}};export{n as c};
