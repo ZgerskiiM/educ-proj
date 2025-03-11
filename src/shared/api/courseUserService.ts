@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { AuthService } from '@/app/features/auth/model/Auth';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://45.12.228.30:8080';
 
 // Функция для получения актуального токена при каждом запросе
 const getAuthToken = () => {
