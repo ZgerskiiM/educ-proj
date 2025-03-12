@@ -54,7 +54,7 @@ const userData = ref({
   firstName: '',
   lastName: '',
   email: '',
-  imageUrl: 'https://w7.pngwing.com/pngs/215/58/png-transparent-computer-icons-google-account-scalable-graphics-computer-file-my-account-icon-rim-123rf-symbol.png'
+  imageUrl: 'https://randomuser.me/api/portraits/women/28.jpg'
 });
 
 const getAuthToken = () => {
@@ -112,7 +112,7 @@ async function fetchUserData() {
       firstName: response.data.firstName || '',
       lastName: response.data.lastName || '',
       email: response.data.email || '',
-      imageUrl: response.data.imageUrl || "public/EmptyAvatar.png"
+      imageUrl: response.data.imageUrl || '/EmptyAvatar.png'
     };
   } catch (error) {
     console.error('Ошибка при получении данных пользователя:', error);
@@ -143,6 +143,10 @@ function handleLogout() {
   localStorage.removeItem("jwt_token");
 
 }
+
+
+// Добавьте этот код в <script setup>
+// Опции фильтра курсов
 const courseFilterOptions = [
   { value: 'all', label: 'Все курсы' },
   { value: 'not-started', label: 'Не начатые' },
