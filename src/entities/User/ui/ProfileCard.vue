@@ -179,10 +179,6 @@
       </v-row>
     </v-card-text>
   </v-card>
-
-  <!-- Кнопки под карточкой (только на десктопе) -->
-
-
   <!-- Диалог подтверждения выхода -->
   <v-dialog v-model="showLogoutDialog" max-width="400">
     <v-card>

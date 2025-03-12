@@ -142,7 +142,6 @@ onMounted(async () => {
   const savedImageUrl = localStorage.getItem(`lesson_image_${currentLessonId}`);
 
   if (savedImageUrl) {
-    console.log('Получено изображение урока из localStorage:', savedImageUrl);
     lessonImageUrl.value = savedImageUrl;
 
     // Удаляем из хранилища после использования
@@ -170,11 +169,9 @@ const fetchCourseData = async (id) => {
   try {
     const response = await courseUserService.fetchCourseWithBlocks(id);
     courseTitle.value = response.courseTitle || 'Курс без названия';
-    courseBlocks.value = response.blocks || [];
   } catch (err) {
     console.error('Ошибка при загрузке курса:', err);
     error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
-    courseBlocks.value = [];
   } finally {
     loading.value = false;
   }
@@ -272,13 +269,11 @@ const navigateToNextLesson = async () => {
 
     if (nextLesson && (nextLesson.imageUrl || nextLesson.lessonImage)) {
       const nextImageUrl = fixImageUrl(nextLesson.imageUrl || nextLesson.lessonImage);
-      console.log('Сохраняем изображение следующего урока:', nextImageUrl);
       localStorage.setItem(`lesson_image_${nextLessonId.value}`, nextImageUrl);
     }
 
     // Отмечаем урок как завершенный
     await markLessonAsComplete(lessonId.value);
-    console.log('Урок отмечен как завершенный');
 
     // Дожидаемся завершения запроса
     await new Promise(resolve => setTimeout(resolve, 300));
@@ -286,7 +281,6 @@ const navigateToNextLesson = async () => {
     // Проверяем, что компонент все еще смонтирован
     if (nextLessonId.value) {
       const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`;
-      console.log('Переход к следующему уроку:', nextUrl);
 
       // Очищаем состояние текущего урока перед переходом
       if (typeof LessonStateService !== 'undefined') {
@@ -297,7 +291,7 @@ const navigateToNextLesson = async () => {
       router.push(nextUrl);
     }
   } catch (error) {
-    console.error('Ошибка при переходе к следующему уроку:', error);
+    console.error('', error);
   } finally {
     // Устанавливаем таймаут для сброса состояния
     setTimeout(() => {
@@ -383,32 +377,30 @@ const completingLesson = ref(false);
 
 // Получение данных урока
 const fetchLessonData = async () => {
-  loading.value = true;
-  error.value = '';
+  const maxRetries = 3;
+  let retries = 0;
 
-  try {
-    const currentLessonId = route.params.lessonId;
-    console.log('Загрузка данных для урока:', currentLessonId);
+  while (retries < maxRetries) {
+    try {
+      loading.value = true;
+      // Ваш существующий код загрузки данных урока
+      const response = await courseService.fetchLesson(lessonId.value);
+      lessonData.value = response;
+      return response; // Успешно загружено
+    } catch (err) {
+      retries++;
+      console.error(`Ошибка при загрузке урока (попытка ${retries}/${maxRetries}):`, err);
 
-    const data = await courseService.getLessonDetails(currentLessonId);
-    console.log('Получены данные урока:', data);
+      if (retries >= maxRetries) {
+        error.value = 'Не удалось загрузить урок. Пожалуйста, проверьте подключение к интернету и попробуйте снова.';
+        throw err;
+      }
 
-    // Обновляем данные в интерфейсе
-    lessonData.value = data;
-
-    // Обновляем URL изображения, если его еще нет
-    if (!lessonImageUrl.value && data.imageUrl) {
-      lessonImageUrl.value = fixImageUrl(data.imageUrl);
+      // Ждем перед повторной попыткой (увеличиваем время с каждой попыткой)
+      await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+    } finally {
+      loading.value = false;
     }
-
-    // Отмечаем урок как начатый после загрузки данных
-    await startLesson(currentLessonId);
-
-  } catch (err) {
-    console.error('Ошибка при загрузке урока:', err);
-    error.value = 'Не удалось загрузить данные урока';
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -434,7 +426,6 @@ watch(() => route.params.lessonId, (newLessonId) => {
     const savedImageUrl = localStorage.getItem(`lesson_image_${newLessonId}`);
 
     if (savedImageUrl) {
-      console.log('Получено изображение урока из localStorage при переходе:', savedImageUrl);
       lessonImageUrl.value = savedImageUrl;
       localStorage.removeItem(`lesson_image_${newLessonId}`);
     } else {
@@ -497,13 +488,65 @@ onBeforeUnmount(() => {
   }
 });
 
-// Загрузка данных при монтировании компонента
 onMounted(async () => {
-  await Promise.all([
-    fetchLessonData(),
-    fetchAllLessons()
-  ]);
+  try {
+    loading.value = true;
+
+    // Сначала загружаем данные курса
+    await fetchCourseData(courseId.value);
+
+    // Затем данные урока
+    const lessonInfo = await fetchLessonData();
+
+    // Только после успешной загрузки урока получаем список уроков
+    await fetchAllLessons();
+
+    // Устанавливаем изображение после всех загрузок
+    if (lessonInfo && lessonInfo.imageUrl) {
+      lessonImageUrl.value = fixImageUrl(lessonInfo.imageUrl);
+    } else {
+      const savedImageUrl = localStorage.getItem(`lesson_image_${lessonId.value}`);
+      if (savedImageUrl) {
+        lessonImageUrl.value = savedImageUrl;
+      } else {
+        lessonImageUrl.value = '/public/default-lesson.jpg';
+      }
+    }
+  } catch (e) {
+    error.value = 'Ошибка при загрузке урока. Попробуйте обновить страницу.';
+    console.error('Ошибка загрузки:', e);
+  } finally {
+    loading.value = false;
+  }
 });
+
+// 4. Улучшите обработку состояния загрузки
+watch(() => route.params.lessonId, async (newLessonId, oldLessonId) => {
+  if (newLessonId && newLessonId !== oldLessonId) {
+    loading.value = true;
+    error.value = '';
+    lessonStarted.value = false;
+
+    try {
+      // Сначала обнуляем текущие данные
+      lessonData.value = {
+        lessonTitle: '',
+        videoUrl: '',
+        description: '',
+        sheetUrl: '',
+        imageUrl: '',
+      };
+
+      // Затем загружаем новые
+      await fetchLessonData();
+      // Не обязательно перезагружать весь список уроков при смене урока
+    } catch (e) {
+      error.value = 'Не удалось загрузить урок. Попробуйте еще раз.';
+    } finally {
+      loading.value = false;
+    }
+  }
+}, { immediate: true });
 
 </script>
 

@@ -17,6 +17,7 @@
           label="Фамилия"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
+          :error-messages="errors.lastName"
         />
         <v-text-field
           class="w-100 font-weight-light"
@@ -24,6 +25,7 @@
           label="Имя"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
+          :error-messages="errors.firstName"
         />
         <v-text-field
           class="w-100 font-weight-light"
@@ -31,6 +33,8 @@
           label="Почта"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
+          :error-messages="errors.email"
+          @input="validateEmail"
         />
         <v-text-field
           class="w-100 mb-0 font-weight-light"
@@ -43,6 +47,8 @@
           v-model="formData.password"
           :type="visiblePassword ? 'text' : 'password'"
           @click:append-inner="visiblePassword = !visiblePassword"
+          :error-messages="errors.password"
+          @input="validatePassword"
         />
         <v-text-field
           class="w-100 mb-0 font-weight-light"
@@ -62,13 +68,26 @@
             Войдите
           </router-link>
         </v-card-text>
+
+        <!-- Добавляем вывод серверной ошибки -->
+        <v-alert
+          v-if="serverError"
+          type="error"
+          variant="tonal"
+          closable
+          class="mb-3 w-100"
+          @click:close="serverError = ''"
+        >
+          {{ serverError }}
+        </v-alert>
+
         <v-btn
           class="text-none mb-2 w-100 font-weight-thin"
           text="Создать профиль"
           type="submit"
           :density="mdAndDown ? 'compact' : 'comfortable'"
           :disabled="isButtonDisabled"
-          @click="result"
+          :loading="isLoading"
         />
         <v-card
           class="info-card d-flex align-center mt-3 bg-color-none"
@@ -111,6 +130,8 @@ const { mdAndDown, smAndUp } = useDisplay()
 const visiblePassword = ref<boolean>(false)
 const visibleConfirm = ref<boolean>(false)
 const passwordMatchError = ref<string>('')
+const serverError = ref<string>('')
+const isLoading = ref<boolean>(false)
 
 const formData = reactive<FormData>({
   password: '',
@@ -118,6 +139,13 @@ const formData = reactive<FormData>({
   email: '',
   firstName: '',
   lastName: '',
+})
+
+const errors = reactive({
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
 })
 
 const router = useRouter()
@@ -138,12 +166,69 @@ const validatePasswordMatch = () => {
   }
 }
 
-const handleSignup = async () => {
-  // Проверяем совпадение паролей перед отправкой
-  if (formData.password !== formData.confirmPassword) {
-    passwordMatchError.value = 'Пароли не совпадают'
+const validateEmail = () => {
+  errors.email = ''
+
+  if (!formData.email) return
+
+  // Проверка формата email с помощью регулярного выражения
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(formData.email)) {
+    errors.email = 'Некорректный формат электронной почты'
+  }
+}
+
+const validatePassword = () => {
+  errors.password = ''
+
+  if (!formData.password) return
+
+  // Проверка длины пароля
+  if (formData.password.length < 8) {
+    errors.password = 'Пароль должен содержать не менее 8 символов'
     return
   }
+
+  // Проверка наличия латинских букв
+  if (!/[a-zA-Z]/.test(formData.password)) {
+    errors.password = 'Пароль должен содержать латинские буквы'
+    return
+  }
+
+  // Проверка наличия цифр
+  if (!/\d/.test(formData.password)) {
+    errors.password = 'Пароль должен содержать цифры'
+    return
+  }
+
+  // Проверка наличия спецсимволов
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password)) {
+    errors.password = 'Пароль должен содержать специальные символы'
+    return
+  }
+
+  // Если есть ранее введенный пароль для подтверждения, проверим совпадение
+  if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
+    passwordMatchError.value = 'Пароли не совпадают'
+  } else {
+    passwordMatchError.value = ''
+  }
+}
+
+const handleSignup = async () => {
+  // Сбрасываем все ошибки
+  serverError.value = ''
+
+  // Проверяем валидность данных перед отправкой
+  validateEmail()
+  validatePassword()
+  validatePasswordMatch()
+
+  if (errors.email || errors.password || passwordMatchError.value) {
+    return
+  }
+
+  isLoading.value = true
 
   try {
     const result = await AuthService.signup(
@@ -155,13 +240,30 @@ const handleSignup = async () => {
     router.push({ path: '/verify', query: { email: formData.email } })
   } catch (error: any) {
     if (error.response) {
+      // Обработка ошибок от сервера
+      if (error.response.data?.message) {
+        serverError.value = error.response.data.message
+      } else if (error.response.data?.errors) {
+        // Если сервер возвращает ошибки для конкретных полей
+        const fieldErrors = error.response.data.errors
+        if (fieldErrors.email) errors.email = fieldErrors.email
+        if (fieldErrors.password) errors.password = fieldErrors.password
+        if (fieldErrors.firstName) errors.firstName = fieldErrors.firstName
+        if (fieldErrors.lastName) errors.lastName = fieldErrors.lastName
+      } else {
+        serverError.value = `Ошибка сервера: ${error.response.status}`
+      }
       console.error('Ошибка сервера:', error.response.data)
       console.error('Код статуса:', error.response.status)
     } else if (error.request) {
+      serverError.value = 'Не удалось связаться с сервером. Проверьте подключение к интернету.'
       console.error('Ошибка запроса:', error.request)
     } else {
+      serverError.value = `Произошла ошибка: ${error.message}`
       console.error('Ошибка:', error.message)
     }
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -171,7 +273,10 @@ const isButtonDisabled = computed(() => {
          !formData.firstName ||
          !formData.lastName ||
          formData.password !== formData.confirmPassword ||
-         !!passwordMatchError.value
+         !!passwordMatchError.value ||
+         !!errors.email ||
+         !!errors.password ||
+         isLoading.value
 })
 </script>
 

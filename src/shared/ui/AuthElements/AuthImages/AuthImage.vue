@@ -1,7 +1,7 @@
 <template>
   <v-img
     class="responsive-image d-none d-sm-flex"
-    src="/public/main--menu3.webp"
+    src="/main--menu3_11zon.webp"
     :aspect-ratio="16 / 9"
     cover
   />

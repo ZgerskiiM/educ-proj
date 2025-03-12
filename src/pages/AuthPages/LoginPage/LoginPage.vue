@@ -12,18 +12,6 @@
           Вход
         </v-card-title>
 
-        <!-- Сообщение об ошибке -->
-        <v-alert
-          v-if="errorMessage"
-          type="error"
-          variant="tonal"
-          class="mb-4 w-100"
-          closable
-          @click:close="errorMessage = ''"
-        >
-          {{ errorMessage }}
-        </v-alert>
-
         <v-text-field
           class="w-100 font-weight-light"
           v-model="formData.email"
@@ -51,6 +39,18 @@
             Восстановить
           </router-link>
         </v-card-text>
+
+        <v-alert
+          v-if="serverError"
+          type="error"
+          variant="tonal"
+          closable
+          class="mb-3 w-100 font-weight-light"
+          @click:close="serverError = ''"
+        >
+          {{ serverError }}
+        </v-alert>
+
         <v-btn
           class="text-none mb-2 w-100 font-weight-thin"
           type="submit"
@@ -62,7 +62,7 @@
         <v-btn
           class="text-none mb-2 w-100 font-weight-thin"
           text="Создать аккаунт"
-          @click="navigateToLogin()"
+          @click="navigateToRegister()"
           flat
         />
       </form>
@@ -82,7 +82,7 @@ const { mdAndDown, smAndUp } = useDisplay()
 const router = useRouter()
 const visible = ref<boolean>(false)
 const loading = ref<boolean>(false)
-const errorMessage = ref<string>('')
+const serverError = ref<string>('') // Переименовано для соответствия с регистрацией
 
 const formData = reactive<FormData>({
   password: '',
@@ -104,7 +104,7 @@ interface FormErrors {
   email: string
 }
 
-const navigateToLogin = () => {
+const navigateToRegister = () => {
   router.push('/register')
 }
 
@@ -114,10 +114,8 @@ const validateForm = (): boolean => {
   if (!formData.email.trim()) {
     formErrors.email = 'Введите email'
     isValid = false
-  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    formErrors.email = 'Введите корректный email'
-    isValid = false
   }
+  // Проверка на валидность email удалена
 
   if (!formData.password) {
     formErrors.password = 'Введите пароль'
@@ -127,48 +125,99 @@ const validateForm = (): boolean => {
   return isValid
 }
 
+// Безопасная работа с localStorage
+const safeGetItem = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key)
+  } catch (e) {
+    console.error('Error accessing localStorage:', e)
+    return null
+  }
+}
+
+const safeSetItem = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value)
+  } catch (e) {
+    console.error('Error writing to localStorage:', e)
+  }
+}
+
+const safeRemoveItem = (key: string): void => {
+  try {
+    localStorage.removeItem(key)
+  } catch (e) {
+    console.error('Error removing from localStorage:', e)
+  }
+}
+
 const handleLogin = async () => {
   if (!validateForm()) return
 
   try {
     loading.value = true
-    errorMessage.value = ''
+    serverError.value = ''
+    formErrors.email = ''
+    formErrors.password = ''
 
     // Вход пользователя
     const result = await AuthService.login(formData.email, formData.password)
 
-    // Получаем URL для перенаправления (если пользователь пытался получить доступ
-    // к защищенной странице перед тем, как был перенаправлен на страницу входа)
-    const redirectUrl = localStorage.getItem('redirectAfterLogin');
-    localStorage.removeItem('redirectAfterLogin');
+    // Получаем URL для перенаправления
+    const redirectUrl = safeGetItem('redirectAfterLogin')
+    safeRemoveItem('redirectAfterLogin')
 
     // Если у нас есть сохраненный URL, пытаемся перейти на него
     if (redirectUrl) {
       // Проверяем, имеет ли пользователь доступ к целевому URL
       if (redirectUrl.includes('/admin') && !AuthService.isAdmin()) {
         // Если нет доступа к админке, перенаправляем на домашнюю страницу
-        router.push('/');
-        localStorage.setItem('accessError', 'Доступ к административной панели запрещен');
+        router.push('/lk')
+        safeSetItem('accessError', 'Доступ к административной панели запрещен')
       } else {
         // Если имеет доступ, перенаправляем на сохраненный URL
-        router.push(redirectUrl);
+        router.push(redirectUrl)
       }
     } else {
       // Если нет сохраненного URL, перенаправляем в зависимости от роли
       if (AuthService.isAdmin()) {
-        router.push('/admin');
+        router.push('/admin')
       } else {
-        router.push('/course');
+        router.push('/course')
       }
     }
-  } catch (error) {
-    // Обработка ошибок...
+  } catch (error: any) {
+    // Добавлена детальная обработка ошибок
+    if (error.response) {
+      // Ошибки от сервера
+      if (error.response.status === 401) {
+        serverError.value = 'Неверный логин или пароль'
+      } else if (error.response.status === 403) {
+        serverError.value = 'Доступ запрещен'
+      } else if (error.response.data?.message) {
+        serverError.value = error.response.data.message
+      } else if (error.response.data?.errors) {
+        // Обработка ошибок отдельных полей
+        const fieldErrors = error.response.data.errors
+        if (fieldErrors.email) formErrors.email = fieldErrors.email
+        if (fieldErrors.password) formErrors.password = fieldErrors.password
+      } else {
+        serverError.value = `Ошибка сервера: ${error.response.status}`
+      }
+      console.error('Ошибка сервера:', error.response.data)
+    } else if (error.request) {
+      // Ошибки сетевого соединения
+      serverError.value = 'Не удалось связаться с сервером. Проверьте подключение к интернету.'
+      console.error('Ошибка запроса:', error.request)
+    } else {
+      // Прочие ошибки
+      serverError.value = `Произошла ошибка: ${error.message}`
+      console.error('Ошибка:', error.message)
+    }
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
-
-// Функция для получения данных пользователя, включая роль
 
 const isButtonDisabled = computed(() => {
   return !formData.email || !formData.password || loading.value
@@ -203,6 +252,15 @@ a {
 
 .v-card-text {
   font-size: 0.8rem;
+}
+
+/* Стиль для сообщения об ошибке */
+.error-message {
+  color: #ff5252;
+  background-color: rgba(255, 82, 82, 0.12);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
 }
 
 @media (max-width: 1200px) {
