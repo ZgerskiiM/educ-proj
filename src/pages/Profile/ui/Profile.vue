@@ -54,7 +54,7 @@ const userData = ref({
   firstName: '',
   lastName: '',
   email: '',
-  imageUrl: 'https://randomuser.me/api/portraits/women/28.jpg'
+  imageUrl: ''
 });
 
 const getAuthToken = () => {
