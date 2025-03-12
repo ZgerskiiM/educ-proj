@@ -45,7 +45,7 @@
         >
           <v-avatar size="180" class="mb-2 mt-2" :class="{ 'align-self-start': !mdAndDown }">
             <v-img
-              :src="(fixImageUrl(processImageUrl(modelValue.imageUrl)))"
+              :src="currentImageUrl"
               alt="Фото профиля"
               @error="handleImageError"
             ></v-img>
@@ -206,7 +206,7 @@ import { useDisplay } from 'vuetify';
 import { AuthService } from '@/app/features/auth/model/Auth';
 import axios from 'axios';
 
-const API_URL = 'http://45.12.228.30:8080';
+const API_URL = 'https://babichschool.ru:8080';
 const { mdAndDown } = useDisplay();
 
 const router = useRouter();
@@ -321,6 +321,16 @@ function cancelEditing() {
   editedData.value = { ...props.modelValue };
   isEditing.value = false;
 }
+
+const useDefaultImage = ref(false);
+
+const currentImageUrl = computed(() => {
+  if (useDefaultImage.value) {
+    return '/public/EmptyAvatar.png';
+  }
+  return fixImageUrl(processImageUrl(props.modelValue.imageUrl));
+});
+
 
 function logout() {
   showLogoutDialog.value = false;

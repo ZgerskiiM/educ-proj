@@ -183,7 +183,7 @@ const handleLogin = async () => {
       if (AuthService.isAdmin()) {
         router.push('/admin')
       } else {
-        router.push('/course')
+        router.push('/lk')
       }
     }
   } catch (error: any) {

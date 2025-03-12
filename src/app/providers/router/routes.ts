@@ -3,8 +3,8 @@ import type { RouteRecordRaw } from 'vue-router'
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    component: () => import("@/pages/MainPage.vue"),
-    meta: { breadcrumb: 'Главная' }
+    redirect: '/lk',
+    meta: { breadcrumb: 'Главная' },
   },
   {
     path: '/register',

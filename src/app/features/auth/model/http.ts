@@ -1,7 +1,7 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode"; // Вам нужно установить эту библиотеку: npm install jwt-decode
 
-const API_URL = 'http://45.12.228.30:8080';
+const API_URL = 'https://babichschool.ru:8080';
 
 const http = axios.create({
   baseURL: API_URL,
