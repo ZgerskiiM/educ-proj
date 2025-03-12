@@ -324,7 +324,7 @@ const useDefaultImage = ref(false)
 
 const currentImageUrl = computed(() => {
   if (useDefaultImage.value) {
-    return '/public/EmptyAvatar.png'
+    return '/EmptyAvatar.png'
   }
   return fixImageUrl(processImageUrl(props.modelValue.imageUrl))
 })

@@ -18,7 +18,7 @@
           />
         </v-col>
 
-        <v-col v-if="certificates.length === 0" cols="12">
+        <v-col v-if="certificates.length === 0" cols="12" class="text-center py-8 mt-0 pt-0">
           <EmptyState
             :icon="emptyState.icon"
             :title="emptyState.title"
