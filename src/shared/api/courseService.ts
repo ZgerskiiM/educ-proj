@@ -82,18 +82,12 @@ export const courseService = {
     return response.data;
   },
 
-
-
-  // Обновление курса
-// Обновление курса - новая реализация
 async updateCourse(courseId, courseData) {
   try {
-    // Проверяем, что courseId - строка или число
     const id = typeof courseId === 'object' ? courseData.id || courseData.courseId : courseId;
 
-    // Если есть файл изображения, используем FormData
     const formData = new FormData();
-    formData.append('courseId', courseData.courseId); // Убрал пробел в ключе
+    formData.append('courseId', courseData.courseId);
     formData.append('newTitle', courseData.title);
     formData.append('price', courseData.price);
     formData.append('difficulty', courseData.difficulty);
