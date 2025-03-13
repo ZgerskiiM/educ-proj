@@ -89,7 +89,7 @@ defineEmits(['click'])
 }
 
 .v-card {
-    min-height: 1vh;
+    min-height: 35vh;
     height: auto;
     background-color: #FFFFFF;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -104,7 +104,7 @@ defineEmits(['click'])
 
 .responsive-image {
   width: 100%;
-  height: 16vh;
+  max-height: 22vh;
   min-width: 0vw;
 }
 

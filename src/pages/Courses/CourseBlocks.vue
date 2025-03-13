@@ -14,7 +14,7 @@
           <v-icon>mdi-pencil</v-icon>
           Чат курса
         </v-btn>
-      <div v-if="!mdAndDown" class="breadcrumbs-container">
+      <!-- <div v-if="!mdAndDown" class="breadcrumbs-container">
                 <v-breadcrumbs
                     class="mb-1 pl-0 font-weight-regular"
                     color="#F48A21"
@@ -22,8 +22,8 @@
                     <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
                     <v-breadcrumbs-item disabled :to="`/course`">{{ courseTitle }}</v-breadcrumbs-item>
                 </v-breadcrumbs>
-            </div>
-            <div v-else class="back-button-container pt-4 pb-2 pl-0 ml-0">
+            </div> -->
+            <div class="back-button-container pt-4 pb-2 pl-0 ml-0">
             <v-btn
               variant="outlined"
               density="comfortable"

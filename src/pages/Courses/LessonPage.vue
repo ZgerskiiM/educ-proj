@@ -9,7 +9,7 @@
         {{ error }}
       </div>
       <div v-else>
-        <div v-if="!mdAndDown" class="breadcrumbs-container">
+        <!-- <div v-if="!mdAndDown" class="breadcrumbs-container">
           <v-breadcrumbs class="mb-1 pl-0 font-weight-light" color="#F48A21">
             <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
             <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseTitle }}</v-breadcrumbs-item>
@@ -18,8 +18,8 @@
             >
             <v-breadcrumbs-item disabled>{{ lessonData.lessonTitle }}</v-breadcrumbs-item>
           </v-breadcrumbs>
-        </div>
-        <div v-else class="back-button-container pt-4 pb-2 pl-0 ml-0">
+        </div> -->
+        <div class="back-button-container pt-4 pb-2 pl-0 ml-0">
           <v-btn
             variant="outlined"
             density="comfortable"
@@ -33,10 +33,7 @@
         <div class="content-wrapper flex-column">
           <div class="video-block mb-0 pt-0">
             <h2 class="font-weight-medium mb-3">{{ lessonData.lessonTitle }}</h2>
-            <VideoPlayer
-              :video-url="lessonData.videoUrl"
-              :poster-image="fixImageUrl(lessonImageUrl)"
-            />
+            <VideoPlayer :video-url="lessonData.videoUrl" :poster-image="fixImageUrl(lessonImageUrl)" />
             <div class="nav--buttons pt-0 mt-0 mb-1 d-flex justify-end">
               <v-btn
                 class="text-none rounded-lg"
@@ -70,41 +67,41 @@
             </div>
           </div>
           <div class="lesson-sidebar">
-            <v-expansion-panels class="w-100">
-              <!-- Панель "Описание урока" отображается только если есть описание -->
-              <v-expansion-panel
-                v-if="lessonData.description"
-                class="w-100"
-                key="1"
-                title="01 / Описание урока"
-              >
-                <template v-slot:text>
-                  <div
-                    class="font-weight-light"
-                    v-html="lessonData.description || 'Описание отсутствует'"
-                  ></div>
-                </template>
-              </v-expansion-panel>
-              <v-expansion-panel
-                v-if="lessonData.sheetUrl"
-                class="w-100"
-                key="2"
-                title="02 / Дополнительные материалы"
-              >
-                <template v-slot:text>
-                  <p class="font-weight-light">
-                    <a :href="lessonData.sheetUrl" target="_blank" class="material-link">
-                      Скачать материалы к уроку
-                    </a>
-                  </p>
-                </template>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </div>
+  <v-expansion-panels class="w-100">
+    <!-- Панель "Описание урока" отображается только если есть описание -->
+    <v-expansion-panel
+      v-if="lessonData.description"
+      class="w-100"
+      key="1"
+      title="01 / Описание урока"
+    >
+      <template v-slot:text>
+        <div
+          class="font-weight-light"
+          v-html="lessonData.description || 'Описание отсутствует'"
+        ></div>
+      </template>
+    </v-expansion-panel>
+        <v-expansion-panel
+          v-if="lessonData.sheetUrl"
+          class="w-100"
+          key="2"
+          title="02 / Дополнительные материалы"
+        >
+          <template v-slot:text>
+            <p class="font-weight-light">
+              <a :href="lessonData.sheetUrl" target="_blank" class="material-link">
+                Скачать материалы к уроку
+              </a>
+            </p>
+          </template>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </div>
         </div>
       </div>
     </v-container>
-    <AppFooter />
+    <AppFooter/>
   </div>
 </template>
 
@@ -162,32 +159,31 @@ onMounted(async () => {
 })
 
 const fetchLessonData = async () => {
-  const maxRetries = 3
-  let retries = 0
+  const maxRetries = 3;
+  let retries = 0;
 
   while (retries < maxRetries) {
     try {
-      loading.value = true
+      loading.value = true;
       // Замените fetchLesson на getLessonDetails
-      const response = await courseService.getLessonDetails(lessonId.value)
-      lessonData.value = response
-      return response
+      const response = await courseService.getLessonDetails(lessonId.value);
+      lessonData.value = response;
+      return response;
     } catch (err) {
-      retries++
-      console.error(`Ошибка при загрузке урока (попытка ${retries}/${maxRetries}):`, err)
+      retries++;
+      console.error(`Ошибка при загрузке урока (попытка ${retries}/${maxRetries}):`, err);
 
       if (retries >= maxRetries) {
-        error.value =
-          'Не удалось загрузить урок. Пожалуйста, проверьте подключение к интернету и попробуйте снова.'
-        throw err
+        error.value = 'Не удалось загрузить урок. Пожалуйста, проверьте подключение к интернету и попробуйте снова.';
+        throw err;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000 * retries))
+      await new Promise(resolve => setTimeout(resolve, 1000 * retries));
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
-}
+};
 
 const fetchCourseData = async (id) => {
   if (!id) return
@@ -280,14 +276,14 @@ const navigateToNextLesson = async () => {
   // Если это последний урок, выполнить завершение блока
   if (isLastLesson.value) {
     // Добавить логику завершения блока
-    router.push(`/course/${courseId.value}`)
-    return
+    router.push(`/course/${courseId.value}`);
+    return;
   }
 
   // Иначе переходим к следующему уроку
   if (nextLessonId.value) {
-    const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`
-    router.push(nextUrl)
+    const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`;
+    router.push(nextUrl);
   }
 }
 
@@ -336,16 +332,18 @@ watch([() => route.params.courseId, () => route.params.blocksId], ([newCourseId,
   }
 })
 
+
 const fetchAllLessons = async () => {
   try {
     // Используем getLessonsByBlockId вместо отсутствующей функции
-    const response = await courseService.getLessonsByBlockId(blockId.value)
-    allLessons.value = response || []
+    const response = await courseService.getLessonsByBlockId(blockId.value);
+    allLessons.value = response || [];
+
   } catch (err) {
-    console.error('Ошибка при загрузке списка уроков:', err)
-    error.value = 'Не удалось загрузить список уроков. Пожалуйста, попробуйте позже.'
+    console.error('Ошибка при загрузке списка уроков:', err);
+    error.value = 'Не удалось загрузить список уроков. Пожалуйста, попробуйте позже.';
   }
-}
+};
 
 watch(
   () => route.params.lessonId,
@@ -397,10 +395,10 @@ watch(
 
 // Получение всех уроков блока (для навигации)
 
+
 // Навигация к предыдущему уроку
 const navigateToPreviousLesson = () => {
   if (!previousLessonId.value) {
-    console.log('Нет предыдущего урока')
     return
   }
 
@@ -411,7 +409,6 @@ const navigateToPreviousLesson = () => {
 
   if (prevLesson && (prevLesson.imageUrl || prevLesson.lessonImage)) {
     const prevImageUrl = fixImageUrl(prevLesson.imageUrl || prevLesson.lessonImage)
-    console.log('Сохраняем изображение предыдущего урока:', prevImageUrl)
     localStorage.setItem(`lesson_image_${previousLessonId.value}`, prevImageUrl)
   }
 
