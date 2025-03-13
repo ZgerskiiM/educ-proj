@@ -8,47 +8,47 @@ const router = createRouter({
   routes,
 })
 
-// router.beforeEach(async (to, from, next) => {
-//   // Если маршрут требует авторизации
-//   if (to.meta.requiresAuth) {
-//     // Проверяем, авторизован ли пользователь
-//     const isAuthenticated = AuthService.isAuthenticated();
-//     if (!isAuthenticated) {
-//       next({ name: 'login' });
-//       return;
-//     }
-//     // Если требуется определенная роль
-//     if (to.meta.requiredRole) {
-//       const userRole = localStorage.getItem('userRole');
-//       const hasRequiredRole = AuthService.hasRole(to.meta.requiredRole as string);
-//       if (!hasRequiredRole) {
-//         localStorage.setItem('accessError',
-//           `Доступ запрещен. Требуется роль ${to.meta.requiredRole}`);
+router.beforeEach(async (to, from, next) => {
+  // Если маршрут требует авторизации
+  if (to.meta.requiresAuth) {
+    // Проверяем, авторизован ли пользователь
+    const isAuthenticated = AuthService.isAuthenticated();
+    if (!isAuthenticated) {
+      next({ name: 'login' });
+      return;
+    }
+    // Если требуется определенная роль
+    if (to.meta.requiredRole) {
+      const userRole = localStorage.getItem('userRole');
+      const hasRequiredRole = AuthService.hasRole(to.meta.requiredRole as string);
+      if (!hasRequiredRole) {
+        localStorage.setItem('accessError',
+          `Доступ запрещен. Требуется роль ${to.meta.requiredRole}`);
 
-//         // абсолютный путь, чтобы избежать проблем с именами маршрутов
-//         next('/lk');
-//         return;
-//       }
-//     }
-//     // Проверка доступа к курсу (если это страница курса)
-//     if (to.name === 'CourseBlocks' && to.params.courseId) {
+        // абсолютный путь, чтобы избежать проблем с именами маршрутов
+        next('/lk');
+        return;
+      }
+    }
+    // Проверка доступа к курсу (если это страница курса)
+    if (to.name === 'CourseBlocks' && to.params.courseId) {
 
-//       try {
-//         const hasAccess = await hasAccessToCourse(to.params.courseId);
+      try {
+        const hasAccess = await hasAccessToCourse(to.params.courseId);
 
-//         if (!hasAccess) {
-//           localStorage.setItem('accessError', 'У вас нет доступа к этому курсу');
-//           next('/lk');
-//           return;
-//         }
-//       } catch (error) {
-//         console.error('Error checking course access:', error);
-//         next('/lk');
-//         return;
-//       }
-//     }
-//   }
-//   next();
-// });
+        if (!hasAccess) {
+          localStorage.setItem('accessError', 'У вас нет доступа к этому курсу');
+          next('/lk');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking course access:', error);
+        next('/lk');
+        return;
+      }
+    }
+  }
+  next();
+});
 
 export default router

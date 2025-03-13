@@ -27,18 +27,12 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/r-password',
     component: () => import("@/pages/AuthPages/rPassword/rPassword.vue")
   },
-  // {
-  //   path: '/course/:courseId',
-  //   name: 'CourseBlocks',
-  //   component: () => import('@/pages/Courses/CourseBlocks.vue'),
-  //   meta: { requiresAuth: true },
-  // },
   {
-   path: '/course',
+    path: '/course/:courseId',
     name: 'CourseBlocks',
-     component: () => import('@/pages/Courses/CourseBlocks.vue'),
-   meta: { requiresAuth: true },
-   },
+    component: () => import('@/pages/Courses/CourseBlocks.vue'),
+    meta: { requiresAuth: true },
+  },
   {
     path: '/course/:courseId/blocks/:blocksId/lessons/:lessonId',
     name: 'LessonContent',
