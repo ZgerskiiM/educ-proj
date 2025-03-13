@@ -1,7 +1,7 @@
 <template>
   <v-card
     @click="$emit('click', courseData.id)"
-    :class="smAndDown ? 'course-block-card d-flex flex-column rounded-sm' : 'rounded-lg	 course-block-card d-flex align-center'"
+    :class="mdAndDown ? 'course-block-card d-flex flex-column rounded-sm' : 'rounded-lg	 course-block-card d-flex align-center'"
     width="100%"
     flat
     elevation="1"
@@ -13,24 +13,19 @@
       cover
     />
     <div
-      :class="smAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'"
+      :class="mdAndDown ? 'card-text px-2 py-3 flex-grow-1' : 'card-text ml-10 flex-grow-1'"
     >
       <div class="d-flex align-center justify-space-between">
-        <div class="text-h6">
-          <span class="font-weight-bold">Блок {{ courseData.number }} / </span>
+        <div class="text-h7">
+          <span class="font-weight-regular">Блок {{ courseData.number }} / </span>
           <span class="font-weight-light">{{ courseData.title }}</span>
-        </div>
-
-        <div :class="smAndDown ? 'font-weight-light grey--text progress-small' : 'font-weight-light mt-8 mr-10 grey--text'">
-          Пройдено {{ courseData.progress.completed }}/{{ courseData.progress.total }}
-          <v-icon small>mdi-chevron-right</v-icon>
         </div>
       </div>
 
       <!-- Десктопная версия чипов -->
-      <div v-if="!smAndDown" class="chip d-flex flex-wrap gap-2 mt-2">
+      <div v-if="!mdAndDown" class="chip d-flex flex-wrap gap-2 mt-2">
         <v-chip
-          class="custom-chip1 my-1"
+          class="custom-chip1 font-weight-light my-1"
           :text="courseData.duration"
           label
         >
@@ -38,7 +33,7 @@
 
         <v-chip
           style="background-color: #FFE68E;"
-          class="custom-chip2 my-1 ml-2"
+          class="custom-chip2 font-weight-light my-1 ml-2"
           label
           color="#333132"
         >
@@ -47,7 +42,7 @@
 
         <v-chip
           style="background-color: #FEE99E; color: #333132"
-          class="custom-chip3 my-1 ml-2"
+          class="custom-chip3 font-weight-light my-1 ml-2"
           label
         >
           {{ courseData.cards }} технологических карт
@@ -87,7 +82,7 @@
 <script lang="ts" setup>
 import { useDisplay } from 'vuetify';
 
-const { smAndDown } = useDisplay();
+const { smAndDown, mdAndDown } = useDisplay();
 
 const fixImageUrl = (url) => {
   if (!url) {
@@ -186,7 +181,7 @@ h3 {
 .responsive-image {
   width: 100%;
   height: 100vh;
-  max-width: 18vw;
+  max-width: 15vw;
   min-width: 0vw;
 }
 

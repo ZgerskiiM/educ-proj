@@ -43,8 +43,13 @@
             'align-self-start': !mdAndDown,
           }"
         >
-          <v-avatar size="180" class="mb-2 mt-2" :class="{ 'align-self-start': !mdAndDown }">
-            <v-img :src="currentImageUrl" alt="Фото профиля" @error="handleImageError"></v-img>
+          <v-avatar size="150" class="mb-2 mt-4" :class="{ 'align-self-start': !mdAndDown }">
+            <v-img
+              :src="currentImageUrl"
+              alt="Фото профиля"
+              @error="handleImageError"
+              fallback="/default-avatar.jpg"
+            ></v-img>
           </v-avatar>
           <v-file-input
             v-if="isEditing"
@@ -64,36 +69,35 @@
         <v-col cols="12" md="8">
           <div v-if="!isEditing">
             <div class="d-flex justify-space-between align-center mb-4">
-              <div class="profile-card--text">Личная информация</div>
+              <div class="profile-card--text font-weight-light">Личная информация</div>
             </div>
 
             <v-list color="#FAFAFA" :class="{ 'pa-0 list-left-aligned': !mdAndDown }">
               <v-list-item>
                 <template v-slot:prepend>
-                  <v-icon icon="mdi-account" class="mr-2"></v-icon>
+                  <v-icon icon="mdi-account"></v-icon>
                 </template>
-                <v-list-item-title>Имя</v-list-item-title>
-                <v-list-item-subtitle>{{ modelValue.firstName }}</v-list-item-subtitle>
+                <v-list-item-title class="font-weight-light" >Имя</v-list-item-title>
+                <v-list-item-subtitle class="font-weight-light">{{ modelValue.firstName }}</v-list-item-subtitle>
               </v-list-item>
 
               <v-list-item>
                 <template v-slot:prepend>
-                  <v-icon icon="mdi-account-outline" class="mr-2"></v-icon>
+                  <v-icon icon="mdi-account-outline"></v-icon>
                 </template>
-                <v-list-item-title>Фамилия</v-list-item-title>
-                <v-list-item-subtitle>{{ modelValue.lastName }}</v-list-item-subtitle>
+                <v-list-item-title class="font-weight-light" >Фамилия</v-list-item-title>
+                <v-list-item-subtitle class="font-weight-light">{{ modelValue.lastName }}</v-list-item-subtitle>
               </v-list-item>
 
               <v-list-item>
                 <template v-slot:prepend>
-                  <v-icon icon="mdi-email" class="mr-2"></v-icon>
+                  <v-icon icon="mdi-email"></v-icon>
                 </template>
-                <v-list-item-title>Email</v-list-item-title>
-                <v-list-item-subtitle>{{ modelValue.email }}</v-list-item-subtitle>
+                <v-list-item-title class="font-weight-light">Email</v-list-item-title>
+                <v-list-item-subtitle class="font-weight-light">{{ modelValue.email }}</v-list-item-subtitle>
               </v-list-item>
             </v-list>
 
-            <!-- Кнопки только для мобильных устройств -->
             <div v-if="mdAndDown" class="mt-4 d-flex justify-end">
               <v-btn
                 class="profile-card--button font-weight-light text-none"
@@ -324,8 +328,14 @@ const useDefaultImage = ref(false)
 
 const currentImageUrl = computed(() => {
   if (useDefaultImage.value) {
+    return '/EmptyAvatar.png' // Убедитесь, что этот файл существует в папке public
+  }
+
+  // Проверяем, есть ли вообще URL
+  if (!props.modelValue.imageUrl) {
     return '/EmptyAvatar.png'
   }
+
   return fixImageUrl(processImageUrl(props.modelValue.imageUrl))
 })
 
@@ -363,7 +373,9 @@ function logout() {
 }
 
 .profile--card {
-  max-height: 35vh; /* Для компьютеров */
+  max-height: 35vh;
+  overflow-y: auto;
+
 }
 
 /* Стили для мобильных устройств */

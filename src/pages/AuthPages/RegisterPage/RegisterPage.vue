@@ -18,6 +18,7 @@
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="errors.lastName"
+          @input="$event.target.value = $event.target.value.replace(/\s/g, '')"
         />
         <v-text-field
           class="w-100 font-weight-light"
@@ -26,6 +27,7 @@
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="errors.firstName"
+          @input="$event.target.value = $event.target.value.replace(/\s/g, '')"
         />
         <v-text-field
           class="w-100 font-weight-light"
@@ -34,7 +36,7 @@
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="errors.email"
-          @input="validateEmail"
+          @input="validateEmail; $event.target.value = $event.target.value.replace(/\s/g, '')"
         />
         <v-text-field
           class="w-100 mb-0 font-weight-light"
@@ -48,8 +50,8 @@
           :type="visiblePassword ? 'text' : 'password'"
           @click:append-inner="visiblePassword = !visiblePassword"
           :error-messages="errors.password"
-          @input="validatePassword"
-        />
+          @input="validatePassword; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          />
         <v-text-field
           class="w-100 mb-0 font-weight-light"
           label="Повторите пароль"
@@ -60,7 +62,7 @@
           :type="visibleConfirm ? 'text' : 'password'"
           @click:append-inner="visibleConfirm = !visibleConfirm"
           :error-messages="passwordMatchError"
-          @input="validatePasswordMatch"
+          @input="validatePassword; $event.target.value = $event.target.value.replace(/\s/g, '')"
         />
         <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light">
           Уже есть аккаунт? &nbsp
@@ -68,8 +70,6 @@
             Войдите
           </router-link>
         </v-card-text>
-
-        <!-- Добавляем вывод серверной ошибки -->
         <v-alert
           v-if="serverError"
           type="error"

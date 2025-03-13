@@ -17,8 +17,8 @@
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="codeError"
-          @input="codeError = ''"
-        />
+          @input="codeError = ''; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          />
         <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light ">
           Забыли пароль? &nbsp <router-link to="reset-password"> Восстановить</router-link>
         </v-card-text>

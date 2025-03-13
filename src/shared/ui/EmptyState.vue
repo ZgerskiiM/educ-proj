@@ -15,6 +15,7 @@
     </v-tooltip>
 
     <v-btn
+      class="font-weight-light text-none"
       :color="actionColor"
       :to="actionRoute"
       disabled

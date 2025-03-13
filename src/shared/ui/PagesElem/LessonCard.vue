@@ -2,7 +2,7 @@
   <v-card
     @click="$emit('click', courseData.id)"
     class="course-lessons rounded-lg"
-    :width="mdAndDown ? '50vw' : '30vw'"
+    :width="mdAndDown ? '50vw' : '14vw'"
     elevation="1"
   >
     <v-img

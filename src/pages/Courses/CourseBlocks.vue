@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <Header/>
     <v-container
-      :width="mdAndDown ? '100vw' : '80vw'"
+      :width="mdAndDown ? '100vw' : '60vw'"
     >
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
@@ -33,18 +33,13 @@
               В профиль
             </v-btn>
           </div>
-
-      <!-- Индикатор загрузки -->
       <div v-if="loading" class="d-flex justify-center my-5">
         <v-progress-circular indeterminate color="#F48A21"></v-progress-circular>
       </div>
-
-      <!-- Сообщение об ошибке -->
       <v-alert v-if="error" type="error" class="my-3">
         {{ error }}
       </v-alert>
 
-      <!-- Список блоков курса -->
       <v-container v-if="!loading && !error" class="d-flex flex-column ga-7 ml-0 pl-0 align-center">
         <CourseCard
           v-for="(block, index) in courseBlocks"
@@ -53,12 +48,12 @@
           @click="navigateToLesson(courseId, block.blockId)"
         />
 
-        <!-- Если блоков нет -->
         <v-alert v-if="courseBlocks.length === 0" type="info" class="my-3">
           Для этого курса еще не добавлены блоки
         </v-alert>
       </v-container>
     </v-container>
+    <AppFooter/>
   </div>
 </template>
 
@@ -77,7 +72,6 @@ const router = useRouter();
 const route = useRoute();
 
 
-// Состояние
 const loading = ref(false);
 const error = ref('');
 const courseTitle = ref('Пекарская витрина: от Булок до Хлеба');
@@ -85,7 +79,6 @@ const courseBlocks = ref([]);
 const courseId = ref(null);
 const сourseSupport = ref('');
 
-// Функция для получения данных курса
 const fetchCourseData = async (id) => {
   if (!id) return;
 
@@ -135,8 +128,6 @@ const formatBlockData = (block, number) => {
   };
 };
 
-
-
 const defaultSupportLink = 'https://t.me/babichbaker_course';
 
 const navigateToSupport = () => {
@@ -158,7 +149,7 @@ const navigateToLesson = (courseId, blockId) => {
   router.push(`/course/${courseId}/blocks/${blockId}`);
 };
 
-// Получаем ID курса из URL и загружаем данные
+
 onMounted(() => {
   const id = route.params.courseId;
   if (id) {
@@ -181,8 +172,6 @@ watch(() => route.params.courseId, (newId) => {
 .course-title {
     font-size: 1.8rem;
 }
-
-
 
 h1 {
     color: #333132;
@@ -219,7 +208,7 @@ template {
 
 .page-wrapper {
   background-color: #fff8f2;
-  height: 100vh;
+  height: 100%;
 }
 
 .responsive-image {

@@ -1,39 +1,18 @@
 <!-- src/features/user/UsersFilter.vue -->
 <template>
   <v-card class="mb-6">
-    <v-card-text>
-      <v-row>
-        <v-col cols="12" md="4">
+    <v-card-text class="py-6 px-6 d-flex flex-row justify-center align-center">
           <v-text-field
             v-model="searchModel"
             label="Поиск пользователей"
             prepend-inner-icon="mdi-magnify"
             hide-details
             outlined
-            dense
             @input="updateSearch"
           ></v-text-field>
-        </v-col>
-        <v-col cols="12" md="3">
-          <v-select
-            v-model="roleModel"
-            :items="roleOptions"
-            label="Роль"
-            outlined
-            dense
-            hide-details
-            @change="updateRole"
-          ></v-select>
-        </v-col>
-        <v-col cols="12" md="5" class="d-flex justify-end align-center">
-          <v-btn color="#333132" class="mr-2" @click="$emit('apply-filter')">
-            Применить
-          </v-btn>
-          <v-btn color="success" @click="$emit('grant-access')">
+          <v-btn class="ml-16"  color="success" @click="$emit('grant-access')">
             Предоставить доступ к курсу
           </v-btn>
-        </v-col>
-      </v-row>
     </v-card-text>
   </v-card>
 </template>

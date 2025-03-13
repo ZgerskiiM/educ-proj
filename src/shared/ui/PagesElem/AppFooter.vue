@@ -1,14 +1,13 @@
 <template>
   <v-divider class="mt-10"></v-divider>
 
-  <v-footer class="bg-transparent px-4 mb-2">
+  <v-footer class="bg-transparent px-4">
     <v-container
-      class="mb-16"
-      :width="mdAndDown ? '100vw' : '80vw'"
+      class="mb-4 mt-4"
+      :width="mdAndDown ? '100vw' : '60vw'"
     >
       <div class="d-flex flex-column flex-md-row justify-space-between">
-        <!-- Левый блок -->
-        <div class="text-md-left mb-4 mb-md-0">
+        <div class="text-md-left  mb-md-0">
           <div class="mb-2">
             <img src="/school_вектор_полный.png" alt="Логотип" height="40" />
           </div>
@@ -20,13 +19,13 @@
         <!-- Правый блок -->
         <div class="text-md-right text-left">
           <div>
-            <a href="https://t.me/babichbaker_course" target="_blank" class="footer-text text-none text-decoration-none font-weight-light " rel="noopener">
-              Политика конфиденциальности
+            <a href="https://docs.google.com/document/d/1Lh6td42PDXVTXLXlh10ja17lFtt0M6aWYJ-CdSA6MdA/edit?hl=ru&tab=t.0" target="_blank" class="footer-text text-none text-decoration-none font-weight-light " rel="noopener">
+              Договор оферты
             </a>
           </div>
           <div>
-            <a href="https://t.me/babichbaker_course" target="_blank" class="footer-text text-none text-decoration-none font-weight-light " rel="noopener">
-              Договор оферты
+            <a href="https://docs.google.com/document/d/15OGntOzbng-ewJSm8tmujmHWwrp-BcbRisCZrZaaFFE/edit?usp=sharing" target="_blank" class="footer-text text-none text-decoration-none font-weight-light " rel="noopener">
+              Согласие на обработку данных
             </a>
           </div>
 
@@ -43,7 +42,6 @@
             </a>
           </div>
 
-          <!-- Блок поддержки -->
           <div class="font-weight-light footer-text mt-5">
             Возникли вопросы? <br>
             <a href="https://t.me/babichbaker_course" target="_blank" class="footer-text text-none font-weight-light text-primary" rel="noopener">

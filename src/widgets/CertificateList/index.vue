@@ -1,6 +1,6 @@
 <template>
     <div>
-      <div class="d-flex justify-space-between align-center mb-4">
+      <div class="d-flex justify-space-between align-center mb-8">
         <h2 class="font-weight-regular">{{ title }}</h2>
       </div>
       <v-row>
@@ -18,7 +18,7 @@
           />
         </v-col>
 
-        <v-col v-if="certificates.length === 0" cols="12" class="text-center py-8 mt-0 pt-0">
+        <v-col v-if="certificates.length === 0" cols="12" class="text-center py-8 mt-0 pt-0 font-weight-light">
           <EmptyState
             :icon="emptyState.icon"
             :title="emptyState.title"

@@ -10,12 +10,9 @@
         Создать курс
       </v-btn>
     </div>
-
-    <!-- Поиск и фильтры -->
     <v-card class="mb-6">
       <v-card-text>
-        <v-row>
-          <v-col cols="12" md="4">
+        <v-row class="py-6 px-6">
             <v-text-field
               v-model="courseSearch"
               label="Поиск курсов"
@@ -24,27 +21,9 @@
               outlined
               dense
             ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-select
-              v-model="courseDifficulty"
-              :items="difficultyOptions"
-              label="Сложность"
-              outlined
-              dense
-              hide-details
-            ></v-select>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-btn color="#333132" block @click="applyFilters">
-              Применить
-            </v-btn>
-          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
-
-    <!-- Таблица курсов -->
     <v-data-table
           :headers="courseHeaders"
           :items="courses || []"
@@ -56,11 +35,9 @@
       <template v-slot:item.title="{ item }">
         {{ item.title }}
       </template>
-
       <template v-slot:item.price="{ item }">
         {{ item.price }} ₽
       </template>
-
       <template v-slot:item.status="{ item }">
         <v-chip
           :color="getStatusColor(item.status)"
@@ -69,11 +46,9 @@
           {{ getStatusText(item.status) }}
         </v-chip>
       </template>
-
       <template v-slot:item.userCount="{ item }">
         {{ item.userCount || 0 }}
       </template>
-
       <template v-slot:item.actions="{ item }">
         <v-btn icon small @click="editCourse(item)" class="mr-2">
           <v-icon small>mdi-pencil</v-icon>

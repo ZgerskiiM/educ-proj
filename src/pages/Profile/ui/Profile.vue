@@ -1,13 +1,13 @@
 <template>
+  <Header />
   <v-app>
-    <Header />
     <v-main>
       <v-container
-    :width="mdAndDown ? '100vw' : '80vw'"
+    :width="mdAndDown ? '100vw' : '60vw'"
     >
         <v-row class="mb-2">
           <v-col cols="12">
-            <h1 class="font-weight-medium">Личный кабинет</h1>
+            <h1 class="font-weight-medium mt-4">Личный кабинет</h1>
           </v-col>
         </v-row>
 
@@ -60,7 +60,6 @@ const userData = ref({
 const getAuthToken = () => {
   return AuthService.getToken();
 };
-
 
 // Объявляем переменную для хранения курсов
 const purchasedCourses = ref([]);
@@ -193,7 +192,7 @@ const courseEmptyState = computed(() => {
 }
 
 .v-main {
-  background-color: #fff8f2  ;
+  background-color: #FFF8F0  ;
 }
 
 

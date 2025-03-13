@@ -646,7 +646,7 @@ const editedCourse = ref({
   id: null,
   title: '',
   price: 0,
-  chat: null,
+  chat: [],
   difficulty: 'MEDIUM',
   status: 'PENDING',
   imageUrl: ''
@@ -669,7 +669,7 @@ const initializeFormData = () => {
     difficulty: props.course.difficulty || 'MEDIUM',
     status: props.course.status || 'PENDING',
     imageUrl: props.course.imageUrl || '',
-    chat: props.course.chat,
+    chat: props.course.chat || [],
   };
 
   // Инициализируем данные для нового блока

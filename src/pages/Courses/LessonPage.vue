@@ -1,7 +1,7 @@
 <template>
   <div class="page-wrapper">
     <Header />
-    <v-container fluid class="content-container px-6 pt-2" :width="mdAndDown ? '100vw' : '80vw'">
+    <v-container fluid class="content-container px-6 pt-2" :width="mdAndDown ? '100vw' : '60vw'">
       <div v-if="loading" class="d-flex justify-center my-5">
         <v-progress-circular indeterminate color="#F48A21"></v-progress-circular>
       </div>
@@ -33,7 +33,7 @@
         <div class="content-wrapper flex-column">
           <div class="video-block mb-0 pt-0">
             <h2 class="font-weight-medium mb-3">{{ lessonData.lessonTitle }}</h2>
-            <VideoPlayer :video-url="lessonData.videoUrl" :poster-image="lessonImageUrl" />
+            <VideoPlayer :video-url="lessonData.videoUrl" :poster-image="fixImageUrl(courseImage.value)" />
             <div class="nav--buttons pt-0 mt-0 mb-1 d-flex justify-end">
               <v-btn
                 class="text-none rounded-lg"
@@ -67,7 +67,7 @@
               </v-btn>
             </div>
           </div>
-          <div class="lesson-sidebar">
+          <!-- <div class="lesson-sidebar">
             <v-expansion-panels class="w-100">
               <v-expansion-panel class="w-100" key="1" title="01 / Описание урока">
                 <template v-slot:text>
@@ -88,10 +88,11 @@
                 </template>
               </v-expansion-panel>
             </v-expansion-panels>
-          </div>
+          </div> -->
         </div>
       </div>
     </v-container>
+    <AppFooter/>
   </div>
 </template>
 
@@ -102,13 +103,15 @@ import Header from '@/shared/ui/PagesElem/Header.vue'
 import { useDisplay } from 'vuetify'
 import VideoPlayer from '@/entities/Course/VideoPlayer.vue'
 import { courseService } from '@/shared/api/courseService'
-import { markLessonAsComplete, markLessonAsStarted } from '@/shared/api/UserService'
+// import { markLessonAsComplete, markLessonAsStarted } from '@/shared/api/UserService'
 import { LessonStateService } from '@/shared/api/LessonStateService'
 import { courseUserService } from '@/shared/api/courseUserService'
+import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 
 const { mdAndDown } = useDisplay()
 const route = useRoute()
 const router = useRouter()
+const courseImage = ref()
 
 const lessonImageUrl = ref('')
 
@@ -128,7 +131,6 @@ const fixImageUrl = (url) => {
 onMounted(async () => {
   const currentLessonId = route.params.lessonId
 
-  // Получаем сохраненный URL изображения из localStorage
   const savedImageUrl = localStorage.getItem(`lesson_image_${currentLessonId}`)
 
   if (savedImageUrl) {
@@ -183,6 +185,7 @@ const fetchCourseData = async (id) => {
   try {
     const response = await courseUserService.fetchCourseWithBlocks(id)
     courseTitle.value = response.courseTitle || 'Курс без названия'
+    courseImage.value = response.imageUrl
   } catch (err) {
     console.error('Ошибка при загрузке курса:', err)
     error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.'
@@ -244,72 +247,70 @@ const nextLessonId = computed(() => {
 const lessonStarted = ref(false)
 
 // Создайте функцию для отметки начала урока
-const startLesson = async (lessonId) => {
-  // Проверяем состояние из сервиса
-  if (LessonStateService.isLessonStarted(lessonId)) {
-    lessonStarted.value = true
-    return
-  }
+// const startLesson = async (lessonId) => {
+//   // Проверяем состояние из сервиса
+//   if (LessonStateService.isLessonStarted(lessonId)) {
+//     lessonStarted.value = true
+//     return
+//   }
 
-  try {
-    await markLessonAsStarted(lessonId)
-    lessonStarted.value = true
-  } catch (error) {
-    console.error('Ошибка при отметке начала урока:', error)
-  }
-}
+//   try {
+//     await markLessonAsStarted(lessonId)
+//     lessonStarted.value = true
+//   } catch (error) {
+//     console.error('Ошибка при отметке начала урока:', error)
+//   }
+// }
 
 // Навигация к следующему уроку
 const navigateToNextLesson = async () => {
-  if (completingLesson.value) {
-    console.log('Переход уже выполняется, пропускаем')
-    return
-  }
+  // if (completingLesson.value) {
+  //   console.log('Переход уже выполняется, пропускаем')
+  //   return
+  // }
 
   if (!nextLessonId.value) {
     console.log('Нет следующего урока')
     return
   }
 
-  completingLesson.value = true
 
-  try {
-    // Сохраняем информацию о картинке следующего урока перед переходом
-    const nextLesson = allLessons.value.find(
-      (lesson) => (lesson.id || lesson.lessonId) === nextLessonId.value,
-    )
+  // try {
+  //   // Сохраняем информацию о картинке следующего урока перед переходом
+  //   const nextLesson = allLessons.value.find(
+  //     (lesson) => (lesson.id || lesson.lessonId) === nextLessonId.value,
+  //   )
 
-    if (nextLesson && (nextLesson.imageUrl || nextLesson.lessonImage)) {
-      const nextImageUrl = fixImageUrl(nextLesson.imageUrl || nextLesson.lessonImage)
-      localStorage.setItem(`lesson_image_${nextLessonId.value}`, nextImageUrl)
-    }
+  //   if (nextLesson && (nextLesson.imageUrl || nextLesson.lessonImage)) {
+  //     const nextImageUrl = fixImageUrl(nextLesson.imageUrl || nextLesson.lessonImage)
+  //     localStorage.setItem(`lesson_image_${nextLessonId.value}`, nextImageUrl)
+  //   }
 
-    // Отмечаем урок как завершенный
-    await markLessonAsComplete(lessonId.value)
+  //   // Отмечаем урок как завершенный
 
-    // Дожидаемся завершения запроса
-    await new Promise((resolve) => setTimeout(resolve, 300))
+  //   // Дожидаемся завершения запроса
+  //   await new Promise((resolve) => setTimeout(resolve, 300))
 
     // Проверяем, что компонент все еще смонтирован
     if (nextLessonId.value) {
       const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`
 
       // Очищаем состояние текущего урока перед переходом
-      if (typeof LessonStateService !== 'undefined') {
-        LessonStateService.resetLessonState(lessonId.value)
-      }
+      // if (typeof LessonStateService !== 'undefined') {
+      //   LessonStateService.resetLessonState(lessonId.value)
+      // }
 
       // Переходим к следующему уроку
       router.push(nextUrl)
     }
-  } catch (error) {
-    console.error('', error)
-  } finally {
-    // Устанавливаем таймаут для сброса состояния
-    setTimeout(() => {
-      completingLesson.value = false
-    }, 500)
-  }
+  // } catch (error) {
+  //   console.error('', error)
+  // } finally {
+  //   // Устанавливаем таймаут для сброса состояния
+  //   setTimeout(() => {
+  //     completingLesson.value = false
+  //   }, 500)
+  // }
 }
 
 const isLastLesson = computed(() => {
@@ -317,35 +318,35 @@ const isLastLesson = computed(() => {
 })
 
 // Функция для завершения последнего урока
-const completeLastLesson = async () => {
-  if (completingLesson.value) {
-    return
-  }
+// const completeLastLesson = async () => {
+//   if (completingLesson.value) {
+//     return
+//   }
 
-  completingLesson.value = true
+//   completingLesson.value = true
 
-  try {
-    // Отмечаем урок как завершенный
-    await markLessonAsComplete(lessonId.value)
+//   try {
+//     // Отмечаем урок как завершенный
+//     await markLessonAsComplete(lessonId.value)
 
-    // Дожидаемся завершения запроса
-    await new Promise((resolve) => setTimeout(resolve, 300))
+//     // Дожидаемся завершения запроса
+//     await new Promise((resolve) => setTimeout(resolve, 300))
 
-    // Очищаем состояние текущего урока перед переходом
-    LessonStateService.resetLessonState(lessonId.value)
+//     // Очищаем состояние текущего урока перед переходом
+//     LessonStateService.resetLessonState(lessonId.value)
 
-    // Переходим на страницу курса
-    router.push(`/course/${courseId.value}`)
-  } catch (error) {
-    console.error('Ошибка при завершении последнего урока:', error)
-    alert('Произошла ошибка при завершении урока. Пожалуйста, попробуйте еще раз.')
-  } finally {
-    // Устанавливаем таймаут для сброса состояния
-    setTimeout(() => {
-      completingLesson.value = false
-    }, 500)
-  }
-}
+//     // Переходим на страницу курса
+//     router.push(`/course/${courseId.value}`)
+//   } catch (error) {
+//     console.error('Ошибка при завершении последнего урока:', error)
+//     alert('Произошла ошибка при завершении урока. Пожалуйста, попробуйте еще раз.')
+//   } finally {
+//     // Устанавливаем таймаут для сброса состояния
+//     setTimeout(() => {
+//       completingLesson.value = false
+//     }, 500)
+//   }
+// }
 
 // Сбрасываем состояние отметки начала при смене урока
 watch(

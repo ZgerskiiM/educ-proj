@@ -1,9 +1,11 @@
 <template>
   <div class="page-wrapper ">
     <Header />
-    <v-container :width="mdAndDown ? '100vw' : '80vw'">
+    <v-container :width="mdAndDown ? '100vw' : '60vw'">
+      <div class="info">
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">{{ courseAuthor }}</h3>
+    </div>
       <div v-if="!mdAndDown" class="breadcrumbs-container">
                 <v-breadcrumbs
                     class="mb-1 pl-0 font-weight-light"
@@ -11,7 +13,7 @@
                 >
                     <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
                     <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseTitle }}</v-breadcrumbs-item>
-                    <v-breadcrumbs-item disabled :to="`/course/${courseId}/blocks`">Уроки</v-breadcrumbs-item>
+                    <v-breadcrumbs-item disabled :to="`/course/${courseId}/blocks`">{{ blockTitle }}</v-breadcrumbs-item>
                 </v-breadcrumbs>
             </div>
             <div v-else class="back-button-container pt-4 pb-2 pl-0 ml-0">
@@ -50,13 +52,14 @@
               id: lesson.lessonId,
               number: String(index + 1).padStart(2, '0'),
               title: lesson.lessonTitle,
-              imagePath: fixImageUrl(lesson.imageUrl),
+              imagePath: fixImageUrl(courseImage.value),
             }"
             @click="navigateToLesson(lesson.lessonId, lesson.imageUrl)"
           />
         </template>
       </v-container>
     </v-container>
+    <AppFooter/>
   </div>
 </template>
 
@@ -68,6 +71,7 @@ import { getBlockLessons } from '@/shared/api/UserService'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { courseUserService} from '@/shared/api/courseUserService'
+import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 
 const { mdAndDown } = useDisplay()
 const route = useRoute()
@@ -77,6 +81,7 @@ const router = useRouter()
 const courseId = computed(() => route.params.courseId)
 const blocksId = computed(() => route.params.blocksId)
 
+const courseImage = ref();
 
 const courseTitle = ref('');
 const courseBlocks = ref([]);
@@ -112,6 +117,7 @@ const fetchCourseData = async (id) => {
     const response = await courseUserService.fetchCourseWithBlocks(id);
     courseTitle.value = response.courseTitle || 'Курс без названия';
     courseBlocks.value = response.blocks || [];
+    courseImage.value = response.imageUrl
   } catch (err) {
     console.error('Ошибка при загрузке курса:', err);
     error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
@@ -172,10 +178,12 @@ onMounted(() => {
 })
 </script>
 
+
+
 <style scoped>
 
 .page-wrapper {
   background-color: #fff8f2;
-  height: 100vh;
+  height: 100%;
 }
 </style>

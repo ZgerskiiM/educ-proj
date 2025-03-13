@@ -19,8 +19,8 @@
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="formErrors.email"
-          @input="formErrors.email = ''"
-        />
+          @input="formErrors.email = ''; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          />
         <v-text-field
           class="w-100 mb-0 font-weight-light"
           label="Пароль"
@@ -31,8 +31,8 @@
           :type="visible ? 'text' : 'password'"
           @click:append-inner="visible = !visible"
           :error-messages="formErrors.password"
-          @input="formErrors.password = ''"
-        />
+          @input="formErrors.password = ''; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          />
         <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light">
           Забыли пароль? &nbsp
           <router-link to="reset-password">
