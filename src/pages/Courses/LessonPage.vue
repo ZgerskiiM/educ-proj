@@ -66,28 +66,38 @@
               </v-btn>
             </div>
           </div>
-          <!-- <div class="lesson-sidebar">
-            <v-expansion-panels class="w-100">
-              <v-expansion-panel class="w-100" key="1" title="01 / Описание урока">
-                <template v-slot:text>
-                  <div
-                    class="font-weight-light"
-                    v-html="lessonData.description || 'Описание отсутствует'"
-                  ></div>
-                </template>
-              </v-expansion-panel>
-              <v-expansion-panel class="w-100" key="2" title="02 / Дополнительные материалы">
-                <template v-slot:text>
-                  <p class="font-weight-light" v-if="lessonData.sheetUrl">
-                    <a :href="lessonData.sheetUrl" target="_blank" class="material-link">
-                      Скачать материалы к уроку
-                    </a>
-                  </p>
-                  <p class="panel-text font-weight-light" v-else>У данного урока нет материалов</p>
-                </template>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </div> -->
+          <div class="lesson-sidebar">
+  <v-expansion-panels class="w-100">
+    <!-- Панель "Описание урока" отображается только если есть описание -->
+    <v-expansion-panel
+      v-if="lessonData.description"
+      class="w-100"
+      key="1"
+      title="01 / Описание урока"
+    >
+      <template v-slot:text>
+        <div
+          class="font-weight-light"
+          v-html="lessonData.description || 'Описание отсутствует'"
+        ></div>
+      </template>
+    </v-expansion-panel>
+        <v-expansion-panel
+          v-if="lessonData.sheetUrl"
+          class="w-100"
+          key="2"
+          title="02 / Дополнительные материалы"
+        >
+          <template v-slot:text>
+            <p class="font-weight-light">
+              <a :href="lessonData.sheetUrl" target="_blank" class="material-link">
+                Скачать материалы к уроку
+              </a>
+            </p>
+          </template>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </div>
         </div>
       </div>
     </v-container>
@@ -263,53 +273,18 @@ const lessonStarted = ref(false)
 
 // Навигация к следующему уроку
 const navigateToNextLesson = async () => {
-  // if (completingLesson.value) {
-  //   console.log('Переход уже выполняется, пропускаем')
-  //   return
-  // }
-
-  if (!nextLessonId.value) {
-    console.log('Нет следующего урока')
-    return
+  // Если это последний урок, выполнить завершение блока
+  if (isLastLesson.value) {
+    // Добавить логику завершения блока
+    router.push(`/course/${courseId.value}`);
+    return;
   }
 
-
-  // try {
-  //   // Сохраняем информацию о картинке следующего урока перед переходом
-  //   const nextLesson = allLessons.value.find(
-  //     (lesson) => (lesson.id || lesson.lessonId) === nextLessonId.value,
-  //   )
-
-  //   if (nextLesson && (nextLesson.imageUrl || nextLesson.lessonImage)) {
-  //     const nextImageUrl = fixImageUrl(nextLesson.imageUrl || nextLesson.lessonImage)
-  //     localStorage.setItem(`lesson_image_${nextLessonId.value}`, nextImageUrl)
-  //   }
-
-  //   // Отмечаем урок как завершенный
-
-  //   // Дожидаемся завершения запроса
-  //   await new Promise((resolve) => setTimeout(resolve, 300))
-
-    // Проверяем, что компонент все еще смонтирован
-    if (nextLessonId.value) {
-      const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`
-
-      // Очищаем состояние текущего урока перед переходом
-      // if (typeof LessonStateService !== 'undefined') {
-      //   LessonStateService.resetLessonState(lessonId.value)
-      // }
-
-      // Переходим к следующему уроку
-      router.push(nextUrl)
-    }
-  // } catch (error) {
-  //   console.error('', error)
-  // } finally {
-  //   // Устанавливаем таймаут для сброса состояния
-  //   setTimeout(() => {
-  //     completingLesson.value = false
-  //   }, 500)
-  // }
+  // Иначе переходим к следующему уроку
+  if (nextLessonId.value) {
+    const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`;
+    router.push(nextUrl);
+  }
 }
 
 const isLastLesson = computed(() => {

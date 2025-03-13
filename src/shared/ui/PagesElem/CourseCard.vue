@@ -174,7 +174,7 @@ h3 {
   gap: 8px;
 }
 
-@media (max-width: 819px) {
+@media (max-width: 1050px) {
   h1 {
     font-size: 1rem;
   }

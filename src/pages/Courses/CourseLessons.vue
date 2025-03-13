@@ -81,7 +81,6 @@ const router = useRouter()
 const courseId = computed(() => route.params.courseId)
 const blocksId = computed(() => route.params.blocksId)
 
-const courseImage = ref();
 
 const courseTitle = ref('');
 const courseBlocks = ref([]);
@@ -203,6 +202,7 @@ onMounted(() => {
 
 .page-wrapper {
   background-color: #fff8f2;
+  min-height: 100vh;
   height: 100%;
 }
 </style>
