@@ -52,7 +52,7 @@
               id: lesson.lessonId,
               number: String(index + 1).padStart(2, '0'),
               title: lesson.lessonTitle,
-              imagePath: fixImageUrl(courseImage.value),
+              imagePath: fixImageUrl(courseImage),
             }"
             @click="navigateToLesson(lesson.lessonId, lesson.imageUrl)"
           />
