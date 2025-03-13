@@ -1,4 +1,3 @@
-// src/shared/api/courseUserService.js
 import axios from 'axios';
 import { AuthService } from '@/app/features/auth/model/Auth';
 
@@ -18,5 +17,35 @@ export const courseUserService = {
       }
     });
     return response.data;
+  },
+
+  // Получение блока с уроками
+  async fetchBlockWithLessons(blockId) {
+    try {
+      const response = await axios.get(`${API_URL}/users/blocks/${blockId}`, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Ошибка при получении блока ${blockId}:`, error);
+      throw error;
+    }
+  },
+
+  // Получение деталей урока
+  async fetchLessonDetails(lessonId) {
+    try {
+      const response = await axios.get(`${API_URL}/users/lessons/${lessonId}`, {
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Ошибка при получении урока ${lessonId}:`, error);
+      throw error;
+    }
   }
 };

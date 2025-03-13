@@ -11,7 +11,6 @@ const http = axios.create({
 function forceLogout() {
   localStorage.removeItem("jwt_token");
   localStorage.removeItem("refresh_token");
-  alert("Сессия истекла. Вы будете перенаправлены на страницу входа.");
   window.location.href = '/login';
 }
 

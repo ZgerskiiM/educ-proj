@@ -165,8 +165,8 @@ const fetchLessonData = async () => {
   while (retries < maxRetries) {
     try {
       loading.value = true;
-      // Замените fetchLesson на getLessonDetails
-      const response = await courseService.getLessonDetails(lessonId.value);
+      // Используем courseUserService вместо courseService
+      const response = await courseUserService.fetchLessonDetails(lessonId.value);
       lessonData.value = response;
       return response;
     } catch (err) {
@@ -174,7 +174,7 @@ const fetchLessonData = async () => {
       console.error(`Ошибка при загрузке урока (попытка ${retries}/${maxRetries}):`, err);
 
       if (retries >= maxRetries) {
-        error.value = 'Не удалось загрузить урок. Пожалуйста, проверьте подключение к интернету и попробуйте снова.';
+        error.value = 'Не удалось загрузить урок. Пожалуйста, проверьте доступ к курсу и попробуйте снова.';
         throw err;
       }
 
@@ -184,6 +184,20 @@ const fetchLessonData = async () => {
     }
   }
 };
+
+// Также заменить fetchAllLessons():
+const fetchAllLessons = async () => {
+  try {
+    // Используем courseUserService вместо courseService
+    const response = await courseUserService.fetchBlockWithLessons(blockId.value);
+    allLessons.value = response.lessons || [];
+  } catch (err) {
+    console.error('Ошибка при загрузке списка уроков:', err);
+    error.value = 'Не удалось загрузить список уроков. Пожалуйста, проверьте ваш доступ к курсу.';
+  }
+};
+
+
 
 const fetchCourseData = async (id) => {
   if (!id) return
@@ -332,38 +346,6 @@ watch([() => route.params.courseId, () => route.params.blocksId], ([newCourseId,
   }
 })
 
-
-const fetchAllLessons = async () => {
-  try {
-    // Используем getLessonsByBlockId вместо отсутствующей функции
-    const response = await courseService.getLessonsByBlockId(blockId.value);
-    allLessons.value = response || [];
-
-  } catch (err) {
-    console.error('Ошибка при загрузке списка уроков:', err);
-    error.value = 'Не удалось загрузить список уроков. Пожалуйста, попробуйте позже.';
-  }
-};
-
-watch(
-  () => route.params.lessonId,
-  (newLessonId, oldLessonId) => {
-    if (newLessonId && newLessonId !== oldLessonId) {
-      // Сначала обнуляем текущие данные, чтобы показать загрузку
-      lessonData.value = {
-        lessonTitle: '',
-        videoUrl: '',
-        description: '',
-        sheetUrl: '',
-      }
-      loading.value = true
-
-      // Затем загружаем новые данные
-      fetchLessonData()
-    }
-  },
-  { immediate: true },
-)
 
 watch(
   () => route.params.lessonId,
