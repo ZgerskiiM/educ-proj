@@ -39,14 +39,6 @@
         >
           {{ courseData.lessons }} уроков
         </v-chip>
-
-        <v-chip
-          style="background-color: #FEE99E; color: #333132"
-          class="custom-chip3 font-weight-light my-1 ml-2"
-          label
-        >
-          {{ courseData.cards }} технологических карт
-        </v-chip>
       </div>
 
       <!-- Мобильная версия чипов -->
@@ -67,13 +59,6 @@
           {{ courseData.lessons }} уроков
         </v-chip>
 
-        <v-chip
-          style="background-color: #FEE99E; color: #333132"
-          class="custom-chip3 equal-width-chip"
-          label
-        >
-          {{ courseData.cards }} технологических <br> карт
-        </v-chip>
       </div>
     </div>
   </v-card>

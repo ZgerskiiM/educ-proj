@@ -124,7 +124,6 @@ const formatBlockData = (block, number) => {
     },
     duration: `${block.lessonsCount * 2.5} минут`, // Приблизительная длительность
     lessons: block.lessonsCount,
-    cards: Math.round(block.lessonsCount) // Примерное количество карт
   };
 };
 

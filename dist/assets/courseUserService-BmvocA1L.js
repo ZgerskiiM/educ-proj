@@ -1,1 +1,0 @@
-import{E as s,A as r}from"./index-D_oD8h-s.js";const t="https://babichschool.ru:8080",o=()=>r.getToken(),n={async fetchCourseWithBlocks(e){return(await s.get(`${t}/users/courses/${e}`,{headers:{Authorization:`Bearer ${o()}`}})).data}};export{n as c};
