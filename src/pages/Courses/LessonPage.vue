@@ -348,29 +348,6 @@ const isLastLesson = computed(() => {
 // }
 
 // Сбрасываем состояние отметки начала при смене урока
-watch(
-  () => route.params.lessonId,
-  (newLessonId, oldLessonId) => {
-    lessonStarted.value = false // Сбрасываем флаг начала урока
-
-    if (newLessonId && newLessonId !== oldLessonId) {
-      // Сначала обнуляем текущие данные, чтобы показать загрузку
-      lessonData.value = {
-        lessonTitle: '',
-        videoUrl: '',
-        description: '',
-        sheetUrl: '',
-      }
-      loading.value = true
-
-      // Небольшая задержка перед загрузкой данных нового урока
-      setTimeout(() => {
-        fetchLessonData()
-      }, 100)
-    }
-  },
-  { immediate: true },
-)
 
 watch(allLessons, () => {}, { immediate: true })
 
@@ -380,7 +357,6 @@ watch([() => route.params.courseId, () => route.params.blocksId], ([newCourseId,
   }
 })
 
-const completingLesson = ref(false)
 
 const fetchAllLessons = async () => {
   try {
@@ -388,10 +364,6 @@ const fetchAllLessons = async () => {
     const response = await courseService.getLessonsByBlockId(blockId.value);
     allLessons.value = response || [];
 
-    // Если мы загрузили список уроков и пользователь еще не начинал урок, отметим его
-    if (lessonId.value && !lessonStarted.value) {
-      startLesson(lessonId.value);
-    }
   } catch (err) {
     console.error('Ошибка при загрузке списка уроков:', err);
     error.value = 'Не удалось загрузить список уроков. Пожалуйста, попробуйте позже.';
@@ -516,36 +488,36 @@ onMounted(async () => {
 })
 
 // 4. Улучшите обработку состояния загрузки
-watch(
-  () => route.params.lessonId,
-  async (newLessonId, oldLessonId) => {
-    if (newLessonId && newLessonId !== oldLessonId) {
-      loading.value = true
-      error.value = ''
-      lessonStarted.value = false
+// watch(
+//   () => route.params.lessonId,
+//   async (newLessonId, oldLessonId) => {
+//     if (newLessonId && newLessonId !== oldLessonId) {
+//       loading.value = true
+//       error.value = ''
+//       lessonStarted.value = false
 
-      try {
-        // Сначала обнуляем текущие данные
-        lessonData.value = {
-          lessonTitle: '',
-          videoUrl: '',
-          description: '',
-          sheetUrl: '',
-          imageUrl: '',
-        }
+//       try {
+//         // Сначала обнуляем текущие данные
+//         lessonData.value = {
+//           lessonTitle: '',
+//           videoUrl: '',
+//           description: '',
+//           sheetUrl: '',
+//           imageUrl: '',
+//         }
 
-        // Затем загружаем новые
-        await fetchLessonData()
-        // Не обязательно перезагружать весь список уроков при смене урока
-      } catch (e) {
-        error.value = 'Не удалось загрузить урок. Попробуйте еще раз.'
-      } finally {
-        loading.value = false
-      }
-    }
-  },
-  { immediate: true },
-)
+//         // Затем загружаем новые
+//         await fetchLessonData()
+//         // Не обязательно перезагружать весь список уроков при смене урока
+//       } catch (e) {
+//         error.value = 'Не удалось загрузить урок. Попробуйте еще раз.'
+//       } finally {
+//         loading.value = false
+//       }
+//     }
+//   },
+//   { immediate: true },
+// )
 </script>
 
 <style scoped>
