@@ -1,0 +1,1 @@
+import{D as s}from"./index-BHpa5Asv.js";import{A as r}from"./Auth-TtMAv3HS.js";const o="https://babichschool.ru:8080",t=()=>r.getToken(),i={async fetchCourseWithBlocks(e){return(await s.get(`${o}/users/courses/${e}`,{headers:{Authorization:`Bearer ${t()}`}})).data}};export{i as c};
