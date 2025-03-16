@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 export const userApi = axios.create({
-  baseURL: 'https://babichschool.ru:8081',
+  baseURL: 'https://babichschool.ru:8080',
 });
 
 export const adminApi = axios.create({
-  baseURL: 'https://babichschool.ru:8081/admin',
+  baseURL: 'https://babichschool.ru:8080/admin',
 });
 
 function getAuthTokenDynamic() {
