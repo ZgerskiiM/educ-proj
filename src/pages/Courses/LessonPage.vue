@@ -22,7 +22,8 @@
         <div class="content-wrapper flex-column">
           <div class="video-block mb-0 pt-0">
             <h2 class="font-weight-medium mb-3">{{ lessonData.lessonTitle }}</h2>
-            <VideoPlayer :video-url="lessonData.videoUrl" :poster-image="fixImageUrl(lessonImageUrl)" />
+            <VideoPlayer :video-url="lessonData.videoUrl"
+            :poster-image="fixImageUrl(lessonImageUrl)" />
             <div class="nav--buttons pt-0 mt-0 mb-1 d-flex justify-end">
               <v-btn
                 class="text-none rounded-lg"

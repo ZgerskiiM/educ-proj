@@ -1,7 +1,9 @@
 <template>
   <div class="page-wrapper ">
     <Header />
-    <v-container class="lessons-container" :width="mdAndDown ? '100vw' : '60vw'">
+    <v-container
+    :class="mdAndDown ? 'lessons-container' : 'lessons-container pl-0 pr-0'"
+    :width="mdAndDown ? '100vw' : '60vw'">
       <div class="info">
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">{{ courseAuthor }}</h3>

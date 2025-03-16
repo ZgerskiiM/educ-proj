@@ -3,12 +3,10 @@ import axios from 'axios';
 // Базовые конфигурации без токена
 export const userApi = axios.create({
   baseURL: 'http://localhost:8080',
-  timeout: 5000
 });
 
 export const adminApi = axios.create({
   baseURL: 'http://localhost:8080/admin',
-  timeout: 5000
 });
 
 // Функция для получения токена, которая будет вызываться при каждом запросе

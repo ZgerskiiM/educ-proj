@@ -25,7 +25,7 @@
       <!-- Мобильная версия чипов -->
       <div v-if="mdAndDown" class="chip-container w-100 mt-2 ">
         <v-chip
-          class="custom-chip1 equal-width-chip"
+          class="custom-chip1 font-weight-light equal-width-chip"
           :text="courseData.duration"
           label
         >
@@ -33,7 +33,7 @@
 
         <v-chip
           style="background-color: #FFE68E;"
-          class="custom-chip2 equal-width-chip mx-1"
+          class="custom-chip2 font-weight-light equal-width-chip mx-1"
           label
           color="#333132"
         >
@@ -178,7 +178,7 @@ h3 {
   }
 
   .v-chip {
-    font-size: 0.47rem;
+    font-size: 0.8rem;
   }
 
   span {
