@@ -1,7 +1,7 @@
 <template>
   <v-card
     @click="$emit('click', courseData.id)"
-    :class="mdAndDown ? 'course-block-card d-flex flex-column rounded-sm' : 'rounded-lg	 course-block-card d-flex align-center'"
+    :class="mdAndDown ? 'course-block-card d-flex flex-column rounded-lg' : 'rounded-lg	 course-block-card d-flex align-center'"
     width="100%"
     flat
     elevation="1"
@@ -22,8 +22,27 @@
         </div>
       </div>
 
-      <!-- Десктопная версия чипов -->
-      <div v-if="!mdAndDown" class="chip d-flex flex-wrap gap-2 mt-2">
+      <!-- Мобильная версия чипов -->
+      <div v-if="mdAndDown" class="chip-container w-100 mt-2 ">
+        <v-chip
+          class="custom-chip1 font-weight-light equal-width-chip"
+          :text="courseData.duration"
+          label
+        >
+        </v-chip>
+
+        <v-chip
+          style="background-color: #FFE68E;"
+          class="custom-chip2 font-weight-light equal-width-chip mx-1"
+          label
+          color="#333132"
+        >
+          {{ courseData.lessons }} уроков
+        </v-chip>
+
+      </div>
+            <!-- Десктопная версия чипов -->
+        <div v-else class="chip d-flex flex-wrap gap-2 mt-2">
         <v-chip
           class="custom-chip1 font-weight-light my-1"
           :text="courseData.duration"
@@ -40,26 +59,6 @@
           {{ courseData.lessons }} уроков
         </v-chip>
       </div>
-
-      <!-- Мобильная версия чипов -->
-      <div v-else class="chip-container w-100 mt-2 ">
-        <v-chip
-          class="custom-chip1 equal-width-chip"
-          :text="courseData.duration"
-          label
-        >
-        </v-chip>
-
-        <v-chip
-          style="background-color: #FFE68E;"
-          class="custom-chip2 equal-width-chip mx-1"
-          label
-          color="#333132"
-        >
-          {{ courseData.lessons }} уроков
-        </v-chip>
-
-      </div>
     </div>
   </v-card>
 </template>
@@ -67,20 +66,8 @@
 <script lang="ts" setup>
 import { useDisplay } from 'vuetify';
 
-const { smAndDown, mdAndDown } = useDisplay();
+const { mdAndDown } = useDisplay();
 
-const fixImageUrl = (url) => {
-  if (!url) {
-    return '/public/default-lesson.jpg';
-  }
-
-  // Исправляем только дублирование протокола, не трогая русские символы
-  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
-  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
-
-
-  return fixedUrl;
-};
 
 // Принимаем данные курса напрямую из родительского компонента
 const props = defineProps({
@@ -174,14 +161,14 @@ h3 {
   gap: 8px;
 }
 
-@media (max-width: 1050px) {
+@media (max-width: 1279px) {
   h1 {
     font-size: 1rem;
   }
 
   .responsive-image {
     width: 100%;
-    height: 100vh;
+    height: 10vh;
     max-width: 100vw;
     max-height: 10vh;
   }
@@ -191,7 +178,7 @@ h3 {
   }
 
   .v-chip {
-    font-size: 0.47rem;
+    font-size: 0.8rem;
   }
 
   span {
@@ -206,15 +193,5 @@ h3 {
     font-size: 0.9rem;
   }
 
-  .progress-small {
-    font-size: 0.6rem;
-    display: flex;
-    align-items: center;
-  }
-
-  .mx-2 {
-    margin-left: 8px !important;
-    margin-right: 8px !important;
-  }
 }
 </style>

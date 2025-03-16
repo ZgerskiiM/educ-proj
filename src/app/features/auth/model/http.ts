@@ -1,17 +1,13 @@
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // Вам нужно установить эту библиотеку: npm install jwt-decode
+import { jwtDecode } from "jwt-decode";
+import { userApi } from "@/shared/api/api";
 
-const API_URL = 'https://babichschool.ru:8080';
-
-const http = axios.create({
-  baseURL: API_URL,
-});
+const http = userApi;
 
 // Функция для принудительного выхода
 function forceLogout() {
   localStorage.removeItem("jwt_token");
   localStorage.removeItem("refresh_token");
-  window.location.href = '/login';
 }
 
 // Функция для проверки токена перед запросом
@@ -30,7 +26,6 @@ async function getValidToken() {
 
     // Если токен истекает через менее чем 30 секунд, обновляем его
     if (decoded.exp && decoded.exp - currentTime < 30) {
-      console.log("Токен скоро истечет, обновляем...");
       return await refreshToken();
     }
 
@@ -51,8 +46,8 @@ async function refreshToken() {
       return null;
     }
 
-    // Прямой запрос без использования http (чтобы избежать циклических зависимостей)
-    const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
+    // Используем userApi вместо прямого axios
+    const response = await axios.post(`${userApi.defaults.baseURL}/auth/refresh`, { refreshToken });
 
     // Проверяем все возможные форматы ответа
     let newToken;

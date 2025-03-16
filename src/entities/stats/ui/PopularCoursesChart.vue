@@ -7,7 +7,7 @@
     </v-card>
   </template>
 
-  <script setup>
+  <script lang="ts" setup>
   defineProps({
     chartOption: {
       type: Object,

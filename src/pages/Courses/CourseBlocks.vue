@@ -1,38 +1,23 @@
 <template>
   <div class="page-wrapper">
-    <Header/>
-    <v-container
-      :width="mdAndDown ? '100vw' : '60vw'"
-    >
+    <Header />
+    <v-container class="lesson-container" :width="mdAndDown ? '100vw' : '60vw'">
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
-        <v-btn
-          class="font-weight-regular text-none"
-          variant="outlined"
-          color="#313131"
-          @click="navigateToSupport">
-          <v-icon>mdi-pencil</v-icon>
-          Чат курса
+      <v-btn
+        class="text-none"
+        variant="outlined"
+        color="#313131"
+        @click="navigateToSupport"
+      >
+        <v-icon>mdi-pencil</v-icon>
+        Чат курса
+      </v-btn>
+      <div class="back-button-container pt-4 pb-2 pl-0 ml-0">
+        <v-btn variant="outlined" density="comfortable" :to="`/lk`" class="back-button font-weight-light text-none">
+          В профиль
         </v-btn>
-      <!-- <div v-if="!mdAndDown" class="breadcrumbs-container">
-                <v-breadcrumbs
-                    class="mb-1 pl-0 font-weight-regular"
-                    color="#F48A21"
-                >
-                    <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
-                    <v-breadcrumbs-item disabled :to="`/course`">{{ courseTitle }}</v-breadcrumbs-item>
-                </v-breadcrumbs>
-            </div> -->
-            <div class="back-button-container pt-4 pb-2 pl-0 ml-0">
-            <v-btn
-              variant="outlined"
-              density="comfortable"
-              :to="`/lk`"
-              class="back-button text-none"
-            >
-              В профиль
-            </v-btn>
-          </div>
+      </div>
       <div v-if="loading" class="d-flex justify-center my-5">
         <v-progress-circular indeterminate color="#F48A21"></v-progress-circular>
       </div>
@@ -53,65 +38,65 @@
         </v-alert>
       </v-container>
     </v-container>
-    <AppFooter/>
+    <AppFooter />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useDisplay } from 'vuetify';
-import Header from "@/shared/ui/PagesElem/Header.vue";
-import CourseCard from "@/shared/ui/PagesElem/CourseCard.vue";
-import { courseUserService } from '@/shared/api/courseUserService';
-import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'; // Путь может быть другим, в зависимости от структуры проекта
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
+import Header from '@/shared/ui/PagesElem/Header.vue'
+import CourseCard from '@/shared/ui/PagesElem/CourseCard.vue'
+import { courseUserService } from '@/shared/api/courseUserService'
+import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 
-
-const { mdAndDown } = useDisplay();
-const router = useRouter();
-const route = useRoute();
-
-
-const loading = ref(false);
-const error = ref('');
-const courseTitle = ref('Пекарская витрина: от Булок до Хлеба');
-const courseBlocks = ref([]);
-const courseId = ref(null);
-const сourseSupport = ref('');
+const { mdAndDown } = useDisplay()
+const router = useRouter()
+const route = useRoute()
+const loading = ref(false)
+const error = ref('')
+const courseTitle = ref('Пекарская витрина: от Булок до Хлеба')
+const courseBlocks = ref([])
+const courseId = ref(null)
+const courseSupport = ref('')
+const originalCourseImage = ref('');
 
 const fetchCourseData = async (id) => {
-  if (!id) return;
+  if (!id) return
 
-  loading.value = true;
-  error.value = '';
+  loading.value = true
+  error.value = ''
 
   try {
-    const response = await courseUserService.fetchCourseWithBlocks(id);
-    courseTitle.value = response.courseTitle || 'Курс без названия';
-    courseBlocks.value = response.blocks || [];
-    сourseSupport.value = response.chat
+    const response = await courseUserService.fetchCourseWithBlocks(id)
+    courseTitle.value = response.courseTitle || 'Курс без названия'
+    courseBlocks.value = response.blocks || []
+    courseSupport.value = response.chat
+
+    if (response.imageUrl) {
+      originalCourseImage.value = fixImageUrl(response.imageUrl);
+    }
   } catch (err) {
-    console.error('Ошибка при загрузке курса:', err);
-    error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.';
-    courseBlocks.value = [];
+    console.error('Ошибка при загрузке курса:', err)
+    error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.'
+    courseBlocks.value = []
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const fixImageUrl = (url) => {
   if (!url) {
-    return '/public/default-lesson.jpg';
+    return '/public/default-lesson.jpg'
   }
 
-  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
-  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://')
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://')
 
+  return fixedUrl
+}
 
-  return fixedUrl;
-};
-
-// Форматирование данных блока для компонента CourseCard
 const formatBlockData = (block, number) => {
   return {
     id: block.blockId,
@@ -120,75 +105,76 @@ const formatBlockData = (block, number) => {
     imagePath: fixImageUrl(block.imageUrl), // Заглушка для изображений
     progress: {
       completed: block.completedLessons,
-      total: block.lessonsCount
+      total: block.lessonsCount,
     },
     duration: `${block.lessonsCount * 2.5} минут`, // Приблизительная длительность
     lessons: block.lessonsCount,
-  };
-};
+  }
+}
 
-const defaultSupportLink = 'https://t.me/babichbaker_course';
+const defaultSupportLink = 'https://t.me/babichbaker_course'
 
 const navigateToSupport = () => {
   // Проверяем, что ссылка существует, не пустая и не содержит слово "null"
-  const isValidLink = сourseSupport &&
-                      сourseSupport.value &&
-                      typeof сourseSupport.value === 'string' &&
-                      сourseSupport.value.trim() !== '' &&
-                      !сourseSupport.value.includes('null');
+  const isValidLink =
+    сourseSupport &&
+    сourseSupport.value &&
+    typeof сourseSupport.value === 'string' &&
+    сourseSupport.value.trim() !== '' &&
+    !сourseSupport.value.includes('null')
 
   // Если ссылка валидная, используем её, иначе используем дефолтную
-  const telegramLink = isValidLink ? сourseSupport.value : defaultSupportLink;
+  const telegramLink = isValidLink ? сourseSupport.value : defaultSupportLink
 
   // Открываем ссылку в новом окне
-  window.open(telegramLink, '_blank');
+  window.open(telegramLink, '_blank')
 }
 // Навигация к уроку
 const navigateToLesson = (courseId, blockId) => {
   router.push(`/course/${courseId}/blocks/${blockId}`);
 };
 
+// Следим за изменением ID курса в URL
+watch(
+  () => route.params.courseId,
+  (newId) => {
+    if (newId && newId !== courseId.value) {
+      courseId.value = newId
+      fetchCourseData(newId)
+    }
+  },
+)
 
 onMounted(() => {
-  const id = route.params.courseId;
+  const id = route.params.courseId
   if (id) {
-    courseId.value = id;
-    fetchCourseData(id);
+    courseId.value = id
+    fetchCourseData(id)
   }
-});
-
-// Следим за изменением ID курса в URL
-watch(() => route.params.courseId, (newId) => {
-  if (newId && newId !== courseId.value) {
-    courseId.value = newId;
-    fetchCourseData(newId);
-  }
-});
+})
 </script>
 
 <style scoped>
-
 .course-title {
-    font-size: 1.8rem;
+  font-size: 1.8rem;
 }
 
 h1 {
-    color: #333132;
-    font-size: 3rem;
-
+  color: #333132;
+  font-size: 3rem;
 }
 
 h2 {
-    color: #333132;
-    font-size: 1.8rem;
+  color: #333132;
+  font-size: 1.8rem;
 }
 
 h3 {
-    color: #333132;
+  color: #333132;
 }
 
 template {
-    background-color: BLACK;
+  background-color: BLACK;
 }
 
 .custom-chip1 {
@@ -205,8 +191,13 @@ template {
   color: #333132;
 }
 
+.lesson-container {
+  min-height: 70vh;
+}
+
 .page-wrapper {
   background-color: #fff8f2;
+  min-height: 100vh;
   height: 100%;
 }
 
@@ -218,7 +209,6 @@ template {
 }
 
 @media (max-width: 819px) {
-
   h1 {
     font-size: 1.4rem;
   }
@@ -239,5 +229,4 @@ template {
     font-size: 0.85rem;
   }
 }
-
 </style>

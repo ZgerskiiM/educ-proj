@@ -8,7 +8,6 @@
         <v-tab value="courseInfo">Информация о курсе</v-tab>
         <v-tab value="blocks">Блоки курса</v-tab>
       </v-tabs>
-
       <v-window v-model="activeTab">
         <!-- Вкладка с информацией о курсе -->
         <v-window-item value="courseInfo">
@@ -382,28 +381,6 @@
             ></v-text-field>
           </v-col>
 
-          <!-- Добавляем загрузку изображения урока -->
-          <v-col cols="12">
-            <v-file-input
-              v-model="lessonImageFile"
-              label="Изображение урока"
-              accept="image/*"
-              prepend-icon="mdi-camera"
-            ></v-file-input>
-
-            <!-- Кнопка для загрузки изображения -->
-            <v-btn
-              v-if="lessonImageFile"
-              color="primary"
-              size="small"
-              @click="uploadLessonImageNow"
-              :loading="uploadingLessonImage"
-              class="mt-2"
-            >
-              Загрузить изображение
-            </v-btn>
-          </v-col>
-
           <!-- Добавляем загрузку видео -->
           <v-col cols="12">
             <v-file-input
@@ -497,38 +474,23 @@ const newLesson = ref({
 const addingLesson = ref(false);
 const deletingLesson = ref(null);
 
-// Опции для селектов
-const difficultyOptions = [
-  { text: 'Высокая', value: 'HIGH' },
-  { text: 'Средняя', value: 'MEDIUM' },
-  { text: 'Низкая', value: 'LOW' }
-];
-
 const onBlockOrderChanged = async () => {
   try {
-
     // Явно создаем массив с нужными полями
     const reorderedBlocks = [];
-
     blocks.value.forEach((block, index) => {
       reorderedBlocks.push({
         id: parseInt(block.id, 10),   // Убедимся, что id - числовой
         order: index                  // index гарантированно числовой (0, 1, 2, ...)
       });
     });
-
-
-    // Отправляем запрос
     await courseService.reorderBlocks(editedCourse.value.id, reorderedBlocks);
-    alert('Порядок блоков успешно обновлен');
   } catch (error) {
     console.error('Ошибка при изменении порядка блоков:', error);
-    alert('Не удалось обновить порядок блоков');
     // Восстанавливаем исходный порядок
     await fetchBlocks(editedCourse.value.id);
   }
 };
-
 // Обработчик изменения порядка уроков в блоке
 const onLessonOrderChanged = async () => {
   try {
@@ -556,17 +518,14 @@ const uploadLessonImageNow = async () => {
     alert('Выберите файл и убедитесь, что урок сохранен');
     return;
   }
-
   uploadingLessonImage.value = true;
   try {
     // Вызываем метод для загрузки изображения урока
     const response = await courseService.uploadLessonImage(editedLesson.value.id, lessonImageFile.value);
-
     // Обновляем URL изображения в интерфейсе
     // Исправляем возможное дублирование протокола
     const imageUrl = fixImageUrl(response.imageUrl || response.url || response);
     editedLesson.value.lessonImage = imageUrl;
-
     // Обновляем изображение в списке уроков
     const lessonIndex = blockLessons.value.findIndex(l =>
       l.id === editedLesson.value.id || l.lessonId === editedLesson.value.id
@@ -574,11 +533,8 @@ const uploadLessonImageNow = async () => {
     if (lessonIndex !== -1) {
       blockLessons.value[lessonIndex].lessonImage = imageUrl;
     }
-
-    alert('Изображение успешно загружено');
   } catch (error) {
     console.error('Ошибка при загрузке изображения урока:', error);
-    alert('Ошибка при загрузке изображения: ' + error.message);
   } finally {
     uploadingLessonImage.value = false;
   }
@@ -590,7 +546,6 @@ const uploadLessonVideoNow = async () => {
     alert('Выберите файл и убедитесь, что урок сохранен');
     return;
   }
-
   uploadingLessonVideo.value = true;
   try {
     // Вызываем метод для загрузки видео урока
@@ -607,7 +562,6 @@ const uploadLessonVideoNow = async () => {
 
 
 const uploadingBlockImage = ref(false);
-
 // Добавить функцию для явной загрузки изображения
 const uploadBlockImageNow = async () => {
   if (!blockImageFile.value || !editedBlock.value.id) {
@@ -638,10 +592,8 @@ const uploadBlockImageNow = async () => {
 const statusOptions = [
   { text: 'Активный', value: 'ACTIVE' },
   { text: 'В ожидании', value: 'PENDING' },
-  { text: 'Архивирован', value: 'ARCHIVED' }
 ];
 
-// Данные курса - инициализация с дефолтными значениями
 const editedCourse = ref({
   id: null,
   title: '',
@@ -652,7 +604,6 @@ const editedCourse = ref({
   imageUrl: ''
 });
 
-// Новый блок
 const newBlock = ref({
   title: '',
   courseId: null,
@@ -910,53 +861,6 @@ const editLessonHandler = async (lesson) => {
   }
 };
 
-// Обработчик загрузки видео
-const handleLessonVideoUpload = async () => {
-
-
-  if (!lessonVideoFile.value) {
-    alert('Пожалуйста, выберите файл видео');
-    return;
-  }
-
-  if (!editedLesson.value.id) {
-    alert('ID урока не определен. Сначала сохраните урок.');
-    return;
-  }
-
-  uploadingVideo.value = true;
-  try {
-    const response = await courseService.uploadLessonVideo(editedLesson.value.id, lessonVideoFile.value);
-    alert('Видео успешно загружено');
-
-    // Обновляем данные урока, чтобы отобразить новое видео
-    const updatedLessonDetails = await courseService.getLessonDetails(editedLesson.value.id);
-    editedLesson.value.videoUrl = updatedLessonDetails.videoUrl;
-  } catch (error) {
-    console.error('Ошибка при загрузке видео:', error);
-    alert('Не удалось загрузить видео. Проверьте консоль для деталей.');
-  } finally {
-    uploadingVideo.value = false;
-  }
-};
-
-// Обработчик загрузки изображения
-const handleLessonImageUpload = async () => {
-  if (!lessonImageFile.value || !editedLesson.value.id) return;
-
-  uploadingImage.value = true;
-  try {
-    await courseService.uploadLessonImage(editedLesson.value.id, lessonImageFile.value);
-    alert('Изображение успешно загружено');
-  } catch (error) {
-    console.error('Ошибка при загрузке изображения:', error);
-    alert('Не удалось загрузить изображение');
-  } finally {
-    uploadingImage.value = false;
-  }
-};
-
-// Обновление урока
 // Обновление урока
 const updateLesson = async () => {
   if (!editedLesson.value.newTitle) {
@@ -976,10 +880,8 @@ const updateLesson = async () => {
       },
       editedBlock.value.id // Передаем blockId из компонента
     );
-
     // Обновляем список уроков
     await fetchLessons(editedBlock.value.id);
-
     // Закрываем диалог
     showEditLessonDialog.value = false;
   } catch (error) {
@@ -990,23 +892,17 @@ const updateLesson = async () => {
   }
 };
 
-
-
 watch(blockEditTab, (newTab) => {
   if (newTab === 'lessons' && editedBlock.value.id) {
     fetchLessons(editedBlock.value.id);
   }
 });
-
 // Добавление урока
 const addLesson = async () => {
   if (!newLesson.value.title) {
     alert('Введите название урока');
     return;
   }
-
-
-
   addingLesson.value = true;
   try {
     const lessonData = {

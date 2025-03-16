@@ -1,4 +1,3 @@
-<!-- features/CourseFilter/ui/CourseFilterTabs/index.vue -->
 <template>
   <div class="filter-tabs mb-4">
     <div class="flexible-filter-tabs">
@@ -16,7 +15,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 defineProps({
   modelValue: { type: String, required: true },
   options: { type: Array, required: true }

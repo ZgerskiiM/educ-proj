@@ -1,4 +1,3 @@
-<!-- widgets/CourseList/index.vue -->
 <template>
   <div class="mb-8">
     <div class="d-flex justify-space-between align-center mb-4">
@@ -17,7 +16,7 @@
         :key="course.id"
         cols="12"
         sm="6"
-        lg="3"
+        lg="4"
       >
         <CourseCard :course="course" />
       </v-col>
@@ -62,15 +61,12 @@ const props = defineProps({
 
 const emit = defineEmits(['update:filter-value']);
 
-// Создаем локальную переменную, связанную с внешним пропсом
 const localFilterValue = ref(props.filterValue);
 
-// Отслеживаем изменения внешнего пропса
 watch(() => props.filterValue, (newValue) => {
   localFilterValue.value = newValue;
 });
 
-// Отслеживаем изменения локальной переменной
 watch(localFilterValue, (newValue) => {
   emit('update:filter-value', newValue);
 });

@@ -117,7 +117,6 @@ const newCourseDialog = ref(false);
 const editCourseDialog = ref(false);
 const deleteDialog = ref(false);
 const courseSearch = ref('');
-const courseDifficulty = ref(null);
 
 // Состояние загрузки и уведомлений
 const isLoading = ref(false);
@@ -134,19 +133,12 @@ const courseToDelete = ref(null);
 // Данные курсов
 const courses = ref([]);
 
-// Опции для выбора сложности
-const difficultyOptions = [
-  { text: 'Все уровни', value: null },
-  { text: 'Высокая', value: 'HIGH' },
-  { text: 'Средняя', value: 'MEDIUM' },
-  { text: 'Низкая', value: 'LOW' }
-];
 
 // Обновленные заголовки таблицы - только нужные поля
 const courseHeaders = ref([
   { text: 'Название', value: 'title' },
   { text: 'Цена', value: 'price' },
-  { text: 'Сложность', value: 'difficulty' },
+  // { text: 'Сложность', value: 'difficulty' },
   { text: 'Статус', value: 'status' },
   { text: 'Количество пользователей', value: 'userCount' },
   { text: 'Действия', value: 'actions', sortable: false }
@@ -207,29 +199,11 @@ const getStatusText = (status) => {
   }
 };
 
-const getDifficultyColor = (difficulty) => {
-  switch (difficulty) {
-    case 'HIGH': return 'red';
-    case 'MEDIUM': return 'orange';
-    case 'LOW': return 'green';
-    default: return 'grey';
-  }
-};
-
-const getDifficultyText = (difficulty) => {
-  switch (difficulty) {
-    case 'HIGH': return 'Высокая';
-    case 'MEDIUM': return 'Средняя';
-    case 'LOW': return 'Низкая';
-    default: return difficulty;
-  }
-};
 
 const getStatusColor = (status) => {
   switch (status) {
     case 'ACTIVE': return 'success';
     case 'PENDING': return 'warning';
-    case 'ARCHIVED': return 'error';
     default: return 'default';
   }
 };
@@ -257,10 +231,8 @@ const confirmDeleteCourse = (course) => {
 const createCourse = async (course) => {
   try {
     isLoading.value = true;
-
     // Создаем курс и получаем ответ сервера
     const newCourse = await courseService.createCourseWithImage(course, course.imageFile);
-
     // Важно! Добавляем новый курс в список с ID, полученным от сервера
     if (newCourse && newCourse.id !== undefined) {
       // Добавляем курс в список без перезагрузки всего списка
@@ -305,37 +277,26 @@ const updateCourse = async (updatedCourse) => {
     isLoading.value = false;
   }
 };
-// Удаление курса
-const deleteLoading = ref(false);
 
 
-// Удаление курса - исправленная функция
-// Функция для удаления курса
-// Функция для удаления курса
 // Удаление курса - исправленная функция
 const deleteCourse = async () => {
   if (!courseToDelete.value) {
     showError('Ошибка: курс для удаления не выбран');
     return;
   }
-
   const courseId = courseToDelete.value.courseId;
-
   // Проверка ID
   if (!courseId) {
     console.error('Данные курса:', courseToDelete.value);
     showError('Ошибка: не указан ID курса для удаления');
     return;
   }
-
   try {
     isLoading.value = true;
-
     await courseService.deleteCourse(courseId);
-
     // Закрываем диалог
     deleteDialog.value = false;
-
     // Обновляем список курсов
     await fetchCourses();
 

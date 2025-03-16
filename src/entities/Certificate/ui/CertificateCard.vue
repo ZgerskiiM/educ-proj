@@ -36,7 +36,7 @@
   </v-card>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 defineProps({
   certificate: { type: Object, required: true }
 });

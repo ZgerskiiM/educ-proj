@@ -30,6 +30,9 @@ import { computed } from 'vue'
 
 const { mdAndDown } = useDisplay()
 
+
+
+
 // Принимаем данные урока
 const props = defineProps({
   courseData: {

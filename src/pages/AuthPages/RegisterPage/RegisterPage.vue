@@ -11,33 +11,41 @@
         <v-card-title class="align-md-center justify-center d-flex pl-0 mb-3 font-weight-regular">
           Регистрация
         </v-card-title>
+        <!-- Поле Фамилия -->
         <v-text-field
           class="w-100 font-weight-light"
-          v-model="formData.lastName"
+          v-model="lastNameWithoutSpaces"
           label="Фамилия"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="errors.lastName"
-          @input="$event.target.value = $event.target.value.replace(/\s/g, '')"
+          @keydown="preventSpaces"
+          @paste="(e) => handlePaste(e, 'lastName')"
         />
+        <!-- Поле Имя -->
         <v-text-field
           class="w-100 font-weight-light"
-          v-model="formData.firstName"
+          v-model="firstNameWithoutSpaces"
           label="Имя"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="errors.firstName"
-          @input="$event.target.value = $event.target.value.replace(/\s/g, '')"
+          @keydown="preventSpaces"
+          @paste="(e) => handlePaste(e, 'firstName')"
         />
+        <!-- Поле Email -->
         <v-text-field
           class="w-100 font-weight-light"
-          v-model="formData.email"
+          v-model="emailWithoutSpaces"
           label="Почта"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :error-messages="errors.email"
-          @input="validateEmail; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          @input="validateEmail"
+          @keydown="preventSpaces"
+          @paste="(e) => handlePaste(e, 'email')"
         />
+        <!-- Поле Пароль -->
         <v-text-field
           class="w-100 mb-0 font-weight-light"
           label="Пароль"
@@ -46,24 +54,30 @@
           :density="smAndUp ? 'comfortable' : 'compact'"
           variant="outlined"
           :append-inner-icon="visiblePassword ? 'mdi-eye-off' : 'mdi-eye'"
-          v-model="formData.password"
+          v-model="passwordWithoutSpaces"
           :type="visiblePassword ? 'text' : 'password'"
           @click:append-inner="visiblePassword = !visiblePassword"
           :error-messages="errors.password"
-          @input="validatePassword; $event.target.value = $event.target.value.replace(/\s/g, '')"
-          />
+          @input="validatePassword"
+          @keydown="preventSpaces"
+          @paste="(e) => handlePaste(e, 'password')"
+        />
+        <!-- Поле Повторите пароль -->
         <v-text-field
           class="w-100 mb-0 font-weight-light"
           label="Повторите пароль"
           variant="outlined"
           :density="smAndUp ? 'comfortable' : 'compact'"
           :append-inner-icon="visibleConfirm ? 'mdi-eye-off' : 'mdi-eye'"
-          v-model="formData.confirmPassword"
+          v-model="confirmPasswordWithoutSpaces"
           :type="visibleConfirm ? 'text' : 'password'"
           @click:append-inner="visibleConfirm = !visibleConfirm"
           :error-messages="passwordMatchError"
-          @input="validatePassword; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          @input="validatePassword"
+          @keydown="preventSpaces"
+          @paste="(e) => handlePaste(e, 'confirmPassword')"
         />
+        <!-- Остальной код остается без изменений -->
         <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light">
           Уже есть аккаунт? &nbsp
           <router-link to="/login">
@@ -158,6 +172,76 @@ interface FormData {
   email: string
 }
 
+// Вычисляемые свойства для всех полей с блокировкой пробелов
+const firstNameWithoutSpaces = computed({
+  get: () => formData.firstName,
+  set: (value) => {
+    formData.firstName = value.replace(/\s+/g, '');
+    errors.firstName = '';
+  }
+});
+
+const lastNameWithoutSpaces = computed({
+  get: () => formData.lastName,
+  set: (value) => {
+    formData.lastName = value.replace(/\s+/g, '');
+    errors.lastName = '';
+  }
+});
+
+const emailWithoutSpaces = computed({
+  get: () => formData.email,
+  set: (value) => {
+    formData.email = value.replace(/\s+/g, '');
+    errors.email = '';
+  }
+});
+
+const passwordWithoutSpaces = computed({
+  get: () => formData.password,
+  set: (value) => {
+    formData.password = value.replace(/\s+/g, '');
+    errors.password = '';
+  }
+});
+
+const confirmPasswordWithoutSpaces = computed({
+  get: () => formData.confirmPassword,
+  set: (value) => {
+    formData.confirmPassword = value.replace(/\s+/g, '');
+    validatePasswordMatch();
+  }
+});
+
+// Предотвращает ввод пробелов
+const preventSpaces = (event) => {
+  if (event.key === ' ' || event.key === 'Spacebar') {
+    event.preventDefault();
+  }
+};
+
+// Обрабатывает вставку текста и удаляет пробелы
+const handlePaste = (event, field) => {
+  event.preventDefault();
+
+  const clipboardData = event.clipboardData || window.clipboardData;
+  const pastedText = clipboardData.getData('text');
+  const cleanText = pastedText.replace(/\s+/g, '');
+
+  // Обновляем соответствующее поле
+  formData[field] = cleanText;
+
+  // Сбрасываем ошибки если они есть
+  if (errors[field]) {
+    errors[field] = '';
+  }
+
+  // Если это поле пароля, также проверяем совпадение
+  if (field === 'password' || field === 'confirmPassword') {
+    validatePasswordMatch();
+  }
+};
+
 const validatePasswordMatch = () => {
   if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
     passwordMatchError.value = 'Пароли не совпадают'
@@ -208,11 +292,7 @@ const validatePassword = () => {
   }
 
   // Если есть ранее введенный пароль для подтверждения, проверим совпадение
-  if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
-    passwordMatchError.value = 'Пароли не совпадают'
-  } else {
-    passwordMatchError.value = ''
-  }
+  validatePasswordMatch();
 }
 
 const handleSignup = async () => {
@@ -239,12 +319,11 @@ const handleSignup = async () => {
     )
     router.push({ path: '/verify', query: { email: formData.email } })
   } catch (error: any) {
+    // Обработка ошибок без изменений
     if (error.response) {
-      // Обработка ошибок от сервера
       if (error.response.data?.message) {
         serverError.value = error.response.data.message
       } else if (error.response.data?.errors) {
-        // Если сервер возвращает ошибки для конкретных полей
         const fieldErrors = error.response.data.errors
         if (fieldErrors.email) errors.email = fieldErrors.email
         if (fieldErrors.password) errors.password = fieldErrors.password
