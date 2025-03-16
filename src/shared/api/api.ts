@@ -1,18 +1,15 @@
 import axios from 'axios';
 
-// Базовые конфигурации без токена
 export const userApi = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'https://babichschool:8081',
 });
 
 export const adminApi = axios.create({
-  baseURL: 'http://localhost:8080/admin',
+  baseURL: 'https://babichschool:8081/admin',
 });
 
-// Функция для получения токена, которая будет вызываться при каждом запросе
 function getAuthTokenDynamic() {
   try {
-    // Получаем токен напрямую из localStorage
     return localStorage.getItem('jwt_token');
   } catch (error) {
     console.error('Ошибка при получении токена:', error);
