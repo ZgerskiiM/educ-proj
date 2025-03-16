@@ -4,8 +4,3 @@
   </keep-alive>
 </template>
 
-<style lang="css" scoped>
-
-
-
-</style>

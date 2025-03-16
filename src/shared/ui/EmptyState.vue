@@ -3,7 +3,6 @@
   <v-icon :icon="icon" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
   <div class="mb-2">{{ title }}</div>
   <div class="mb-6 text-grey">{{ description }}</div>
-
   <div class="tooltip-wrapper" v-if="actionText">
     <v-tooltip
       location="bottom"
@@ -13,7 +12,6 @@
         <div v-bind="props" class="w-100 h-100 position-absolute"></div>
       </template>
     </v-tooltip>
-
     <v-btn
       class="font-weight-light text-none"
       :color="actionColor"
@@ -26,7 +24,7 @@
 </v-card>
   </template>
 
-<script setup>
+<script lang="ts" setup>
   defineProps({
     icon: { type: String, required: true },
     title: { type: String, required: true },

@@ -2,133 +2,107 @@
   <Header />
   <v-app>
     <v-main>
-      <v-container
-    :width="mdAndDown ? '100vw' : '60vw'"
-    >
+      <v-container :width="mdAndDown ? '100vw' : '60vw'">
         <v-row class="mb-2">
           <v-col cols="12">
             <h1 class="font-weight-medium mt-4">Личный кабинет</h1>
           </v-col>
         </v-row>
-
         <v-overlay :model-value="isLoading" contained class="align-center justify-center">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
-
-        <ProfileCard v-model="userData" class="mb-8"
-         @logout="handleLogout" />
-
+        <ProfileCard v-model="userData" class="mb-8" @logout="handleLogout" />
         <CourseList
           :courses="purchasedCourses"
           :filter-value="courseFilter"
           :filter-options="courseFilterOptions"
           :empty-state="courseEmptyState"
         />
-
-        <CertificateList
-          :certificates="certificates"
-        />
+        <CertificateList :certificates="certificates" />
       </v-container>
-      <AppFooter/>
-
+      <AppFooter />
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
-import Header from '@/shared/ui/PagesElem/Header.vue';
-import ProfileCard from '@/entities/User/ui/ProfileCard.vue';
-import CourseList from '@/widgets/CourseList/index.vue';
-import CertificateList from '@/widgets/CertificateList/index.vue';
-import { AuthService } from '@/app/features/auth/model/Auth';
-import { useDisplay } from 'vuetify';
-import { getUserCourses } from '@/shared/api/UserService';
-import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue';
+import { ref, computed, onMounted } from 'vue'
+import Header from '@/shared/ui/PagesElem/Header.vue'
+import ProfileCard from '@/entities/User/ui/ProfileCard.vue'
+import CourseList from '@/widgets/CourseList/index.vue'
+import CertificateList from '@/widgets/CertificateList/index.vue'
+import { AuthService } from '@/app/features/auth/model/Auth'
+import { fetchUserData } from '@/shared/api/UserService'
+import { useDisplay } from 'vuetify'
+import { getUserCourses } from '@/shared/api/UserService'
+import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 
-const { mdAndDown } = useDisplay();
-const courseFilter = ref('all');
-const isLoading = ref(false);
+const { mdAndDown } = useDisplay()
+const courseFilter = ref('all')
+const isLoading = ref(false)
 const userData = ref({
   firstName: '',
   lastName: '',
   email: '',
-  imageUrl: ''
-});
+  imageUrl: '',
+})
 
-const getAuthToken = () => {
-  return AuthService.getToken();
-};
+const purchasedCourses = ref([])
 
-// Объявляем переменную для хранения курсов
-const purchasedCourses = ref([]);
-
-// Функция для загрузки курсов пользователя
 async function fetchUserCourses() {
   try {
-    isLoading.value = true;
+    isLoading.value = true
 
     // Проверяем наличие токена перед запросом
-    const token = AuthService.getToken();
+    const token = AuthService.getToken()
     if (!token) {
-      purchasedCourses.value = []; // Пустой массив, если нет токена
-      return;
+      purchasedCourses.value = [] // Пустой массив, если нет токена
+      return
     }
 
-    const courses = await getUserCourses();
+    const courses = await getUserCourses()
 
-    purchasedCourses.value = courses.map(course => ({
+    purchasedCourses.value = courses.map((course) => ({
       id: course.id,
       title: course.title,
       imageUrl: course.imageUrl || '/public/main--menu3.png',
       progress: course.progress || 0,
       lessonsCompleted: course.lessonsCompleted || 0,
       totalLessons: course.totalLessons || 0,
-      certificateAvailable: course.certificateAvailable || false
-    }));
+      certificateAvailable: course.certificateAvailable || false,
+    }))
   } catch (error) {
-    console.error('Ошибка при получении курсов пользователя:', error);
-    purchasedCourses.value = [];
+    console.error('Ошибка при получении курсов пользователя:', error)
+    purchasedCourses.value = []
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
-const API_URL = 'https://babichschool.ru:8080';
-
-// Функция для получения данных пользователя с API
-async function fetchUserData() {
+async function loadUserData() {
   try {
-    isLoading.value = true;
-    const response = await axios.get(`${API_URL}/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`
-      }
-    });
+    isLoading.value = true
+    const userDataResult = await fetchUserData()
 
     userData.value = {
-      firstName: response.data.firstName || '',
-      lastName: response.data.lastName || '',
-      email: response.data.email || '',
-      imageUrl: response.data.imageUrl || '/EmptyAvatar.png'
-    };
+      firstName: userDataResult.firstName || '',
+      lastName: userDataResult.lastName || '',
+      email: userDataResult.email || '',
+      imageUrl: userDataResult.imageUrl || '/EmptyAvatar.png',
+    }
   } catch (error) {
-    console.error('Ошибка при получении данных пользователя:', error);
+    console.error('Ошибка при получении данных пользователя:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
 }
 
-// Загружаем данные при монтировании компонента
 onMounted(() => {
-  fetchUserData();
-  fetchUserCourses(); // Добавляем загрузку курсов
-});
+  loadUserData()
+  fetchUserCourses() // Добавляем загрузку курсов
+})
 
-
-// Сертификаты
-const certificates = ref('');
+const certificates = ref('')
 
 function handleLogout() {
   // Дополнительные действия при выходе, например, очистка состояния приложения
@@ -136,39 +110,35 @@ function handleLogout() {
     firstName: '',
     lastName: '',
     email: '',
-    imageUrl: ''
-  };
+    imageUrl: '',
+  }
 
-  localStorage.removeItem("jwt_token");
-
+  localStorage.removeItem('jwt_token')
 }
 
-
-// Добавьте этот код в <script setup>
-// Опции фильтра курсов
 const courseFilterOptions = [
   { value: 'all', label: 'Все курсы' },
   { value: 'not-started', label: 'Не начатые' },
   { value: 'in-progress', label: 'В процессе' },
-  { value: 'completed', label: 'Завершенные' }
-];
+  { value: 'completed', label: 'Завершенные' },
+]
 
 // Пустое состояние для курсов
 const courseEmptyState = computed(() => {
-  let message = '';
+  let message = ''
 
-  switch(courseFilter.value) {
+  switch (courseFilter.value) {
     case 'not-started':
-      message = 'У вас нет не начатых курсов';
-      break;
+      message = 'У вас нет не начатых курсов'
+      break
     case 'in-progress':
-      message = 'У вас нет курсов в процессе';
-      break;
+      message = 'У вас нет курсов в процессе'
+      break
     case 'completed':
-      message = 'У вас нет завершенных курсов';
-      break;
+      message = 'У вас нет завершенных курсов'
+      break
     default:
-      message = 'У вас пока нет курсов';
+      message = 'У вас пока нет курсов'
   }
 
   return {
@@ -176,14 +146,16 @@ const courseEmptyState = computed(() => {
     title: message,
     description: 'Выберите другой фильтр или перейдите в каталог',
     actionText: 'Перейти в каталог',
-    actionRoute: '/catalog'
-  };
-});
+    actionRoute: '/catalog',
+  }
+})
 </script>
 
 <style scoped>
 .cabinet-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .cabinet-card:hover {
@@ -192,9 +164,8 @@ const courseEmptyState = computed(() => {
 }
 
 .v-main {
-  background-color: #FFF8F0  ;
+  background-color: #fff8f0;
 }
-
 
 .progress-container {
   position: absolute;
@@ -219,11 +190,11 @@ const courseEmptyState = computed(() => {
 }
 
 h1 {
-  color:#333132;
+  color: #333132;
 }
 
 .sertificate-card {
-  max-height: 20px
+  max-height: 20px;
 }
 
 .filter-tabs {
@@ -242,8 +213,6 @@ h1 {
     min-height: 1vh;
   }
 }
-
-
 
 /* Стили для мобильных устройств */
 @media (max-width: 959px) {

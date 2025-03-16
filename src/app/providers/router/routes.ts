@@ -4,7 +4,6 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/lk',
-    meta: { breadcrumb: 'Главная' },
   },
   {
     path: '/register',
@@ -24,7 +23,8 @@ export const routes: Array<RouteRecordRaw> = [
     component: () => import("@/pages/AuthPages/VerificationPage/VerificationPage.vue")
   },
   {
-    path: '/r-password',
+    path: '/auth/reset-password',
+    name: 'ConfirmPasswordChange',
     component: () => import("@/pages/AuthPages/rPassword/rPassword.vue")
   },
   {
@@ -48,12 +48,13 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/lk',
-    component: () => import("@/pages/Profile/ui/Profile.vue"),
+    name: 'UserProfile',
+    component: () => import('@/pages/Profile/ui/Profile.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/admin',
-    component: () => import("@/pages/admin/AdminPanel.vue"),
+    component: () => import('@/pages/Admin/AdminPanel.vue'),
     meta: { requiresAuth: true, requiredRole: 'ADMIN'}
   },
 ]

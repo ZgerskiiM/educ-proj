@@ -8,25 +8,10 @@
           class="rounded-t-lg"
           :alt="course.title"
         ></v-img>
-        <!-- <div class="progress-container">
-          <v-tooltip location="top" :text="`Прогресс: ${course.progress}%`">
-            <template v-slot:activator="{ props }">
-              <v-progress-linear
-                v-bind="props"
-                v-model="course.progress"
-                height="8"
-                :color="getProgressColor(course.progress)"
-                rounded
-              ></v-progress-linear>
-            </template>
-          </v-tooltip>
-        </div> -->
       </div>
-      <v-card-title class="text-truncate">{{ course.title }}</v-card-title>
+      <v-card-title class=" font-weight-regular">{{ course.title }}</v-card-title>
       <v-card-text class="py-1">
         <div class="d-flex align-center mb-2">
-          <!-- <v-icon icon="mdi-book-open-variant" size="small" class="mr-1"></v-icon>
-          <span class="text-caption">{{ course.lessonsCompleted }} из {{ course.totalLessons }} уроков</span> -->
         </div>
         <div class="text-caption text-truncate-2 course-description">
           {{ course.description }}
@@ -39,29 +24,38 @@
           class="card-btn-text text-none	font-weight-regular w-50"
           color="#333132"
           prepend-icon="mdi-play"
-          :to="`/course/${course.id}`"
-        >
+          @click="navigateToCourse"
+          >
           {{ course.progress > 0 ? 'Продолжить' : 'Приступить' }}
         </v-btn>
       </v-card-actions>
     </v-card>
   </template>
 
-  <script setup>
-  defineProps({
-    course: { type: Object, required: true }
-  });
+<script lang="ts" setup>
+import { useRouter } from 'vue-router';
 
-  function getProgressColor(progress) {
-    if (progress < 30) return 'red';
-    if (progress < 70) return 'orange';
-    return 'green';
-  }
-  </script>
+const props = defineProps({
+  course: { type: Object, required: true }
+});
+
+const router = useRouter();
+const emit = defineEmits(['navigate']);
+
+function navigateToCourse() {
+  localStorage.setItem(`original_course_image_${props.course.id}`, props.course.imageUrl);
+  router.push(`/course/${props.course.id}`);
+}
+</script>
 
 <style scoped>
 .cabinet-card {
+
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.v-card-title {
+  font-size: 1rem;
 }
 
 .cabinet-card:hover {

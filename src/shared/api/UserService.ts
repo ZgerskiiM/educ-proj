@@ -1,9 +1,31 @@
-import axios from 'axios'
 import { AuthService } from '@/app/features/auth/model/Auth';
+import { userApi } from '@/shared/api/api';
 
-const API_URL = 'https://babichschool.ru:8080';
 
-// Функция для получения данных пользователя с ролью
+export const fetchUserData = async () => {
+  try {
+    const token = AuthService.getToken();
+    if (!token) {
+      throw new Error('Authentication token is missing');
+    }
+    const response = await userApi.get('/users/me');
+
+    const userData = {
+      firstName: response.data.firstName || '',
+      lastName: response.data.lastName || '',
+      email: response.data.email || '',
+      imageUrl: response.data.imageUrl || '/EmptyAvatar.png',
+      role: response.data.role || ''
+    };
+
+    return userData;
+  } catch (error) {
+    console.error('Ошибка при получении данных пользователя:', error);
+    throw error;
+  }
+}
+
+
 export const getUserData = async () => {
   try {
     // Получаем токен из localStorage
@@ -13,23 +35,15 @@ export const getUserData = async () => {
     if (!token) {
       throw new Error('Authentication token is missing');
     }
-
-    const response = await axios.get(`${API_URL}/users/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
+    const response = await userApi.get(`/users/me`);
     // Извлекаем все необходимые данные, включая роль
     const { firstName, lastName, email, role } = response.data;
     return { firstName, lastName, email, role };
-
   } catch (error) {
     console.error('Error fetching user data:', error);
     throw error;
   }
 };
-
 // Проверка роли пользователя
 export const checkUserRole = async (requiredRole) => {
   try {
@@ -44,16 +58,9 @@ export const checkUserRole = async (requiredRole) => {
 export const hasAccessToCourse = async (courseId) => {
   try {
     const token = AuthService.getToken();
-
     if (!token) return false;
-
     // Получаем все курсы пользователя
-    const response = await axios.get(`${API_URL}/users/courses`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
+    const response = await userApi.get(`/users/courses`);
     // Проверяем, есть ли курс в списке доступных
     const userCourses = response.data;
     return userCourses.some(course => course.id === parseInt(courseId));
@@ -62,7 +69,6 @@ export const hasAccessToCourse = async (courseId) => {
     return false;
   }
 };
-
 // Функция для получения курсов пользователя
 export const getUserCourses = async () => {
   try {
@@ -72,12 +78,7 @@ export const getUserCourses = async () => {
       throw new Error('Authentication token is missing');
     }
 
-    const response = await axios.get(`${API_URL}/users/courses`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    }
-  );
+    const response = await userApi.get(`/users/courses`);
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -99,20 +100,11 @@ export const getUserCourses = async () => {
   }
 };
 
-
-
 export const getBlockLessons = async (blockId) => {
   try {
     const token = AuthService.getToken();
-
     if (!token) return false;
-
-    // Получаем все курсы пользователя
-    const response = await axios.get(`${API_URL}/users/blocks/${blockId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-    });
+    const response = await userApi.get(`/users/blocks/${blockId}`);
       return response.data
   } catch (error) {
     console.error('Ошибка при получении данных блока:', error);
@@ -120,81 +112,7 @@ export const getBlockLessons = async (blockId) => {
   }
 };
 
-// Создаем набор для отслеживания выполняющихся запросов
-const pendingLessonRequests = new Set();
 
-import { LessonStateService } from './LessonStateService';
-
-export const markLessonAsStarted = async (lessonId) => {
-  const requestKey = `start-${lessonId}`;
-
-  // Если урок уже отмечен как начатый или запрос выполняется, пропускаем
-  if (LessonStateService.isLessonStarted(lessonId) ||
-      LessonStateService.isRequestInProgress(requestKey)) {
-    return Promise.resolve({});
-  }
-
-  // Отмечаем, что запрос выполняется
-  LessonStateService.startRequest(requestKey);
-
-  try {
-    const token = AuthService.getToken();
-    if (!token) throw new Error('Authentication token is missing');
-
-    const response = await axios.post(`${API_URL}/users/lessons/${lessonId}/start`, {}, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    // Отмечаем урок как начатый
-    LessonStateService.markLessonAsStarted(lessonId);
-
-    return response.data;
-  } catch (error) {
-    console.error('Error marking lesson as started:', error);
-    throw error;
-  } finally {
-    // Завершаем запрос
-    LessonStateService.finishRequest(requestKey);
-  }
-};
-
-export const markLessonAsComplete = async (lessonId) => {
-  const requestKey = `complete-${lessonId}`;
-
-  // Если урок уже отмечен как завершенный или запрос выполняется, пропускаем
-  if (LessonStateService.isLessonCompleted(lessonId) ||
-      LessonStateService.isRequestInProgress(requestKey)) {
-    return Promise.resolve({});
-  }
-
-  // Отмечаем, что запрос выполняется
-  LessonStateService.startRequest(requestKey);
-
-  try {
-    const token = AuthService.getToken();
-    if (!token) throw new Error('Authentication token is missing');
-
-    // Добавляем небольшую задержку для надежности
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const response = await axios.post(`${API_URL}/users/lessons/${lessonId}/complete`, {}, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    // Отмечаем урок как завершенный
-    LessonStateService.markLessonAsCompleted(lessonId);
-
-    return response.data;
-  } catch (error) {
-    console.error('Error marking lesson as complete:', error);
-    throw error;
-  } finally {
-    // Завершаем запрос
-    LessonStateService.finishRequest(requestKey);
-  }
-};
-
-// Проверка, является ли пользователь администратором
 export const isAdmin = async () => {
   return await checkUserRole('ADMIN');
 };
@@ -202,7 +120,7 @@ export const isAdmin = async () => {
 // Функция для входа пользователя
 export const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
+    const response = await userApi.post(`/auth/login`, { email, password });
 
     // Сохраняем токены
     const { accessToken, refreshToken } = response.data;
@@ -233,16 +151,13 @@ export const loginUser = async (email, password) => {
   }
 };
 
-// Функция для проверки, имеет ли пользователь определенную роль (синхронная версия)
 export const hasRole = (requiredRole) => {
   const userRole = localStorage.getItem('userRole');
   return userRole === requiredRole;
 };
 
-// Выход пользователя
 export const logoutUser = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('userRole');
-  // При необходимости тут можно делать запрос на сервер для инвалидации токена
 };

@@ -7,7 +7,7 @@
     </v-chip>
   </template>
 
-  <script setup>
+  <script lang="ts" setup>
   defineProps({
     status: {
       type: String,
@@ -19,7 +19,6 @@
     switch (status) {
       case 'Опубликован': return 'success';
       case 'Черновик': return 'warning';
-      case 'Архив': return 'error';
       default: return 'default';
     }
   };

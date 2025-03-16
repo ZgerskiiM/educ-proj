@@ -17,7 +17,7 @@
   </v-card>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, watch } from 'vue';
 
 const props = defineProps({

@@ -38,7 +38,7 @@
     </v-row>
   </template>
 
-  <script setup>
+  <script lang="ts" setup>
   defineProps({
     stats: {
       type: Object,

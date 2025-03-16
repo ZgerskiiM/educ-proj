@@ -9,6 +9,8 @@
                 <v-text-field
                   v-model="userEmail"
                   label="Email пользователя*"
+                  @input="userEmail = userEmail.replace(/\s/g, '')"
+                  @keydown.space.prevent
                   required
                   :rules="[v => !!v || 'Email обязателен', v => /.+@.+\..+/.test(v) || 'Введите корректный email']"
                 ></v-text-field>
@@ -40,7 +42,7 @@
     </v-dialog>
   </template>
 
-  <script setup>
+  <script lang="ts" setup>
   import { ref, computed, onMounted, watch } from 'vue';
   import { getUserService } from '@/shared/api/getUserService';
 

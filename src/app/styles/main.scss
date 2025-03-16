@@ -33,9 +33,9 @@
   max-height: 32vh;
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 819px) and (max-width: 1279px) {
   .course-block-card {
-    min-height: 10vh;
+    min-height: 20vh;
   }
 }
 
@@ -57,7 +57,7 @@
   }
 
   .course-block-card {
-    min-height: 22vh;
+    min-height: 20vh;
   }
 }
 

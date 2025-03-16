@@ -79,7 +79,7 @@ const videoType = computed(() => {
         case 'mov':
             return 'video/quicktime';
         default:
-            return 'video/mp4'; // По умолчанию предполагаем mp4
+            return 'video/mp4';
     }
 });
 

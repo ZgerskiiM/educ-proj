@@ -1,36 +1,24 @@
 <template>
   <div class="page-wrapper ">
     <Header />
-    <v-container :width="mdAndDown ? '100vw' : '60vw'">
+    <v-container class="lessons-container" :width="mdAndDown ? '100vw' : '60vw'">
       <div class="info">
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">{{ courseAuthor }}</h3>
     </div>
-      <!-- <div v-if="!mdAndDown" class="breadcrumbs-container">
-                <v-breadcrumbs
-                    class="mb-1 pl-0 font-weight-light"
-                    color="#F48A21"
-                >
-                    <v-breadcrumbs-item to="/lk">Профиль</v-breadcrumbs-item>
-                    <v-breadcrumbs-item :to="`/course/${courseId}`">{{ courseTitle }}</v-breadcrumbs-item>
-                    <v-breadcrumbs-item disabled :to="`/course/${courseId}/blocks`">{{ blockTitle }}</v-breadcrumbs-item>
-                </v-breadcrumbs>
-            </div> -->
             <div class="back-button-container pt-4 pb-2 pl-0 ml-0">
             <v-btn
               variant="outlined"
               density="comfortable"
               :to="`/course/${courseId}`"
-              class="back-button text-none"
+              class="back-button font-weight-light text-none"
             >
               К блокам
             </v-btn>
           </div>
-
       <v-card-title class="course-title font-weight-bold pt-0 pl-0" style="color: #333132">
         Блок {{ blockNumber }} / {{ blockTitle }}
       </v-card-title>
-
       <v-container
         :class="
           mdAndDown
@@ -52,9 +40,9 @@
               id: lesson.lessonId,
               number: String(index + 1).padStart(2, '0'),
               title: lesson.lessonTitle,
-              imagePath: fixImageUrl(lesson.imageUrl),
-                          }"
-            @click="navigateToLesson(lesson.lessonId, lesson.imageUrl)"
+              imagePath: lesson.imageUrl,
+            }"
+            @click="navigateToLesson(lesson.lessonId)"
           />
         </template>
       </v-container>
@@ -76,42 +64,105 @@ import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 const { mdAndDown } = useDisplay()
 const route = useRoute()
 const router = useRouter()
-
-// Получаем параметры маршрута
 const courseId = computed(() => route.params.courseId)
 const blocksId = computed(() => route.params.blocksId)
-
-
 const courseTitle = ref('');
 const courseBlocks = ref([]);
-
-// Данные курса
 const courseAuthor = ref('Авторский курс от Максима Бабича')
 const blockNumber = ref('1')
 const blockTitle = ref('')
-
 const loading = ref(true)
 const error = ref('')
 const lessons = ref([])
 
-const fixImageUrl = (url) => {
-  if (!url) {
-    return '/public/default-lesson.jpg';
+
+const courseImage = ref('');
+
+// В методе onMounted или внутри fetchBlockData
+onMounted(() => {
+  // Получаем изображение курса из localStorage
+  const savedCourseImage = localStorage.getItem(`original_course_image_${courseId.value}`);
+  if (savedCourseImage) {
+    courseImage.value = savedCourseImage;
   }
 
-  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://');
-  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://');
+  fetchBlockData();
+});
 
 
-  return fixedUrl;
-};
+
+const fetchBlockData = async () => {
+  loading.value = true
+  error.value = ''
+
+  try {
+    // Используем blocksId из параметров маршрута
+    const data = await getBlockLessons(blocksId.value)
+    blockTitle.value = data.blockTitle
+    lessons.value = data.lessons
+
+    // Получаем сохраненное изображение курса
+    const savedCourseImage = localStorage.getItem(`original_course_image_${courseId.value}`);
+    if (savedCourseImage) {
+      courseImage.value = savedCourseImage;
+    }
+  } catch (err) {
+    error.value = 'Не удалось загрузить данные уроков'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const blockImage = ref('')
+
+const fixImageUrl = (url) => {
+  if (!url) {
+    return '/assets/default-lesson.jpg'
+  }
+
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://')
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://')
+
+  return fixedUrl
+}
+
+// Функция загрузки данных курса
+const fetchBlockImage = async (courseId, blockId) => {
+  if (!courseId) return
+
+  loading.value = true
+
+  try {
+    const response = await courseUserService.fetchCourseWithBlocks(courseId)
+
+    // Находим нужный блок по ID
+    const block = response.blocks.find(b => b.blockId === blockId)
+
+    if (block) {
+      // Применяем ту же функцию обработки
+      blockImage.value = fixImageUrl(block.imageUrl)
+    }
+  } catch (err) {
+    console.error('Ошибка при загрузке данных:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  const courseId = route.params.courseId
+  const blockId = route.params.blockId
+
+  if (courseId && blockId) {
+    fetchBlockImage(courseId, blockId)
+  }
+})
 
 const fetchCourseData = async (id) => {
   if (!id) return;
-
   loading.value = true;
   error.value = '';
-
   try {
     const response = await courseUserService.fetchCourseWithBlocks(id);
     courseTitle.value = response.courseTitle || 'Курс без названия';
@@ -125,26 +176,6 @@ const fetchCourseData = async (id) => {
   }
 };
 
-
-
-// Форматирование данных блока для компонента CourseCard
-const formatBlockData = (block, number) => {
-  return {
-    id: block.blockId,
-    number: number.toString(),
-    title: block.blockTitle,
-    imagePath: fixImageUrl(block.imageUrl), // Заглушка для изображений
-    progress: {
-      completed: block.completedLessons,
-      total: block.lessonsCount
-    },
-    duration: `${block.lessonsCount * 2.5} минут`, // Приблизительная длительность
-    lessons: block.lessonsCount,
-    cards: Math.round(block.lessonsCount) // Примерное количество карт
-  };
-};
-
-
 onMounted(() => {
   const id = route.params.courseId;
   if (id) {
@@ -153,44 +184,10 @@ onMounted(() => {
   }
 });
 
-
-// Функция для загрузки данных блока
-const fetchBlockData = async () => {
-  loading.value = true
-  error.value = ''
-
-  try {
-    // Используем blocksId из параметров маршрута
-    const data = await getBlockLessons(blocksId.value)
-
-    // Логируем для отладки
-
-
-    // Обновляем состояние
-    blockTitle.value = data.blockTitle
-    lessons.value = data.lessons
-  } catch (err) {
-    error.value = 'Не удалось загрузить данные уроков'
-    console.error(err)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Обновленная функция навигации к уроку с сохранением иерархии маршрута
-const navigateToLesson = (lessonId, imageUrl) => {
-  // Сохраняем URL изображения в localStorage
-  if (imageUrl) {
-    const fixedImageUrl = fixImageUrl(imageUrl);
-    console.log(`Сохраняем изображение урока ${lessonId}:`, fixedImageUrl);
-    localStorage.setItem(`lesson_image_${lessonId}`, fixedImageUrl);
-  }
-
-  // Переходим на страницу урока
+const navigateToLesson = (lessonId) => {
   router.push(`/course/${courseId.value}/blocks/${blocksId.value}/lessons/${lessonId}`);
 };
 
-// Загружаем данные при монтировании компонента
 onMounted(() => {
   fetchBlockData()
 })
@@ -199,6 +196,10 @@ onMounted(() => {
 
 
 <style scoped>
+
+.lessons-container {
+  min-height: 70vh;
+}
 
 .page-wrapper {
   background-color: #fff8f2;

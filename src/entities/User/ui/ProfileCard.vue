@@ -33,21 +33,24 @@
     </v-btn>
   </div>
 
-  <v-card class="profile--card mb-5 rounded-xm">
+  <v-card class="profile--card mb-5 rounded-lg">
     <v-card-text>
       <v-row>
-        <v-col
-          class="d-flex flex-column"
+        <v-col cols="12" md="4" lg="3"
+          class="d-flex"
           :class="{
-            'justify-center align-center': mdAndDown,
-            'align-self-start': !mdAndDown,
+            'justify-center align-center flex-column': mdAndDown,
+            'align-self-start flex-row': !mdAndDown,
           }"
         >
-          <v-avatar size="150" class="mb-2 mt-4" :class="{ 'align-self-start': !mdAndDown }">
+          <v-avatar size="160" class="mb-2 mt-4"
+          :class="{
+            'justify-center align-center flex-column ': mdAndDown,
+            'align-self-start ml-4': !mdAndDown,
+          }">
             <v-img
               :src="currentImageUrl"
               alt="Фото профиля"
-              @error="handleImageError"
               fallback="/default-avatar.jpg"
             ></v-img>
           </v-avatar>
@@ -66,9 +69,9 @@
           ></v-file-input>
         </v-col>
 
-        <v-col cols="12" md="8">
+        <v-col cols="12" md="7" lg="8">
           <div v-if="!isEditing">
-            <div class="d-flex justify-space-between align-center mb-4">
+            <div class="d-flex justify-start align-start mb-4">
               <div class="profile-card--text font-weight-light">Личная информация</div>
             </div>
 
@@ -173,7 +176,6 @@
       </v-row>
     </v-card-text>
   </v-card>
-  <!-- Диалог подтверждения выхода -->
   <v-dialog v-model="showLogoutDialog" max-width="400">
     <v-card>
       <v-card-title>Подтверждение</v-card-title>
@@ -185,7 +187,6 @@
         <v-btn
           class="profile-card--button font-weight-light text-none"
           variant="outlined"
-          text
           @click="showLogoutDialog = false"
           >Отмена</v-btn
         >
@@ -193,7 +194,6 @@
           variant="outlined"
           class="profile-card--button font-weight-light text-none"
           color="error"
-          text
           @click="logout"
           >Выйти</v-btn
         >
@@ -202,14 +202,14 @@
   </v-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import { AuthService } from '@/app/features/auth/model/Auth'
 import axios from 'axios'
+import { userApi } from '@/shared/api/api'
 
-const API_URL = 'https://babichschool.ru:8080'
 const { mdAndDown } = useDisplay()
 
 const router = useRouter()
@@ -227,59 +227,91 @@ const getAuthToken = () => {
   return AuthService.getToken()
 }
 
-function handleImageError(e) {
-  e.target.src = '/default-avatar.jpg'
-}
+
 
 async function saveChanges() {
   try {
-    const token = getAuthToken()
+    // Получение токена авторизации
+    const token = getAuthToken();
     if (!token) {
-      alert('Вы не авторизованы')
-      return
+      emit('error', 'Вы не авторизованы');
+      return false;
     }
 
-    await axios({
-      method: 'POST',
-      url: `${API_URL}/users/update-user`,
+    // Обновление профиля пользователя
+    await userApi.post('/users/update-user', null, {
       params: {
         newFirstName: editedData.value.firstName,
-        newLastName: editedData.value.lastName,
-      },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+        newLastName: editedData.value.lastName
+      }
+    });
 
+    // Загрузка изображения, если оно было изменено
     if (imageChanged.value && imageFile.value) {
-      const formData = new FormData()
-      formData.append('image', imageFile.value)
+      const formData = new FormData();
+      formData.append('image', imageFile.value);
 
-      const photoResponse = await axios.post(`${API_URL}/users/upload`, formData, {
+      const photoResponse = await userApi.post('/users/upload', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      })
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
-      editedData.value.imageUrl = photoResponse.data.imageUrl
+      // Обновление URL изображения в данных
+      if (photoResponse.data && photoResponse.data.imageUrl) {
+        editedData.value.imageUrl = photoResponse.data.imageUrl;
+      }
     }
 
-    emit('update:modelValue', { ...editedData.value })
-    isEditing.value = false
-    alert('Профиль успешно обновлен')
+    // Обновление родительского компонента и сброс состояния редактирования
+    emit('update:modelValue', { ...editedData.value });
+    isEditing.value = false;
+
+    // Уведомление об успешном обновлении
+    emit('success', 'Профиль успешно обновлен');
+    return true;
   } catch (error) {
-    console.error('Ошибка при обновлении профиля:', error)
-    alert('Не удалось обновить профиль')
+    // Детализированная обработка ошибок
+    const errorMessage = error.response?.data?.message || 'Не удалось обновить профиль';
+    console.error('Ошибка при обновлении профиля:', error);
+    emit('error', errorMessage);
+    return false;
   }
 }
 
+const currentImageUrl = computed(() => {
+  // Если нет URL изображения в данных пользователя
+  if (!props.modelValue.imageUrl) {
+    return '/public/EmptyAvatar.png';
+  }
+
+  // Обработка существующего URL
+  try {
+    const processedUrl = processImageUrl(props.modelValue.imageUrl);
+    return fixImageUrl(processedUrl);
+  } catch (e) {
+    // Если произошла ошибка при обработке URL
+    console.error('Ошибка обработки URL изображения:', e);
+    return '/public/EmptyAvatar.png';
+  }
+});
+
+// Упростите и исправьте функцию processImageUrl
 const processImageUrl = (url) => {
-  if (!url) return '/default-avatar.jpg'
-  if (url.startsWith('/')) return `${API_URL}${url}`
-  if (!url.startsWith('http://') && !url.startsWith('https://')) return `http://${url}`
-  return url
-}
+  if (!url || url === 'null' || url === 'undefined') {
+    return '/public/EmptyAvatar.png';
+  }
+
+  if (url.startsWith('/')) {
+    return `${userApi}${url}`;
+  }
+
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;  // Лучше использовать https
+  }
+
+  return url;
+};
 
 const fixImageUrl = (url) => {
   if (!url) return '/public/default-lesson.jpg'
@@ -324,20 +356,7 @@ function cancelEditing() {
   isEditing.value = false
 }
 
-const useDefaultImage = ref(false)
 
-const currentImageUrl = computed(() => {
-  if (useDefaultImage.value) {
-    return '/EmptyAvatar.png' // Убедитесь, что этот файл существует в папке public
-  }
-
-  // Проверяем, есть ли вообще URL
-  if (!props.modelValue.imageUrl) {
-    return '/EmptyAvatar.png'
-  }
-
-  return fixImageUrl(processImageUrl(props.modelValue.imageUrl))
-})
 
 function logout() {
   showLogoutDialog.value = false

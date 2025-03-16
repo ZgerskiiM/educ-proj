@@ -35,7 +35,6 @@ export const AuthService = {
 
   // Сохранение токенов
   setTokens(response: any): void {
-    // Адаптируемся к структуре ответа API
     if (response.token) {
       localStorage.setItem(TOKEN_KEY, response.token);
     }
@@ -69,6 +68,40 @@ export const AuthService = {
     }
   },
 
+  // В файле Auth.ts добавьте новый метод
+// В файле Auth.ts добавьте/измените методы:
+
+// Метод для запроса восстановления пароля
+ async forgotPassword(email) {
+  try {
+    const response = await http.post('/auth/forgot-password', null, {
+      params: {
+        email
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при запросе сброса пароля:', error);
+    throw error;
+  }
+},
+
+// Метод для установки нового пароля
+ async resetPassword(token, newPassword) {
+  try {
+    const response = await http.post('/auth/reset-password', null, {
+      params: {
+        token,
+        newPassword
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка при сбросе пароля:', error);
+    throw error;
+  }
+},
+
   // Авторизация пользователя
   async login(email: string, password: string): Promise<any> {
     try {
@@ -84,7 +117,6 @@ export const AuthService = {
         console.log('Setting user role from token:', decodedToken.role);
         localStorage.setItem(USER_ROLE_KEY, decodedToken.role);
       } else {
-        // Запасной вариант - получаем через API
         try {
           const userData = await this.getUserData();
           if (userData && userData.role) {

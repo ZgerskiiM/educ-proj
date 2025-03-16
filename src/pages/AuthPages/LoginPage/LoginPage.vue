@@ -21,17 +21,18 @@
           :error-messages="formErrors.email"
           @input="formErrors.email = ''; $event.target.value = $event.target.value.replace(/\s/g, '')"
           />
-        <v-text-field
-          class="w-100 mb-0 font-weight-light"
-          label="Пароль"
-          :density="smAndUp ? 'comfortable' : 'compact'"
-          variant="outlined"
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          v-model="formData.password"
-          :type="visible ? 'text' : 'password'"
-          @click:append-inner="visible = !visible"
-          :error-messages="formErrors.password"
-          @input="formErrors.password = ''; $event.target.value = $event.target.value.replace(/\s/g, '')"
+          <v-text-field
+            class="w-100 mb-0 font-weight-light"
+            label="Пароль"
+            :density="smAndUp ? 'comfortable' : 'compact'"
+            variant="outlined"
+            :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+            v-model="passwordWithoutSpaces"
+            :type="visible ? 'text' : 'password'"
+            @click:append-inner="visible = !visible"
+            :error-messages="formErrors.password"
+            @paste="handlePaste"
+            @keydown="preventSpaces"
           />
         <v-card-text class="w-100 justify-center d-flex mt-0 pt-0 pl-0 font-weight-light">
           Забыли пароль? &nbsp
@@ -82,7 +83,29 @@ const { mdAndDown, smAndUp } = useDisplay()
 const router = useRouter()
 const visible = ref<boolean>(false)
 const loading = ref<boolean>(false)
-const serverError = ref<string>('') // Переименовано для соответствия с регистрацией
+const serverError = ref<string>('')
+
+const passwordWithoutSpaces = computed({
+  get: () => formData.password,
+  set: (value) => {
+    formData.password = value.replace(/\s+/g, '');
+    formErrors.password = '';
+  }
+});
+const preventSpaces = (event) => {
+  if (event.key === ' ' || event.key === 'Spacebar') {
+    event.preventDefault();
+  }
+};
+const handlePaste = (event) => {
+  event.preventDefault();
+  const clipboardData = event.clipboardData || window.clipboardData;
+  const pastedText = clipboardData.getData('text');
+  const cleanText = pastedText.replace(/\s+/g, '');
+  formData.password = cleanText;
+  formErrors.password = '';
+};
+
 
 const formData = reactive<FormData>({
   password: '',
@@ -125,7 +148,6 @@ const validateForm = (): boolean => {
   return isValid
 }
 
-// Безопасная работа с localStorage
 const safeGetItem = (key: string): string | null => {
   try {
     return localStorage.getItem(key)

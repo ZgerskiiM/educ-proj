@@ -47,7 +47,7 @@
     </v-data-table>
   </template>
 
-  <script setup>
+  <script lang="ts" setup>
   import { ref } from 'vue';
 
   defineProps({
@@ -60,7 +60,7 @@
   const userHeaders = ref([
     { text: 'Аватар', value: 'avatar', sortable: false },
     { text: 'Имя', value: 'firstName' },
-    { text: 'Имя', value: 'lastName' },
+    { text: 'Фамилия', value: 'lastName' },
     { text: 'Email', value: 'email' },
     { text: 'Роль', value: 'role' },
     { text: 'Действия', value: 'actions', sortable: false }
