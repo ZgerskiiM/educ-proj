@@ -1,5 +1,13 @@
 import axios from 'axios';
 
+// export const userApi = axios.create({
+//   baseURL: 'http://localhost:8080',
+// });
+
+// export const adminApi = axios.create({
+//   baseURL: 'http://localhost:8080/admin',
+// });
+
 export const userApi = axios.create({
   baseURL: 'https://babichschool.ru:8080',
 });
@@ -7,6 +15,7 @@ export const userApi = axios.create({
 export const adminApi = axios.create({
   baseURL: 'https://babichschool.ru:8080/admin',
 });
+
 
 function getAuthTokenDynamic() {
   try {

@@ -22,7 +22,6 @@
       </v-col>
     </v-row>
 
-    <!-- Пустое состояние -->
     <div v-else class="text-center py-8 mt-0 pt-0 font-weight-light">
       <EmptyState
         :icon="emptyState.icon"

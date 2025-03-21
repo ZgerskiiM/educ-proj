@@ -95,6 +95,8 @@
         handle=".drag-handle"
         @end="onBlockOrderChanged"
         :animation="200"
+        style="max-height: 30vh; overflow-y: auto;"
+
       >
         <template #item="{element: block}">
           <v-list-item
@@ -288,7 +290,7 @@
       @end="onLessonOrderChanged"
       :animation="200"
       class="bg-transparent"
-      style="max-height: 30vh; overflow-y: auto;"
+      style="max-height: 20vh; overflow-y: auto;"
     >
       <template #item="{element: lesson}">
         <v-list-item :title="lesson.lessonTitle">

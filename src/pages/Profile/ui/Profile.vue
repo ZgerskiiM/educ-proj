@@ -18,6 +18,7 @@
           :filter-options="courseFilterOptions"
           :empty-state="courseEmptyState"
         />
+        
         <CertificateList :certificates="certificates" />
       </v-container>
       <AppFooter />
@@ -53,10 +54,9 @@ async function fetchUserCourses() {
   try {
     isLoading.value = true
 
-    // Проверяем наличие токена перед запросом
     const token = AuthService.getToken()
     if (!token) {
-      purchasedCourses.value = [] // Пустой массив, если нет токена
+      purchasedCourses.value = []
       return
     }
 
@@ -99,13 +99,12 @@ async function loadUserData() {
 
 onMounted(() => {
   loadUserData()
-  fetchUserCourses() // Добавляем загрузку курсов
+  fetchUserCourses()
 })
 
 const certificates = ref('')
 
 function handleLogout() {
-  // Дополнительные действия при выходе, например, очистка состояния приложения
   userData.value = {
     firstName: '',
     lastName: '',
@@ -123,7 +122,6 @@ const courseFilterOptions = [
   { value: 'completed', label: 'Завершенные' },
 ]
 
-// Пустое состояние для курсов
 const courseEmptyState = computed(() => {
   let message = ''
 

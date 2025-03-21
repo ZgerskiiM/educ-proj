@@ -207,7 +207,6 @@ import { ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import { AuthService } from '@/app/features/auth/model/Auth'
-import axios from 'axios'
 import { userApi } from '@/shared/api/api'
 
 const { mdAndDown } = useDisplay()
@@ -226,8 +225,6 @@ const showLogoutDialog = ref(false)
 const getAuthToken = () => {
   return AuthService.getToken()
 }
-
-
 
 async function saveChanges() {
   try {
