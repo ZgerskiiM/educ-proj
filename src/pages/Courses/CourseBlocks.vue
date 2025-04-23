@@ -4,17 +4,17 @@
     <v-container class="lesson-container" :width="mdAndDown ? '100vw' : '60vw'">
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
-      <v-btn
-        class="text-none"
-        variant="outlined"
-        color="#313131"
-        @click="navigateToSupport"
-      >
+      <v-btn class="text-none" variant="outlined" color="#313131" @click="navigateToSupport">
         <v-icon>mdi-pencil</v-icon>
         Чат курса
       </v-btn>
       <div class="back-button-container pt-4 pb-2 pl-0 ml-0">
-        <v-btn variant="outlined" density="comfortable" :to="`/lk`" class="back-button font-weight-light text-none">
+        <v-btn
+          variant="outlined"
+          density="comfortable"
+          :to="`/profile`"
+          class="back-button font-weight-light text-none"
+        >
           В профиль
         </v-btn>
       </div>
@@ -60,7 +60,7 @@ const courseTitle = ref('Пекарская витрина: от Булок до
 const courseBlocks = ref([])
 const courseId = ref(null)
 const courseSupport = ref('')
-const originalCourseImage = ref('');
+const originalCourseImage = ref('')
 
 const fetchCourseData = async (id) => {
   if (!id) return
@@ -75,7 +75,7 @@ const fetchCourseData = async (id) => {
     courseSupport.value = response.chat
 
     if (response.imageUrl) {
-      originalCourseImage.value = fixImageUrl(response.imageUrl);
+      originalCourseImage.value = fixImageUrl(response.imageUrl)
     }
   } catch (err) {
     console.error('Ошибка при загрузке курса:', err)
@@ -131,8 +131,8 @@ const navigateToSupport = () => {
 }
 // Навигация к уроку
 const navigateToLesson = (courseId, blockId) => {
-  router.push(`/course/${courseId}/blocks/${blockId}`);
-};
+  router.push(`/course/${courseId}/blocks/${blockId}`)
+}
 
 // Следим за изменением ID курса в URL
 watch(

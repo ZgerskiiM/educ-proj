@@ -26,7 +26,6 @@ function getAuthTokenDynamic() {
   }
 }
 
-// Добавляем интерцептор для userApi
 userApi.interceptors.request.use(config => {
   const token = getAuthTokenDynamic();
 
@@ -37,7 +36,6 @@ userApi.interceptors.request.use(config => {
   return config;
 });
 
-// Добавляем интерцептор для adminApi
 adminApi.interceptors.request.use(config => {
   const token = getAuthTokenDynamic();
 

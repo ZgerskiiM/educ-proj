@@ -1,10 +1,17 @@
 <template>
     <v-data-table
-      :headers="userHeaders"
+      :headers="isMobile ? mobileHeaders : userHeaders"
       :items="users"
       :search="search"
-      :items-per-page="10"
-      class="elevation-1"
+      :items-per-page="itemsPerPage"
+      :page.sync="page"
+      :footer-props="{
+        'items-per-page-options': [5, 10, 15, 20],
+        'items-per-page-text': 'Строк на странице'
+      }"
+      height="500"
+      fixed-header
+      class="elevation-1 users-table"
     >
       <template v-slot:item.avatar="{ item }">
         <v-avatar size="40">
@@ -15,7 +22,7 @@
       <template v-slot:item.role="{ item }">
         <v-chip
           :color="item.role === 'Администратор' ? 'primary' : 'default'"
-          small
+          :size="isMobile ? 'x-small' : 'small'"
         >
           {{ item.role }}
         </v-chip>
@@ -30,7 +37,7 @@
           icon
           small
           color="#333132"
-          @click="$emit('remove-admin', item)"
+          @click="$emit('remove-admin', item.email)"
         >
           <v-icon small>mdi-close</v-icon>
         </v-btn>
@@ -39,7 +46,7 @@
           icon
           small
           color="#333132"
-          @click="$emit('make-admin', item)"
+          @click="$emit('make-admin', item.email)"
         >
           <v-icon small>mdi-account-check</v-icon>
         </v-btn>
@@ -48,14 +55,26 @@
   </template>
 
   <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
 
-  defineProps({
+  const props = defineProps({
     users: Array,
-    search: String
+    search: String,
+    isMobile: {
+      type: Boolean,
+      default: false
+    },
+    page: {
+      type: Number,
+      default: 1
+    },
+    itemsPerPage: {
+      type: Number,
+      default: 10
+    }
   });
 
-  defineEmits(['view-details', 'remove-admin', 'make-admin']);
+  defineEmits(['view-details', 'remove-admin', 'make-admin', 'update:page']);
 
   const userHeaders = ref([
     { text: 'Аватар', value: 'avatar', sortable: false },
@@ -65,4 +84,23 @@
     { text: 'Роль', value: 'role' },
     { text: 'Действия', value: 'actions', sortable: false }
   ]);
+
+  // Упрощенные заголовки для мобильного вида
+  const mobileHeaders = ref([
+    { text: 'Аватар', value: 'avatar', sortable: false, width: '15%' },
+    { text: 'Имя', value: 'firstName', width: '20%' },
+    { text: 'Email', value: 'email', width: '30%' },
+    { text: 'Роль', value: 'role', width: '15%' },
+    { text: 'Действия', value: 'actions', sortable: false, width: '20%' }
+  ]);
   </script>
+
+<style scoped>
+  .v-data-table :deep(.v-data-table__wrapper) {
+    overflow-x: auto;
+  }
+  
+  .users-table {
+    height: auto !important;
+  }
+</style>

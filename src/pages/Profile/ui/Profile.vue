@@ -5,7 +5,7 @@
       <v-container :width="mdAndDown ? '100vw' : '60vw'">
         <v-row class="mb-2">
           <v-col cols="12">
-            <h1 class="font-weight-medium mt-4">Личный кабинет</h1>
+            <h1 class="font-weight-medium mt-4">Профиль</h1>
           </v-col>
         </v-row>
         <v-overlay :model-value="isLoading" contained class="align-center justify-center">
@@ -18,7 +18,7 @@
           :filter-options="courseFilterOptions"
           :empty-state="courseEmptyState"
         />
-        
+
         <CertificateList :certificates="certificates" />
       </v-container>
       <AppFooter />

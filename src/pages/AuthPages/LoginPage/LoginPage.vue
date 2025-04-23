@@ -11,7 +11,6 @@
         <v-card-title class="align-md-center justify-center d-flex pl-0 mb-3 font-weight-regular">
           Вход
         </v-card-title>
-
         <v-text-field
           class="w-100 font-weight-light"
           v-model="formData.email"

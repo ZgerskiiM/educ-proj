@@ -1,51 +1,74 @@
 <template>
-    <v-app-bar app color="#F48A21" dark>
-      <v-app-bar-nav-icon @click="$emit('toggle-drawer')"></v-app-bar-nav-icon>
-      <div class="logo">
-        <v-btn>
-          <img src="/public/school_вектор_полный_w.png" class="logo__img" />
-        </v-btn>
-      </div>
-      <v-toolbar-title>Панель администратора</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn
-              color="white"
-              @click="handleProfileClick"
-              class="profile-btn"
-              variant="text"
-            >
-              <div class="d-flex align-center">
-                <v-img
-                  src="/user.png"
-                  height="35"
-                  width="35"
-                  class="black-icon"
-                ></v-img>
-              </div>
-            </v-btn>
+    <v-app-bar class="upper-wrapper justify-center" elevation="0" height="80" app>
+      <v-container :width="mdAndDown ? '100vw' : '70vw'">
+        <div class="header-content">
+          <div class="logo">
+            <img src="/school_вектор_полный_w.png" class="logo__img" />
+          </div>
+
+          <v-btn color="white" @click="handleProfileClick" class="profile-btn" variant="text">
+            <div class="d-flex align-center">
+              <span class="profile-text mr-2 font-weight-regular">Профиль</span>
+              <v-img src="/user.png" height="35" width="35" class="black-icon"></v-img>
+            </div>
+          </v-btn>
+        </div>
+      </v-container>
     </v-app-bar>
-  </template>
+</template>
 
-  <script setup>
-  defineEmits(['toggle-drawer']);
+<script setup>
+defineEmits(['toggle-drawer'])
 
-  import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
 const handleProfileClick = () => {
-  router.push('/LK');
+  router.push('/profile')
 }
-  </script>
+</script>
 
+<style lang="scss" scoped>
+.upper-wrapper {
+  width: 100%;
+  background-color: #f48a21;
+}
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
 
-  <style scoped>
-  .logo__img {
-    height: 30px;
-  }
+.logo {
+  display: flex;
+  align-items: center;
+}
 
-  .black-icon {
+.logo__img {
+  height: 4vh;
+}
+
+.black-icon {
   filter: invert(1);
 }
-  </style>
+
+.profile-btn {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.profile-text {
+  color: white;
+  font-weight: 500;
+}
+
+/* Скрываем текст на мобильных устройствах */
+@media (max-width: 600px) {
+  .profile-text {
+    display: none;
+  }
+}
+</style>

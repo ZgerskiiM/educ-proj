@@ -1,25 +1,52 @@
-<template>
-  <div>
-    <div class="d-flex justify-space-between align-center mb-6">
-      <h1 class="font-weight-regular">Управление курсами</h1>
-      <v-btn
-        color="#333132"
-        prepend-icon="mdi-plus"
-        @click="newCourseDialog = true"
-      >
-        Создать курс
+  <template>
+  <div :class="{ 'mobile-layout': mdAndDown }">
+    <h2 class="font-weight-regular mb-4">Список курсов</h2>
+    
+    <div class="d-flex flex-wrap gap-3 mb-6">
+      <v-btn 
+        color="black" 
+        class="text-none font-weight-light"
+        variant="outlined"
+        :size="mdAndDown ? 'small' : 'default'"
+        :class="{'text-body-2': mdAndDown}"
+        @click="openDialog">
+        Добавить курс
       </v-btn>
     </div>
-    <v-card class="mb-6">
+
+    <v-text-field
+      v-model="courseSearch"
+      append-inner-icon="mdi-magnify"
+      label="Поиск курса"
+      single-line
+      hide-details
+      variant="outlined"
+      density="compact"
+      class="mb-4 search-field font-weight-light"
+    ></v-text-field>
+
+    <!-- Предупреждение о демо-данных -->
+    <v-alert
+      v-if="isDemoMode"
+      type="info"
+      variant="tonal"
+      closable
+      class="mb-4"
+    >
+      <strong>Демо-режим:</strong> Отображаются тестовые данные, так как API недоступен. Некоторые функции могут не работать.
+    </v-alert>
+
+    <v-card class="mb-6" v-if="false">
       <v-card-text>
-        <v-row class="py-6 px-6">
+        <v-row class="py-2 px-6" :class="{ 'py-1 px-2': mdAndDown }">
             <v-text-field
               v-model="courseSearch"
               label="Поиск курсов"
               prepend-inner-icon="mdi-magnify"
               hide-details
               outlined
-              dense
+              density="compact"
+              class="compact-field"
             ></v-text-field>
         </v-row>
       </v-card-text>
@@ -29,8 +56,15 @@
           :items="courses || []"
           :search="courseSearch"
           :loading="isLoading"
-          :items-per-page="10"
-          class="elevation-1"
+          :items-per-page="itemsPerPage"
+          :page.sync="page"
+          :footer-props="{
+            'items-per-page-options': [5, 10, 15, 20],
+            'items-per-page-text': 'Строк на странице'
+          }"
+          height="500"
+          fixed-header
+          :class="['elevation-1', 'font-weight-light', 'courses-table', { 'mobile-table': mdAndDown }]"
       >
       <template v-slot:item.title="{ item }">
         {{ item.title }}
@@ -41,7 +75,7 @@
       <template v-slot:item.status="{ item }">
         <v-chip
           :color="getStatusColor(item.status)"
-          small
+          size="small"
         >
           {{ getStatusText(item.status) }}
         </v-chip>
@@ -50,11 +84,11 @@
         {{ item.userCount || 0 }}
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn icon small @click="editCourse(item)" class="mr-2">
-          <v-icon small>mdi-pencil</v-icon>
+        <v-btn variant="oulined" icon density="compact" size="40" @click="editCourse(item)" class="mr-2 border-sm">
+          <v-icon size="small" class="bg-transparent">mdi-pencil</v-icon>
         </v-btn>
-        <v-btn icon small color="red" @click="confirmDeleteCourse(item)">
-          <v-icon small>mdi-delete</v-icon>
+        <v-btn variant="oulined" icon density="compact" size="40" color="red" @click="confirmDeleteCourse(item)" class="border">
+          <v-icon size="small" class="bg-transparent">mdi-delete</v-icon>
         </v-btn>
       </template>
     </v-data-table>
@@ -108,9 +142,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useDisplay } from 'vuetify';
 import { courseService } from '@/shared/api/courseService';
 import CreateCourseDialog from '@/features/course/CreateCourseDialog.vue';
 import EditCourseDialog from '@/features/course/EditCourseDialog.vue';
+
+const { mdAndDown } = useDisplay();
 
 // Состояние диалогов и фильтров
 const newCourseDialog = ref(false);
@@ -118,8 +155,13 @@ const editCourseDialog = ref(false);
 const deleteDialog = ref(false);
 const courseSearch = ref('');
 
+// Пагинация
+const page = ref(1);
+const itemsPerPage = ref(mdAndDown.value ? 5 : 10);
+
 // Состояние загрузки и уведомлений
 const isLoading = ref(false);
+const isDemoMode = ref(false);
 const snackbar = ref({
   show: false,
   text: '',
@@ -135,59 +177,120 @@ const courses = ref([]);
 
 
 // Обновленные заголовки таблицы - только нужные поля
-const courseHeaders = ref([
-  { text: 'Название', value: 'title' },
-  { text: 'Цена', value: 'price' },
-  // { text: 'Сложность', value: 'difficulty' },
-  { text: 'Статус', value: 'status' },
-  { text: 'Количество пользователей', value: 'userCount' },
-  { text: 'Действия', value: 'actions', sortable: false }
-]);
+const courseHeaders = computed(() => {
+  const headers = [
+    { text: 'Название', value: 'title', width: "30vw" },
+    { text: 'Цена', value: 'price', width: mdAndDown.value ? '20%' : null },
+    { text: 'Статус', value: 'status', width: mdAndDown.value ? '20%' : null },
+  ];
+  
+  if (!mdAndDown.value) {
+    headers.push({ text: 'Количество пользователей', value: 'userCount' });
+  }
+  
+  headers.push({ text: 'Действия', value: 'actions', sortable: false, width: mdAndDown.value ? '30%' : null });
+  
+  return headers;
+});
 
 // Загрузка курсов при монтировании компонента
 onMounted(async () => {
   await fetchCourses();
 });
 
-// Получение списка всех курсов - оставляем как есть
+// Получение списка всех курсов
 const fetchCourses = async () => {
   try {
     isLoading.value = true;
-    const response = await courseService.fetchAllCourses();
+    isDemoMode.value = false;
+    
+    try {
+      const response = await courseService.fetchAllCourses();
 
-    let coursesData = [];
+      let coursesData = [];
 
-    if (Array.isArray(response)) {
-      coursesData = response;
-    } else if (response && typeof response === 'object') {
-      if (Array.isArray(response.content)) {
-        coursesData = response.content;
-      } else if (Array.isArray(response.items)) {
-        coursesData = response.items;
-      } else if (Array.isArray(response.data)) {
-        coursesData = response.data;
+      if (Array.isArray(response)) {
+        coursesData = response;
+      } else if (response && typeof response === 'object') {
+        if (Array.isArray(response.content)) {
+          coursesData = response.content;
+        } else if (Array.isArray(response.items)) {
+          coursesData = response.items;
+        } else if (Array.isArray(response.data)) {
+          coursesData = response.data;
+        } else {
+          console.warn('Данные не содержат массив:', response);
+          coursesData = getDemoCourses();
+          isDemoMode.value = true;
+        }
       } else {
-        console.error('Данные не содержат массив:', response);
-        coursesData = [];
+        console.warn('Неизвестный формат ответа:', response);
+        coursesData = getDemoCourses();
+        isDemoMode.value = true;
       }
+
+      // Проверяем наличие ID у каждого курса и выводим предупреждение, если ID отсутствует
+      courses.value = coursesData.map(course => {
+        if (course.courseId === undefined) {
+          console.warn('Курс без ID:', course);
+        }
+        return course;
+      });
+    } catch (error) {
+      console.warn('Ошибка при загрузке курсов, использую демо-данные:', error);
+      courses.value = getDemoCourses();
+      isDemoMode.value = true;
     }
 
-    // Проверяем наличие ID у каждого курса и выводим предупреждение, если ID отсутствует
-    courses.value = coursesData.map(course => {
-      if (course.courseId === undefined) {
-        console.warn('Курс без ID:', course);
-      }
-      return course;
-    });
-
   } catch (error) {
-    console.error('Ошибка при загрузке курсов:', error);
+    console.error('Критическая ошибка при загрузке курсов:', error);
     courses.value = [];
+    showError('Не удалось загрузить список курсов');
   } finally {
     isLoading.value = false;
   }
 };
 
+// Генерация демо-данных для тестирования интерфейса
+const getDemoCourses = () => {
+  return [
+    {
+      courseId: 1,
+      title: 'Введение в вязание',
+      price: 5000,
+      status: 'ACTIVE',
+      userCount: 45
+    },
+    {
+      courseId: 2,
+      title: 'Мастер-класс по шитью',
+      price: 7500,
+      status: 'ACTIVE',
+      userCount: 32
+    },
+    {
+      courseId: 3,
+      title: 'Декорирование интерьера',
+      price: 8900,
+      status: 'PENDING',
+      userCount: 0
+    },
+    {
+      courseId: 4,
+      title: 'Вязание для продвинутых',
+      price: 9500,
+      status: 'ACTIVE',
+      userCount: 28
+    },
+    {
+      courseId: 5,
+      title: 'Старые техники шитья',
+      price: 4500,
+      status: 'ARCHIVED',
+      userCount: 15
+    }
+  ];
+};
 
 // Вспомогательные функции
 const getStatusText = (status) => {
@@ -216,25 +319,67 @@ const editCourse = (course) => {
 
 // Подтверждение удаления курса
 const confirmDeleteCourse = (course) => {
+  // Создаем копию объекта курса
+  const courseCopy = {...course};
+  
+  // Если courseId не определен, но есть id, используем id как courseId
+  if (courseCopy.courseId === undefined && courseCopy.id !== undefined) {
+    courseCopy.courseId = courseCopy.id;
+  }
 
-  if (!course || course.courseId === undefined) {
+  if (!courseCopy || courseCopy.courseId === undefined) {
     showError('Ошибка: курс не содержит ID');
     console.error('Курс без ID:', course);
     return;
   }
 
-  courseToDelete.value = {...course}; // Создаем копию объекта курса
+  courseToDelete.value = courseCopy;
   deleteDialog.value = true;
+};
+
+// Вспомогательные функции для отображения уведомлений
+const showSuccess = (text) => {
+  snackbar.value = {
+    show: true,
+    text,
+    color: 'success'
+  };
+};
+
+const showError = (text) => {
+  snackbar.value = {
+    show: true,
+    text,
+    color: 'error'
+  };
+};
+
+const showInfo = (text) => {
+  snackbar.value = {
+    show: true,
+    text,
+    color: 'info'
+  };
 };
 
 // Создание нового курса
 const createCourse = async (course) => {
   try {
+    if (isDemoMode.value) {
+      showInfo('В демо-режиме добавление курсов недоступно');
+      newCourseDialog.value = false;
+      return;
+    }
+    
     isLoading.value = true;
     // Создаем курс и получаем ответ сервера
     const newCourse = await courseService.createCourseWithImage(course, course.imageFile);
     // Важно! Добавляем новый курс в список с ID, полученным от сервера
     if (newCourse && newCourse.id !== undefined) {
+      // Убедимся, что courseId также установлен
+      if (newCourse.courseId === undefined) {
+        newCourse.courseId = newCourse.id;
+      }
       // Добавляем курс в список без перезагрузки всего списка
       courses.value.push(newCourse);
       showSuccess('Курс успешно создан');
@@ -249,80 +394,135 @@ const createCourse = async (course) => {
     showError('Ошибка при создании курса: ' + (error.response?.data?.message || error.message));
   } finally {
     isLoading.value = false;
+    newCourseDialog.value = false;
   }
 };
 
-// Обновление курса в родительском компоненте
-const updateCourse = async (updatedCourse) => {
+// Обновление существующего курса
+const updateCourse = async (course) => {
   try {
-    if (!updatedCourse || updatedCourse.id === undefined) {
-      showError('Ошибка: не указан ID курса для обновления');
+    if (isDemoMode.value) {
+      showInfo('В демо-режиме обновление курсов недоступно');
+      editCourseDialog.value = false;
       return;
     }
-
+    
     isLoading.value = true;
-
-    // Обновляем метод в courseService
-    const result = await courseService.updateCourse(updatedCourse.id, updatedCourse);
-    console.log('', result);
-
-    // Обновляем список курсов
-    await fetchCourses();
-
-    showSuccess('Курс успешно обновлен');
+    // Обновляем курс и получаем ответ сервера
+    const updatedCourse = await courseService.updateCourseWithImage(course, course.imageFile);
+    
+    // Находим индекс курса в массиве и обновляем его
+    const index = courses.value.findIndex(c => c.id === course.id || c.courseId === course.courseId);
+    if (index !== -1) {
+      // Заменяем курс на обновленный
+      courses.value[index] = updatedCourse || course;
+      showSuccess('Курс успешно обновлен');
+    } else {
+      console.error('Курс не найден в списке:', course);
+      showError('Ошибка: не удалось найти курс в списке');
+      // Перезагружаем весь список
+      await fetchCourses();
+    }
   } catch (error) {
     console.error('Ошибка при обновлении курса:', error);
     showError('Ошибка при обновлении курса: ' + (error.response?.data?.message || error.message));
   } finally {
     isLoading.value = false;
+    editCourseDialog.value = false;
   }
 };
 
-
-// Удаление курса - исправленная функция
+// Удаление курса
 const deleteCourse = async () => {
-  if (!courseToDelete.value) {
-    showError('Ошибка: курс для удаления не выбран');
-    return;
-  }
-  const courseId = courseToDelete.value.courseId;
-  // Проверка ID
-  if (!courseId) {
-    console.error('Данные курса:', courseToDelete.value);
-    showError('Ошибка: не указан ID курса для удаления');
-    return;
-  }
   try {
-    isLoading.value = true;
-    await courseService.deleteCourse(courseId);
-    // Закрываем диалог
-    deleteDialog.value = false;
-    // Обновляем список курсов
-    await fetchCourses();
+    if (isDemoMode.value) {
+      showInfo('В демо-режиме удаление курсов недоступно');
+      deleteDialog.value = false;
+      return;
+    }
+    
+    if (!courseToDelete.value || courseToDelete.value.courseId === undefined) {
+      throw new Error('Курс для удаления не содержит ID');
+    }
 
+    isLoading.value = true;
+    await courseService.deleteCourse(courseToDelete.value.courseId);
+    
+    // Исправленная логика фильтрации - оставляем курсы, которые НЕ совпадают с удаляемым
+    courses.value = courses.value.filter(course => {
+      // Проверяем совпадение по id
+      const idMatch = course.id !== undefined && 
+                     courseToDelete.value.id !== undefined && 
+                     course.id === courseToDelete.value.id;
+      
+      // Проверяем совпадение по courseId
+      const courseIdMatch = course.courseId !== undefined && 
+                           course.courseId === courseToDelete.value.courseId;
+      
+      // Оставляем курс только если он НЕ совпадает ни по id, ни по courseId
+      return !idMatch && !courseIdMatch;
+    });
+    
     showSuccess('Курс успешно удален');
+    deleteDialog.value = false;
   } catch (error) {
     console.error('Ошибка при удалении курса:', error);
-    showError('Не удалось удалить курс: ' + (error.response?.data?.message || error.message));
+    showError('Ошибка при удалении курса: ' + (error.response?.data?.message || error.message));
   } finally {
     isLoading.value = false;
-    courseToDelete.value = null;
   }
 };
-// Вспомогательные функции для уведомлений
-const showSuccess = (text) => {
-  snackbar.value = {
-    show: true,
-    text: text,
-    color: 'success'
-  };
-};
 
-const showError = (text) => {
-  snackbar.value = {
-    show: true,
-    text: text,
-    color: 'error'
-  };
+// Функция для открытия диалога добавления курса
+const openDialog = () => {
+  if (isDemoMode.value) {
+    showInfo('В демо-режиме добавление курсов недоступно');
+    return;
+  }
+  
+  newCourseDialog.value = true;
 };
 </script>
+
+<style scoped>
+.mobile-layout h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.search-field {
+  max-width: 400px;
+}
+
+.mobile-layout .v-btn {
+  font-size: 0.8125rem;
+}
+
+.mobile-layout .v-icon {
+  font-size: 18px;
+}
+
+.mobile-layout .v-card {
+  border-radius: 0.25rem;
+}
+
+.mobile-table {
+  font-size: 0.85rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.courses-table {
+  height: auto !important; 
+}
+
+.compact-field {
+  height: 40px;
+}
+
+.smaller-text {
+  font-size: 0.85rem;
+}
+</style>

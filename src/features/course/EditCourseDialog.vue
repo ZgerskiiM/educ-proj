@@ -1,146 +1,334 @@
 <template>
-  <v-dialog v-model="dialog" max-width="900px">
+  <v-dialog v-model="dialog" max-width="800" persistent>
     <v-card>
-      <v-card-title>
-        <span >Редактирование курса</span>
+      <v-card-title class="d-flex justify-space-between align-center">
+        <span class="font-weight-medium">Редактирование курса</span>
+        <v-btn icon @click="closeDialog">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-card-title>
-      <v-tabs v-model="activeTab">
-        <v-tab value="courseInfo">Информация о курсе</v-tab>
-        <v-tab value="blocks">Блоки курса</v-tab>
-      </v-tabs>
-      <v-window v-model="activeTab">
-        <!-- Вкладка с информацией о курсе -->
-        <v-window-item value="courseInfo">
-          <v-card-text>
-            <v-container>
+
+      <v-card-text>
+        <v-tabs v-model="activeTab"  color="black">
+          <v-tab class="font-weight-light" value="basic">Основная информация</v-tab>
+          <v-tab class="font-weight-light" value="content">Содержание курса</v-tab>
+          <v-tab class="font-weight-light" value="settings">Настройки</v-tab>
+        </v-tabs>
+
+        <v-window v-model="activeTab">
+          <!-- Основная информация -->
+          <v-window-item value="basic">
+            <v-container class="py-4">
               <v-row>
+                <!-- Основная информация -->
                 <v-col cols="12">
-                  <v-text-field
-                    v-model="editedCourse.title"
-                    label="Название курса*"
-                    required
-                  ></v-text-field>
+                  <h3 class="font-weight-regular mb-4">Основная информация</h3>
+                  <v-row>
+                    <v-col cols="12" >
+                      <v-text-field
+                        class="font-weight-light"
+                        v-model="editedCourse.title"
+                        label="Название курса*"
+                        required
+                        :rules="[v => !!v || 'Название обязательно']"
+                        variant="outlined"
+                        density="comfortable"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <v-text-field
+                        class="font-weight-light"
+                        v-model="editedCourse.price"
+                        label="Цена*"
+                        type="number"
+                        required
+                        :rules="[v => !!v || 'Цена обязательна']"
+                        suffix="₽"
+                        variant="outlined"
+                        density="comfortable"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
                 </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model.number="editedCourse.price"
-                    label="Цена (руб.)*"
-                    type="number"
-                    required
-                  ></v-text-field>
-                  <v-text-field
-                    v-model="editedCourse.chat"
-                    label="Чат для поддержки"
-                    type="text"
-                  ></v-text-field>
+
+                <!-- Описание курса -->
+                <v-col cols="12" >
+                  <h3 class="font-weight-regular mb-4">Описание курса</h3>
+                  <v-textarea
+                    class="font-weight-light"
+                    v-model="editedCourse.description"
+                    label="Описание"
+                    rows="4"
+                    auto-grow
+                    variant="outlined"
+                    density="comfortable"
+                    hint="Опишите, чему научатся студенты на вашем курсе"
+                    persistent-hint
+                  ></v-textarea>
                 </v-col>
-                <v-col cols="12" md="6">
-                  <v-select
-                    v-model="editedCourse.difficulty"
-                    :items="difficultyOptions"
-                    item-title="text"
-                    item-value="value"
-                    label="Сложность*"
-                    required
-                  ></v-select>
-                </v-col>
+
+                <!-- Изображение курса -->
                 <v-col cols="12">
+                  <h3 class="font-weight-regular mb-4">Изображение курса</h3>
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <v-file-input
+                        class="font-weight-light"
+                        v-model="imageFile"
+                        label="Загрузить изображение"
+                        accept="image/*"
+                        @update:model-value="handleImageUpload"
+                        variant="outlined"
+                        density="comfortable"
+                        ref="fileInputRef"
+                        @click:prepend="openFileDialog"
+                        @change="onFileSelected"
+                      ></v-file-input>
+                    </v-col>
+                    <v-col cols="12" md="6" v-if="editedCourse.imageUrl || editedCourse.imageFile">
+                      <div class="image-preview-container">
+                        <v-img
+                          :src="fixImageUrl(editedCourse.imageUrl || editedCourse.imageFile)"
+                          max-height="200"
+                          cover
+                          class="rounded-lg"
+                        ></v-img>
+                        <div class="image-preview-overlay">
+                          <v-btn icon @click="clearImage">
+                            <v-icon>mdi-close</v-icon>
+                          </v-btn>
+                        </div>
+                      </div>
+                    </v-col>
+                  </v-row>
+                </v-col>
+
+                <!-- Настройки курса -->
+                <v-col cols="12">
+                  <h3 class="font-weight-regular mb-4">Настройки курса</h3>
+                  <v-row>
+                    <v-col cols="12" md="6">
+                      <v-select
+                        class="font-weight-light"
+                        v-model="editedCourse.status"
+                        :items="statusOptions"
+                        item-title="text"
+                        item-value="value"
+                        label="Статус курса*"
+                        required
+                        variant="outlined"
+                        density="comfortable"
+                      ></v-select>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-window-item>
+
+          <!-- Содержание курса -->
+          <v-window-item value="content">
+            <v-container class="py-4">
+              <div class="d-flex justify-space-between align-center mb-4">
+                <div class="d-flex align-center flex-column">
+                <h3 class="font-weight-regular">Блоки курса</h3>
+
+                  <v-text-field
+                    v-model="blockSearch"
+                    prepend-icon="mdi-magnify"
+                    label="Поиск блоков"
+                    single-line
+                    hide-details
+                    class="mr-4"
+                    style="max-width: 300px;"
+                  ></v-text-field>
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-plus"
+                    @click="showNewBlockDialog = true"
+                  >
+                    Добавить блок
+                  </v-btn>
+                </div>
+              </div>
+
+              <v-progress-circular
+                v-if="loadingBlocks"
+                indeterminate
+                class="d-flex mx-auto my-4"
+              ></v-progress-circular>
+
+              <draggable
+                v-else
+                v-model="filteredBlocks"
+                item-key="id"
+                handle=".drag-handle"
+                @end="onBlockOrderChanged"
+                :animation="200"
+                class="blocks-list"
+              >
+                <template #item="{ element: block }">
+                  <v-card class="mb-4">
+                    <v-img
+                      v-if="block.imageUrl || block.imageFile"
+                      :src="fixImageUrl(block.imageUrl || block.imageFile)"
+                      height="200"
+                      cover
+                      class="block-image"
+                    >
+                      <div class="d-flex fill-height flex-column justify-space-between">
+                        <div class="d-flex justify-end pa-2">
+                          <v-btn
+                            icon
+                            color="white"
+                            class="elevation-2 mr-2 bg-dark-transparent"
+                            @click="editBlockHandler(block)"
+                          >
+                            <v-icon>mdi-pencil</v-icon>
+                          </v-btn>
+                          <v-btn
+                            icon
+                            color="white"
+                            class="elevation-2 bg-dark-transparent"
+                            @click="deleteBlockConfirm(block)"
+                          >
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
+                        </div>
+                        <v-card-title class="text-white text-shadow">
+                          {{ block.title }}
+                        </v-card-title>
+                      </div>
+                    </v-img>
+                    <v-card-title v-else class="d-flex align-center">
+                      <v-icon class="drag-handle mr-2">mdi-drag</v-icon>
+                      {{ block.title }}
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        icon
+                        @click="editBlockHandler(block)"
+                        class="mr-2"
+                      >
+                        <v-icon>mdi-pencil</v-icon>
+                      </v-btn>
+                      <v-btn
+                        icon
+                        color="error"
+                        @click="deleteBlockConfirm(block)"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-list v-if="block.lessons && block.lessons.length > 0">
+                        <v-list-item
+                          v-for="lesson in block.lessons"
+                          :key="lesson.id"
+                          :title="lesson.title || lesson.lessonTitle"
+                          :subtitle="lesson.description || lesson.lessonDescription"
+                          class="lesson-item"
+                        >
+                          <template v-slot:prepend>
+                            <v-avatar
+                              size="40"
+                              color="primary"
+                              class="mr-3"
+                            >
+                              <v-icon>mdi-play-circle</v-icon>
+                            </v-avatar>
+                          </template>
+                          <template v-slot:append>
+                            <div class="d-flex align-center">
+                              <v-chip
+                                v-if="lesson.videoUrl"
+                                size="small"
+                                color="success"
+                                class="mr-2"
+                              >
+                                <v-icon start size="small">mdi-video</v-icon>
+                                Видео
+                              </v-chip>
+                              <v-chip
+                                v-if="lesson.sheetUrl"
+                                size="small"
+                                color="info"
+                                class="mr-2"
+                              >
+                                <v-icon start size="small">mdi-file-document</v-icon>
+                                Материалы
+                              </v-chip>
+                              <v-btn
+                                icon
+                                @click="editLessonHandler(lesson)"
+                                class="mr-2"
+                              >
+                                <v-icon>mdi-pencil</v-icon>
+                              </v-btn>
+                              <v-btn
+                                icon
+                                color="error"
+                                @click="deleteLesson(lesson.id || lesson.lessonId)"
+                              >
+                                <v-icon>mdi-delete</v-icon>
+                              </v-btn>
+                            </div>
+                          </template>
+                        </v-list-item>
+                      </v-list>
+                      <div v-else class="text-center py-4">
+                        <p class="text-grey">В этом блоке пока нет уроков</p>
+                      </div>
+                      <v-btn
+                        block
+                        variant="text"
+                        prepend-icon="mdi-plus"
+                        @click="addLesson(block)"
+                        class="mt-2"
+                      >
+                        Добавить урок
+                      </v-btn>
+                    </v-card-text>
+                  </v-card>
+                </template>
+              </draggable>
+            </v-container>
+          </v-window-item>
+
+          <!-- Настройки -->
+          <v-window-item value="settings">
+            <v-container class="py-4">
+              <v-row>
+                <v-col cols="12" md="6">
                   <v-select
                     v-model="editedCourse.status"
                     :items="statusOptions"
                     item-title="text"
                     item-value="value"
-                    label="Статус*"
+                    label="Статус курса*"
                     required
                   ></v-select>
                 </v-col>
-                <v-col cols="12">
-                  <v-file-input
-                    v-model="imageFile"
-                    label="Загрузить новое изображение курса"
-                    accept="image/*"
-                    prepend-icon="mdi-camera"
-                    @update:model-value="handleImageUpload"
-                  ></v-file-input>
-                </v-col>
               </v-row>
             </v-container>
-            <small>* обязательные поля</small>
-          </v-card-text>
-        </v-window-item>
+          </v-window-item>
+        </v-window>
+      </v-card-text>
 
-        <!-- Вкладка с блоками курса -->
-        <v-window-item value="blocks">
-          <v-card-text>
-            <div class="d-flex justify-space-between align-center mb-4">
-              <h3>Блоки курса</h3>
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-plus"
-                @click="showNewBlockDialog = true"
-              >
-                Добавить блок
-              </v-btn>
-            </div>
-
-            <!-- Загрузка блоков -->
-            <div v-if="loadingBlocks" class="d-flex justify-center my-5">
-              <v-progress-circular indeterminate></v-progress-circular>
-            </div>
-
-            <draggable
-        v-if="!loadingBlocks"
-        v-model="blocks"
-        item-key="id"
-        handle=".drag-handle"
-        @end="onBlockOrderChanged"
-        :animation="200"
-        style="max-height: 30vh; overflow-y: auto;"
-
-      >
-        <template #item="{element: block}">
-          <v-list-item
-            :title="block.title"
-            lines="two"
-          >
-            <template v-slot:prepend>
-              <div class="d-flex align-center">
-                <v-icon class="drag-handle mr-2 cursor-move">mdi-drag</v-icon>
-                <v-avatar rounded>
-                  <v-img :src="fixImageUrl(block.imageFile) || '/images/default-block.jpg'" />
-                </v-avatar>
-              </div>
-            </template>
-
-            <template v-slot:append>
-              <div class="d-flex">
-                <v-btn icon size="small" class="mr-2" @click="editBlockHandler(block)">
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn icon size="small" @click="deleteBlockConfirm(block)">
-                  <v-icon>mdi-delete</v-icon>
-                </v-btn>
-              </div>
-            </template>
-          </v-list-item>
-        </template>
-      </draggable>
-
-      <!-- Сообщение, если блоков нет -->
-      <div v-if="!loadingBlocks && blocks.length === 0" class="text-center my-5">
-        <p>У этого курса пока нет блоков</p>
-      </div>
-    </v-card-text>
-  </v-window-item>
-
-      </v-window>
-
-      <v-card-actions>
+      <v-card-actions class="pa-4">
         <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" text @click="closeDialog">
+        <v-btn
+          color="grey"
+          variant="text"
+          @click="closeDialog"
+        >
           Отмена
         </v-btn>
-        <v-btn color="blue-darken-1" text @click="saveCourse" :loading="loading">
+        <v-btn
+          color="primary"
+          @click="saveCourse"
+          :loading="saving"
+          :disabled="!isFormValid"
+        >
           Сохранить
         </v-btn>
       </v-card-actions>
@@ -169,6 +357,9 @@
                 label="Изображение блока"
                 accept="image/*"
                 prepend-icon="mdi-camera"
+                ref="blockFileInputRef"
+                @click:prepend="openBlockFileDialog"
+                @change="onBlockImageSelected"
               ></v-file-input>
               <v-btn
                 v-if="blockImageFile && editedBlock.id"
@@ -228,6 +419,9 @@
                     accept="image/*"
                     prepend-icon="mdi-camera"
                     @update:model-value="handleEditBlockImageUpload"
+                    ref="editBlockFileInputRef"
+                    @click:prepend="openEditBlockFileDialog"
+                    @change="onEditBlockImageSelected"
                   ></v-file-input>
                 </v-col>
               </v-row>
@@ -390,6 +584,9 @@
               label="Видео урока"
               accept="video/*"
               prepend-icon="mdi-video"
+              ref="lessonVideoInputRef"
+              @click:prepend="openLessonVideoDialog"
+              @change="onLessonVideoSelected"
             ></v-file-input>
 
             <!-- Кнопка для загрузки видео -->
@@ -422,10 +619,9 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { courseService } from '@/shared/api/courseService';
 import draggable from 'vuedraggable';
-
 
 const props = defineProps({
   modelValue: Boolean,
@@ -439,7 +635,7 @@ const emit = defineEmits(['update:modelValue', 'update']);
 
 // Состояние диалогов и вкладок
 const dialog = ref(props.modelValue);
-const activeTab = ref('courseInfo');
+const activeTab = ref('basic');
 const imageFile = ref(null);
 const loading = ref(false);
 const showNewBlockDialog = ref(false);
@@ -475,6 +671,19 @@ const newLesson = ref({
 });
 const addingLesson = ref(false);
 const deletingLesson = ref(null);
+
+// Добавляем состояние для поиска
+const blockSearch = ref('');
+
+// Добавляем вычисляемое свойство для фильтрации блоков
+const filteredBlocks = computed(() => {
+  if (!blockSearch.value) return blocks.value;
+  
+  const searchTerm = blockSearch.value.toLowerCase();
+  return blocks.value.filter(block => 
+    block.title.toLowerCase().includes(searchTerm)
+  );
+});
 
 const onBlockOrderChanged = async () => {
   try {
@@ -600,10 +809,10 @@ const editedCourse = ref({
   id: null,
   title: '',
   price: 0,
-  chat: [],
   difficulty: 'MEDIUM',
   status: 'PENDING',
-  imageUrl: ''
+  imageUrl: '',
+  imageFile: ''
 });
 
 const newBlock = ref({
@@ -622,7 +831,7 @@ const initializeFormData = () => {
     difficulty: props.course.difficulty || 'MEDIUM',
     status: props.course.status || 'PENDING',
     imageUrl: props.course.imageUrl || '',
-    chat: props.course.chat || [],
+    imageFile: props.course.imageFile || ''
   };
 
   // Инициализируем данные для нового блока
@@ -645,7 +854,7 @@ watch(() => props.course, (newCourse) => {
       difficulty: newCourse.difficulty || 'MEDIUM',
       status: newCourse.status || 'PENDING',
       imageUrl: newCourse.imageUrl || '',
-      chat: newCourse.chat,
+      imageFile: newCourse.imageFile || ''
     };
 
     // Обновляем courseId для нового блока
@@ -717,6 +926,17 @@ const fetchBlocks = async (courseId) => {
   try {
     const response = await courseService.getBlocksByCourseId(courseId);
     blocks.value = Array.isArray(response) ? response : [];
+    
+    // Загружаем уроки для каждого блока
+    for (const block of blocks.value) {
+      try {
+        const lessons = await courseService.getLessonsByBlockId(block.id);
+        block.lessons = Array.isArray(lessons) ? lessons : [];
+      } catch (error) {
+        console.error(`Ошибка при загрузке уроков для блока ${block.id}:`, error);
+        block.lessons = [];
+      }
+    }
   } catch (error) {
     console.error('Ошибка при загрузке блоков:', error);
     alert('Не удалось загрузить блоки курса');
@@ -769,7 +989,8 @@ const fixImageUrl = (url) => {
   if (!url) return '';
   // Исправляем различные варианты дублирования протокола
   return url.replace(/https:\/\/https\/\//, 'https://')
-            .replace(/https:\/\/https:\/\//, 'https://');
+            .replace(/https:\/\/https:\/\//, 'https://')
+            .replace(/^\/\//, 'https://');
 };
 
 // Обновление блока
@@ -837,9 +1058,9 @@ const editLessonHandler = async (lesson) => {
   editedLesson.value = {
     id: lessonId,
     newTitle: lesson.title || lesson.lessonTitle,
-    newDescription: '',
-    newSheetUrl: '',
-    videoUrl: '',
+    newDescription: lesson.description || lesson.lessonDescription,
+    newSheetUrl: lesson.sheetUrl || '',
+    videoUrl: lesson.videoUrl || '',
     lessonImage: lesson.lessonImage || ''
   };
 
@@ -850,7 +1071,7 @@ const editLessonHandler = async (lesson) => {
     // Обновляем форму с полными данными
     editedLesson.value = {
       ...editedLesson.value,
-      newDescription: lessonDetails.description || '',
+      newDescription: lessonDetails.description || lessonDetails.lessonDescription || '',
       newSheetUrl: lessonDetails.sheetUrl || '',
       videoUrl: lessonDetails.videoUrl || ''
     };
@@ -872,18 +1093,22 @@ const updateLesson = async () => {
 
   updatingLesson.value = true;
   try {
-    // Обновляем основные данные урока, передавая blockId из компонента
+    // Обновляем урок
     await courseService.updateLesson(
       editedLesson.value.id,
       {
-        newTitle: editedLesson.value.newTitle,
-        newDescription: editedLesson.value.newDescription,
-        newSheetUrl: editedLesson.value.newSheetUrl
-      },
-      editedBlock.value.id // Передаем blockId из компонента
+        title: editedLesson.value.newTitle,
+        description: editedLesson.value.newDescription,
+        sheetUrl: editedLesson.value.newSheetUrl
+      }
     );
-    // Обновляем список уроков
-    await fetchLessons(editedBlock.value.id);
+
+    // Обновляем список уроков в блоке
+    const block = blocks.value.find(b => b.lessons.some(l => l.id === editedLesson.value.id));
+    if (block) {
+      await fetchBlocks(editedCourse.value.id);
+    }
+
     // Закрываем диалог
     showEditLessonDialog.value = false;
   } catch (error) {
@@ -900,33 +1125,20 @@ watch(blockEditTab, (newTab) => {
   }
 });
 // Добавление урока
-const addLesson = async () => {
-  if (!newLesson.value.title) {
-    alert('Введите название урока');
-    return;
-  }
-  addingLesson.value = true;
-  try {
-    const lessonData = {
-      title: newLesson.value.title,
-      description: newLesson.value.description || '',
-      blockId: newLesson.value.blockId
-    };
-
-    await courseService.createLesson(lessonData);
-
-    // Перезагружаем список уроков после добавления
-    await fetchLessons(newLesson.value.blockId);
-
-    // Сбрасываем форму
-    newLesson.value.title = '';
-    newLesson.value.description = '';
-  } catch (error) {
-    console.error('Ошибка при добавлении урока:', error);
-    alert('Не удалось добавить урок: ' + (error.response?.data?.message || error.message));
-  } finally {
-    addingLesson.value = false;
-  }
+const addLesson = async (block) => {
+  // Устанавливаем ID блока для нового урока
+  newLesson.value.blockId = block.id;
+  // Показываем диалог редактирования урока
+  showEditLessonDialog.value = true;
+  // Сбрасываем форму
+  editedLesson.value = {
+    id: null,
+    newTitle: '',
+    newDescription: '',
+    newSheetUrl: '',
+    videoUrl: '',
+    lessonImage: ''
+  };
 };
 
 // Удаление урока
@@ -968,12 +1180,11 @@ const saveCourse = async () => {
     const response = await courseService.updateCourse(
       editedCourse.value.id,
       {
-        courseId: editedCourse.value.id, // Добавляем courseId в данные
+        courseId: editedCourse.value.id,
         title: editedCourse.value.title,
         price: editedCourse.value.price,
         difficulty: editedCourse.value.difficulty,
-        status: editedCourse.value.status,
-        chat: editedCourse.value.chat,
+        status: editedCourse.value.status
       }
     );
 
@@ -986,15 +1197,9 @@ const saveCourse = async () => {
     loading.value = false;
   }
 };
-// Загрузка изображения для курса
-const handleImageUpload = () => {
-  // Получаем файл из модели v-model
-  const file = imageFile.value;
-
-  if (!file) {
-    return;
-  }
-
+// Обновляем функцию handleImageUpload
+const handleImageUpload = async (file) => {
+  if (!file) return;
 
   // Убедитесь, что у курса есть ID
   const courseId = editedCourse.value.id;
@@ -1003,15 +1208,20 @@ const handleImageUpload = () => {
     return;
   }
 
-  courseService.uploadCourseImage(courseId, file)
-    .then(response => {
-      // Обновляем URL изображения в форме
+  try {
+    const response = await courseService.uploadCourseImage(courseId, file);
+    // Обновляем URL изображения в форме
+    if (response.imageUrl) {
+      editedCourse.value.imageUrl = response.imageUrl;
+    } else if (response.url) {
+      editedCourse.value.imageUrl = response.url;
+    } else if (response.imageFile) {
       editedCourse.value.imageFile = response.imageFile;
-    })
-    .catch(error => {
-      console.error('Ошибка при загрузке изображения:', error);
-      alert('Не удалось загрузить изображение');
-    });
+    }
+  } catch (error) {
+    console.error('Ошибка при загрузке изображения:', error);
+    alert('Не удалось загрузить изображение');
+  }
 };
 
 // Создание нового блока
@@ -1089,6 +1299,14 @@ const deleteBlock = async () => {
     blockToDelete.value = null;
   }
 };
+
+// Добавляем обработчик изменения вкладки
+watch(activeTab, async (newTab) => {
+  if (newTab === 'content' && editedCourse.value.id) {
+    // Загружаем блоки и уроки при открытии вкладки "Содержание курса"
+    await fetchBlocks(editedCourse.value.id);
+  }
+});
 </script>
 
 <style scoped>
@@ -1102,5 +1320,57 @@ const deleteBlock = async () => {
 
 .drag-handle:active, .lesson-drag-handle:active {
   cursor: grabbing;
+}
+
+.blocks-list {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.block-image {
+  position: relative;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.lesson-item {
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.lesson-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.rounded-lg {
+  border-radius: 8px;
+}
+
+.image-preview-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.image-preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.bg-dark-transparent {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(2px);
 }
 </style>

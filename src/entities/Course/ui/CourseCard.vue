@@ -1,14 +1,10 @@
 <template>
     <v-card rounded="lg" elevation="1" class="cabinet-card d-flex flex-column overflow-x">
-      <div class="position-relative">
         <v-img
           :src="course.imageUrl"
-          height="250"
-          cover
-          class="rounded-t-lg"
+          class="mr-3 ml-3 mt-3 rounded-lg"
           :alt="course.title"
         ></v-img>
-      </div>
       <v-card-title class=" font-weight-regular">{{ course.title }}</v-card-title>
       <v-card-text class="py-1">
         <div class="d-flex align-center mb-2">
@@ -50,13 +46,13 @@ function navigateToCourse() {
 
 <style scoped>
 .cabinet-card {
-
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .v-card-title {
   font-size: 1rem;
 }
+
 
 .cabinet-card:hover {
   transform: translateY(-5px);

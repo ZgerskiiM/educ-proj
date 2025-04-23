@@ -47,4 +47,16 @@ export const getUserService = {
     const response = await adminApi.put(`/${email}/role`, null,);
     return response.data;
   },
+
+  // Снятие роли администратора с пользователя
+  async removeAdminRole(email) {
+    const response = await adminApi.delete(`/${email}/role`, null,);
+    return response.data;
+  },
+
+  // Удаление пользователя
+  async deleteUser(userId) {
+    const response = await adminApi.delete(`/users/${userId}`);
+    return response.data;
+  },
 };

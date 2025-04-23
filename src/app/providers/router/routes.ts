@@ -3,29 +3,30 @@ import type { RouteRecordRaw } from 'vue-router'
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/lk',
+    component: () => import('@/pages/MainPage.vue'),
+
   },
   {
     path: '/register',
-    component: () => import("@/pages/AuthPages/RegisterPage/RegisterPage.vue"),
+    component: () => import('@/pages/AuthPages/RegisterPage/RegisterPage.vue'),
   },
   {
     path: '/login',
-    name: "login",
-    component: () => import("@/pages/AuthPages/LoginPage/LoginPage.vue")
+    name: 'login',
+    component: () => import('@/pages/AuthPages/LoginPage/LoginPage.vue'),
   },
   {
     path: '/reset-password',
-    component: () => import("@/pages/AuthPages/ResetPasswordPage/ResetPasswordPage.vue")
+    component: () => import('@/pages/AuthPages/ResetPasswordPage/ResetPasswordPage.vue'),
   },
   {
     path: '/verify',
-    component: () => import("@/pages/AuthPages/VerificationPage/VerificationPage.vue")
+    component: () => import('@/pages/AuthPages/VerificationPage/VerificationPage.vue'),
   },
   {
     path: '/auth/reset-password',
     name: 'ConfirmPasswordChange',
-    component: () => import("@/pages/AuthPages/rPassword/rPassword.vue")
+    component: () => import('@/pages/AuthPages/rPassword/rPassword.vue'),
   },
   {
     path: '/course/:courseId',
@@ -37,24 +38,24 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/course/:courseId/blocks/:blocksId/lessons/:lessonId',
     name: 'LessonContent',
     component: () => import('@/pages/Courses/LessonPage.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/course/:courseId/blocks/:blocksId',
     name: 'BlockLessons',
     component: () => import('@/pages/Courses/CourseLessons.vue'),
     meta: { requiresAuth: true },
-    alias: '/c/:courseId/b/:blocksId'
+    alias: '/c/:courseId/b/:blocksId',
   },
   {
-    path: '/lk',
+    path: '/profile',
     name: 'UserProfile',
     component: () => import('@/pages/Profile/ui/Profile.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/admin',
     component: () => import('@/pages/Admin/AdminPanel.vue'),
-    meta: { requiresAuth: true, requiredRole: 'ADMIN'}
+    meta: { requiresAuth: true, requiredRole: 'ADMIN' },
   },
 ]

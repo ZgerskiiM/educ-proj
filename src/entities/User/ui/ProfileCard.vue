@@ -36,14 +36,14 @@
   <v-card class="profile--card mb-5 rounded-lg">
     <v-card-text>
       <v-row>
-        <v-col cols="12" md="4" lg="3"
-          class="d-flex"
+        <v-col cols="12" md="4" lg="2"
+          class="d-flex mr-0 pr-0 pl-0 ml-0"
           :class="{
             'justify-center align-center flex-column': mdAndDown,
             'align-self-start flex-row': !mdAndDown,
           }"
         >
-          <v-avatar size="160" class="mb-2 mt-4"
+          <v-avatar size="160" class="mb-2  mt-4"
           :class="{
             'justify-center align-center flex-column ': mdAndDown,
             'align-self-start ml-4': !mdAndDown,
@@ -51,7 +51,7 @@
             <v-img
               :src="currentImageUrl"
               alt="Фото профиля"
-              fallback="/default-avatar.jpg"
+              fallback="/public/default-avatar.jpg"
             ></v-img>
           </v-avatar>
           <v-file-input
@@ -69,35 +69,31 @@
           ></v-file-input>
         </v-col>
 
-        <v-col cols="12" md="7" lg="8">
+        <v-col cols="12" md="7" lg="8" class="d-flex align-center">
           <div v-if="!isEditing">
-            <div class="d-flex justify-start align-start mb-4">
-              <div class="profile-card--text font-weight-light">Личная информация</div>
-            </div>
-
             <v-list color="#FAFAFA" :class="{ 'pa-0 list-left-aligned': !mdAndDown }">
               <v-list-item>
                 <template v-slot:prepend>
                   <v-icon icon="mdi-account"></v-icon>
                 </template>
-                <v-list-item-title class="font-weight-light" >Имя</v-list-item-title>
-                <v-list-item-subtitle class="font-weight-light">{{ modelValue.firstName }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="font-weight-regular">Имя</v-list-item-subtitle>
+                <v-list-item-title class="font-weight-light" >{{ modelValue.firstName }}</v-list-item-title>
               </v-list-item>
 
               <v-list-item>
                 <template v-slot:prepend>
                   <v-icon icon="mdi-account-outline"></v-icon>
                 </template>
-                <v-list-item-title class="font-weight-light" >Фамилия</v-list-item-title>
-                <v-list-item-subtitle class="font-weight-light">{{ modelValue.lastName }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="font-weight-light">Фамилия</v-list-item-subtitle>
+                <v-list-item-title class="font-weight-light" >{{ modelValue.lastName }}</v-list-item-title>
               </v-list-item>
 
               <v-list-item>
                 <template v-slot:prepend>
                   <v-icon icon="mdi-email"></v-icon>
                 </template>
-                <v-list-item-title class="font-weight-light">Email</v-list-item-title>
-                <v-list-item-subtitle class="font-weight-light">{{ modelValue.email }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="font-weight-light">Почта</v-list-item-subtitle>
+                <v-list-item-title class="font-weight-light">{{ modelValue.email }}</v-list-item-title>
               </v-list-item>
             </v-list>
 
@@ -392,6 +388,10 @@ function logout() {
   max-height: 35vh;
   overflow-y: auto;
 
+}
+
+.v-avatar {
+  border-radius: 1vw;
 }
 
 /* Стили для мобильных устройств */
