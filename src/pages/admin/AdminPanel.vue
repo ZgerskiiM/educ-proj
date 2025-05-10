@@ -29,7 +29,6 @@ import AdminSidebar from '@/widgets/admin/AdminSidebar/index.vue';
 import AdminDashboard from '@/widgets/admin/AdminDashboard/index.vue';
 import AdminCourses from '@/widgets/admin/AdminCourses/index.vue';
 import AdminUsers from '@/widgets/admin/AdminUsers/index.vue';
-// import AdminReports from '@/widgets/admin/AdminReports/index.vue';
 
 const { mdAndDown } = useDisplay();
 const currentPage = ref('dashboard');
@@ -38,7 +37,6 @@ const menuItems = [
   { title: 'Панель управления', icon: 'mdi-view-dashboard', value: 'dashboard' },
   { title: 'Список курсов', icon: 'mdi-book-open-page-variant', value: 'courses' },
   { title: 'Список пользователей', icon: 'mdi-account-group', value: 'users' },
-  // { title: 'Отчеты (Еще в разработке)', icon: 'mdi-file-chart', value: 'reports' },
 ];
 
 const stats = ref({

@@ -4,7 +4,6 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: () => import('@/pages/MainPage.vue'),
-
   },
   {
     path: '/register',

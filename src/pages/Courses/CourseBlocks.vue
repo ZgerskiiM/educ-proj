@@ -1,6 +1,6 @@
 <template>
   <div class="page-wrapper">
-    <Header />
+    <Header/>
     <v-container class="lesson-container" :width="mdAndDown ? '100vw' : '60vw'">
       <h2 class="mt-5 font-weight-medium">{{ courseTitle }}</h2>
       <h3 class="mb-2 font-weight-regular">Авторский курс от Максима Бабича</h3>
@@ -32,13 +32,12 @@
           :course-data="formatBlockData(block, index + 1)"
           @click="navigateToLesson(courseId, block.blockId)"
         />
-
         <v-alert v-if="courseBlocks.length === 0" type="info" class="my-3">
           Для этого курса еще не добавлены блоки
         </v-alert>
       </v-container>
     </v-container>
-    <AppFooter />
+    <AppFooter/>
   </div>
 </template>
 
@@ -46,9 +45,9 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
+import { courseUserService } from '@/shared/api/courseUserService'
 import Header from '@/shared/ui/PagesElem/Header.vue'
 import CourseCard from '@/shared/ui/PagesElem/CourseCard.vue'
-import { courseUserService } from '@/shared/api/courseUserService'
 import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 
 const { mdAndDown } = useDisplay()
@@ -102,12 +101,12 @@ const formatBlockData = (block, number) => {
     id: block.blockId,
     number: number.toString(),
     title: block.blockTitle,
-    imagePath: fixImageUrl(block.imageUrl), // Заглушка для изображений
+    imagePath: fixImageUrl(block.imageUrl), 
     progress: {
       completed: block.completedLessons,
       total: block.lessonsCount,
     },
-    duration: `${block.lessonsCount * 2.5} минут`, // Приблизительная длительность
+    duration: `${block.lessonsCount * 2.5} минут`, 
     lessons: block.lessonsCount,
   }
 }
@@ -115,7 +114,6 @@ const formatBlockData = (block, number) => {
 const defaultSupportLink = 'https://t.me/babichbaker_course'
 
 const navigateToSupport = () => {
-  // Проверяем, что ссылка существует, не пустая и не содержит слово "null"
   const isValidLink =
     сourseSupport &&
     сourseSupport.value &&

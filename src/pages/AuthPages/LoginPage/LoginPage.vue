@@ -181,26 +181,19 @@ const handleLogin = async () => {
     formErrors.email = ''
     formErrors.password = ''
 
-    // Вход пользователя
     const result = await AuthService.login(formData.email, formData.password)
 
-    // Получаем URL для перенаправления
     const redirectUrl = safeGetItem('redirectAfterLogin')
     safeRemoveItem('redirectAfterLogin')
 
-    // Если у нас есть сохраненный URL, пытаемся перейти на него
     if (redirectUrl) {
-      // Проверяем, имеет ли пользователь доступ к целевому URL
       if (redirectUrl.includes('/admin') && !AuthService.isAdmin()) {
-        // Если нет доступа к админке, перенаправляем на домашнюю страницу
         router.push('/lk')
         safeSetItem('accessError', 'Доступ к административной панели запрещен')
       } else {
-        // Если имеет доступ, перенаправляем на сохраненный URL
         router.push(redirectUrl)
       }
     } else {
-      // Если нет сохраненного URL, перенаправляем в зависимости от роли
       if (AuthService.isAdmin()) {
         router.push('/admin')
       } else {
@@ -208,9 +201,7 @@ const handleLogin = async () => {
       }
     }
   } catch (error: any) {
-    // Добавлена детальная обработка ошибок
     if (error.response) {
-      // Ошибки от сервера
       if (error.response.status === 401) {
         serverError.value = 'Неверный логин или пароль'
       } else if (error.response.status === 403) {
@@ -218,7 +209,6 @@ const handleLogin = async () => {
       } else if (error.response.data?.message) {
         serverError.value = error.response.data.message
       } else if (error.response.data?.errors) {
-        // Обработка ошибок отдельных полей
         const fieldErrors = error.response.data.errors
         if (fieldErrors.email) formErrors.email = fieldErrors.email
         if (fieldErrors.password) formErrors.password = fieldErrors.password
