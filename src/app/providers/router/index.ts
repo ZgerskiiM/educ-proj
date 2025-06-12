@@ -9,15 +9,12 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  // Если маршрут требует авторизации
   if (to.meta.requiresAuth) {
-    // Проверяем, авторизован ли пользователь
     const isAuthenticated = AuthService.isAuthenticated()
     if (!isAuthenticated) {
       next({ name: 'login' })
       return
     }
-    // Если требуется определенная роль
     if (to.meta.requiredRole) {
       const userRole = localStorage.getItem('userRole')
       const hasRequiredRole = AuthService.hasRole(to.meta.requiredRole as string)
@@ -26,13 +23,10 @@ router.beforeEach(async (to, from, next) => {
           'accessError',
           `Доступ запрещен. Требуется роль ${to.meta.requiredRole}`,
         )
-
-        // абсолютный путь, чтобы избежать проблем с именами маршрутов
         next('/profile')
         return
       }
     }
-    // Проверка доступа к курсу (если это страница курса)
     if (to.name === 'CourseBlocks' && to.params.courseId) {
       try {
         const hasAccess = await hasAccessToCourse(to.params.courseId)
