@@ -47,13 +47,16 @@ async function refreshToken() {
     }
 
     // Используем userApi вместо прямого axios
-    const response = await axios.post(`${userApi.defaults.baseURL}/auth/refresh`, { refreshToken });
+    const response = await axios.post(
+      `${userApi.defaults.baseURL}/auth/refresh`,
+      { refreshToken },
+    );
 
     // Проверяем все возможные форматы ответа
     let newToken;
     if (response.data.token) newToken = response.data.token;
     else if (response.data.accessToken) newToken = response.data.accessToken;
-    else if (typeof response.data === 'string') newToken = response.data;
+    else if (typeof response.data === "string") newToken = response.data;
     else throw new Error("Неверный формат ответа");
 
     // Сохраняем токены
@@ -75,10 +78,15 @@ async function refreshToken() {
 http.interceptors.request.use(
   async (config) => {
     // Пропускаем запросы авторизации без проверки токена
-    if (config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh')
-      || config.url?.includes('/auth/signup') || config.url?.includes('/auth/verify')
-      || config.url?.includes('/auth/verify')  || config.url?.includes('/auth/reset-password')
-      || config.url?.includes('/auth/r-password')){
+    if (
+      config.url?.includes("/auth/login") ||
+      config.url?.includes("/auth/refresh") ||
+      config.url?.includes("/auth/signup") ||
+      config.url?.includes("/auth/verify") ||
+      config.url?.includes("/auth/verify") ||
+      config.url?.includes("/auth/reset-password") ||
+      config.url?.includes("/auth/r-password")
+    ) {
       return config;
     }
 
@@ -90,7 +98,7 @@ http.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Интерсептор ответов с обработкой ошибок
@@ -114,7 +122,7 @@ http.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default http;

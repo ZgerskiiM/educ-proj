@@ -9,7 +9,7 @@
           </v-col>
         </v-row>
         <v-overlay :model-value="isLoading" contained class="align-center justify-center">
-          <v-progress-circular indeterminate size="64"></v-progress-circular>
+          <v-progress-circular indeterminate size="64"/>
         </v-overlay>
         <ProfileCard v-model="userData" class="mb-8" @logout="handleLogout" />
         <CourseList
@@ -28,14 +28,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import Header from '@/shared/ui/PagesElem/Header.vue'
-import ProfileCard from '@/entities/User/ui/ProfileCard.vue'
-import CourseList from '@/widgets/CourseList/index.vue'
-import CertificateList from '@/widgets/CertificateList/index.vue'
 import { AuthService } from '@/app/features/auth/model/Auth'
 import { fetchUserData } from '@/shared/api/UserService'
 import { useDisplay } from 'vuetify'
 import { getUserCourses } from '@/shared/api/UserService'
+import Header from '@/shared/ui/PagesElem/Header.vue'
+import ProfileCard from '@/entities/User/ui/ProfileCard.vue'
+import CourseList from '@/widgets/CourseList/index.vue'
+import CertificateList from '@/widgets/CertificateList/index.vue'
 import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
 
 const { mdAndDown } = useDisplay()

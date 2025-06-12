@@ -4,7 +4,16 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: () => import('@/pages/MainPage.vue'),
-
+  },
+  {
+    path: '/catalog',
+    name: 'Catalog',
+    component: () => import('@/pages/CatalogPage.vue'),
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: () => import('@/pages/CartPage.vue'),
   },
   {
     path: '/register',

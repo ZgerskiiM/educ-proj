@@ -35,49 +35,54 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
-import CourseCard from '@/entities/Course/ui/CourseCard.vue';
-import CourseFilterTabs from '@/features/CourseFilter/ui/CourseFilterTabs.vue';
-import EmptyState from '@/shared/ui/EmptyState.vue';
+import { computed, ref, watch } from "vue";
+import CourseCard from "@/entities/Course/ui/CourseCard.vue";
+import CourseFilterTabs from "@/features/CourseFilter/ui/CourseFilterTabs.vue";
+import EmptyState from "@/shared/ui/EmptyState.vue";
 
 const props = defineProps({
-  title: { type: String, default: 'Мои курсы' },
+  title: { type: String, default: "Мои курсы" },
   courses: { type: Array, required: true },
   filterValue: { type: String, required: true },
   filterOptions: { type: Array, required: true },
   emptyState: {
     type: Object,
     default: () => ({
-      icon: 'mdi-school-outline',
-      title: 'У вас пока нет курсов',
-      description: 'Вы можете найти интересные курсы в нашем каталоге',
-      actionText: 'Перейти в каталог',
-      actionRoute: '/catalog',
-      actionDisabled: { type: Boolean, default: false }
-    })
-  }
+      icon: "mdi-school-outline",
+      title: "У вас пока нет курсов",
+      description: "Вы можете найти интересные курсы в нашем каталоге",
+      actionText: "Перейти в каталог",
+      actionRoute: "/catalog",
+      actionDisabled: { type: Boolean, default: false },
+    }),
+  },
 });
 
-const emit = defineEmits(['update:filter-value']);
+const emit = defineEmits(["update:filter-value"]);
 
 const localFilterValue = ref(props.filterValue);
 
-watch(() => props.filterValue, (newValue) => {
-  localFilterValue.value = newValue;
-});
+watch(
+  () => props.filterValue,
+  (newValue) => {
+    localFilterValue.value = newValue;
+  },
+);
 
 watch(localFilterValue, (newValue) => {
-  emit('update:filter-value', newValue);
+  emit("update:filter-value", newValue);
 });
 
 const filteredCourses = computed(() => {
-  switch(localFilterValue.value) {
-    case 'not-started':
-      return props.courses.filter(course => course.progress === 0);
-    case 'in-progress':
-      return props.courses.filter(course => course.progress > 0 && course.progress < 100);
-    case 'completed':
-      return props.courses.filter(course => course.progress === 100);
+  switch (localFilterValue.value) {
+    case "not-started":
+      return props.courses.filter((course) => course.progress === 0);
+    case "in-progress":
+      return props.courses.filter(
+        (course) => course.progress > 0 && course.progress < 100,
+      );
+    case "completed":
+      return props.courses.filter((course) => course.progress === 100);
     default:
       return props.courses;
   }
