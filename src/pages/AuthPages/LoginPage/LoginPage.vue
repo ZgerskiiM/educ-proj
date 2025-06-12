@@ -188,7 +188,7 @@ const handleLogin = async () => {
 
     if (redirectUrl) {
       if (redirectUrl.includes('/admin') && !AuthService.isAdmin()) {
-        router.push('/lk')
+        router.push('/profile')
         safeSetItem('accessError', 'Доступ к административной панели запрещен')
       } else {
         router.push(redirectUrl)
@@ -197,7 +197,7 @@ const handleLogin = async () => {
       if (AuthService.isAdmin()) {
         router.push('/admin')
       } else {
-        router.push('/lk')
+        router.push('/profile')
       }
     }
   } catch (error: any) {

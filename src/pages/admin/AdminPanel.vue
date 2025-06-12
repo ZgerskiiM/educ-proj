@@ -1,22 +1,22 @@
 <template>
+  <AppHeader />
   <v-app>
     <v-main class="main-background">
     <div class="admin-panel" :class="{ 'mobile': mdAndDown }">
-      <admin-header />
-        <div class="admin-layout" :class="{ 'mobile': mdAndDown }">
-          <admin-sidebar
-            :menu-items="menuItems"
-            :current-page="currentPage"
-            @navigate="navigateTo"
-          />
-          <v-container fluid :class="['main-container', { 'mobile': mdAndDown }]">
-            <admin-dashboard v-if="currentPage === 'dashboard'" :stats="stats" />
-            <admin-courses v-if="currentPage === 'courses'" />
-            <admin-users v-if="currentPage === 'users'" />
-            <!-- <admin-reports v-if="currentPage === 'reports'" /> -->
-          </v-container>
-        </div>
+      <div class="admin-layout" :class="{ 'mobile': mdAndDown }">
+        <admin-sidebar
+          :menu-items="menuItems"
+          :current-page="currentPage"
+          @navigate="navigateTo"
+        />
+        <v-container fluid :class="['main-container', { 'mobile': mdAndDown }]">
+          <!-- <admin-dashboard v-if="currentPage === 'dashboard'" :stats="stats" /> -->
+          <admin-courses v-if="currentPage === 'courses'" />
+          <admin-users v-if="currentPage === 'users'" />
+          <!-- <admin-reports v-if="currentPage === 'reports'" /> -->
+        </v-container>
       </div>
+    </div>
     </v-main>
   </v-app>
 </template>
@@ -24,7 +24,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useDisplay } from 'vuetify';
-import AdminHeader from '@/widgets/admin/AdminHeader/index.vue';
+import AppHeader from '@/shared/ui/PagesElem/Header.vue';
 import AdminSidebar from '@/widgets/admin/AdminSidebar/index.vue';
 import AdminDashboard from '@/widgets/admin/AdminDashboard/index.vue';
 import AdminCourses from '@/widgets/admin/AdminCourses/index.vue';
@@ -34,7 +34,7 @@ const { mdAndDown } = useDisplay();
 const currentPage = ref('dashboard');
 
 const menuItems = [
-  { title: 'Панель управления', icon: 'mdi-view-dashboard', value: 'dashboard' },
+  // { title: 'Панель управления', icon: 'mdi-view-dashboard', value: 'dashboard' },
   { title: 'Список курсов', icon: 'mdi-book-open-page-variant', value: 'courses' },
   { title: 'Список пользователей', icon: 'mdi-account-group', value: 'users' },
 ];

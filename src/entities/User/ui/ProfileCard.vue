@@ -1,42 +1,37 @@
 <template>
-  <div v-if="!mdAndDown && !isEditing" class="desktop-buttons mt-2 mb-2 d-flex">
+  <div v-if="!smAndDown && !isEditing" class="desktop-buttons mt-2 mb-2 d-flex">
     <div class="d-flex">
       <v-btn
         class="profile-card--button font-weight-light text-none"
-        variant="outlined"
+        variant="flat"
         color="#333132"
+        text="Редактировать"
         @click="startEditing"
-      >
-        Редактировать
-      </v-btn>
+      />
       <v-btn
         class="profile-card--button font-weight-light text-none ml-3"
         color="error"
         variant="outlined"
+        text="Выйти"
         @click="showLogoutDialog = true"
-      >
-        Выйти
-      </v-btn>
+      />
       <v-btn
         v-if="isAdmin"
         class="profile-card--button font-weight-light text-none ml-3"
         color="warning"
         variant="outlined"
+        text="Админка"
         @click="goToAdmin"
-      >
-        Админка
-      </v-btn>
+      />
     </div>
-
     <v-btn
       class="profile-card--button font-weight-light text-none ml-auto"
       color="primary"
       variant="outlined"
+      text="Связаться с поддержкой"
       href="https://t.me/babichbaker_course"
       target="_blank"
-    >
-      Связаться с поддержкой
-    </v-btn>
+    />
   </div>
 
   <v-card class="profile--card mb-5 rounded-lg">
@@ -44,20 +39,21 @@
       <v-row>
         <v-col
           cols="12"
-          md="4"
-          lg="2"
+          md="3"
+          lg="3"
+          xl="2"
           class="d-flex mr-0 pr-0 pl-0 ml-0"
           :class="{
-            'justify-center align-center flex-column': mdAndDown,
-            'align-self-start flex-row': !mdAndDown,
+            'justify-center align-center flex-column': smAndDown,
+            'align-self-start flex-row': !smAndDown,
           }"
         >
           <v-avatar
             size="160"
             class="mb-2 mt-4"
             :class="{
-              'justify-center align-center flex-column ': mdAndDown,
-              'align-self-start ml-4': !mdAndDown,
+              'justify-center align-center flex-column ': smAndDown,
+              'align-self-start ml-4': !smAndDown,
             }"
           >
             <v-img
@@ -74,18 +70,25 @@
                   <v-progress-circular
                     indeterminate
                     color="primary"
-                  ></v-progress-circular>
+                  />
                 </v-row>
               </template>
             </v-img>
           </v-avatar>
         </v-col>
 
-        <v-col cols="12" md="7" lg="8" class="d-flex align-center">
+        <v-col
+          cols="12"
+          md="8"
+          lg="8"
+          xl="9"
+          class="d-flex align-center"
+          :class="{ 'pl-6': !smAndDown }"
+        >
           <div v-if="!isEditing">
             <v-list
               color="#FAFAFA"
-              :class="{ 'pa-0 list-left-aligned': !mdAndDown }"
+              :class="{ 'pa-0 list-left-aligned': !smAndDown }"
             >
               <v-list-item class="mb-0 pb-0">
                 <v-list-item-title class="font-weight-regular">
@@ -106,35 +109,41 @@
               </v-list-item>
             </v-list>
 
-            <div v-if="mdAndDown" class="mt-4 d-flex justify-end">
+            <div v-if="smAndDown" class="mt-4 d-flex flex-wrap gap-2 justify-center">
               <v-btn
                 class="profile-card--button font-weight-light text-none"
                 color="#31331"
                 prepend-icon="mdi-pencil"
                 variant="outlined"
+                text="Редактировать"
                 @click="startEditing"
-              >
-                Редактировать
-              </v-btn>
+              />
               <v-btn
-                class="profile-card--button font-weight-light text-none ml-2"
+                class="profile-card--button font-weight-light text-none"
                 color="error"
                 variant="outlined"
+                text="Выйти"
                 prepend-icon="mdi-logout"
                 @click="showLogoutDialog = true"
-              >
-                Выйти
-              </v-btn>
+              />
               <v-btn
                 v-if="isAdmin"
-                class="profile-card--button font-weight-light text-none ml-2"
+                class="profile-card--button font-weight-light text-none"
                 color="warning"
                 variant="outlined"
+                text="Админка"
                 prepend-icon="mdi-shield-account"
                 @click="goToAdmin"
-              >
-                Админка
-              </v-btn>
+              />
+              <v-btn
+                class="profile-card--button font-weight-light text-none"
+                color="primary"
+                variant="outlined"
+                text="Поддержка"
+                prepend-icon="mdi-help-circle"
+                href="https://t.me/babichbaker_course"
+                target="_blank"
+              />
             </div>
           </div>
 
@@ -164,7 +173,7 @@
               density="compact"
               hide-details
               class="mb-3"
-              :class="{ 'w-100 h-25': mdAndDown, 'max-width-250': !mdAndDown }"
+              :class="{ 'w-100 h-25': smAndDown, 'max-width-250': !smAndDown }"
               style="max-height: 500px"
               @update:model-value="handlePhotoUpload"
             />
@@ -172,18 +181,16 @@
               <v-btn
                 class="profile-card--button font-weight-light text-none"
                 color="#333132"
+                text="Сохранить"
                 @click="saveChanges"
-              >
-                Сохранить
-              </v-btn>
+              />
               <v-btn
+                class="ml-2 profile-card--button font-weight-light text-none"
                 color="grey"
                 variant="outlined"
+                text="Отмена"
                 @click="cancelEditing"
-                class="ml-2 profile-card--button font-weight-light text-none"
-              >
-                Отмена
-              </v-btn>
+              />
             </div>
           </v-form>
         </v-col>
@@ -223,7 +230,7 @@
       width="50"
       height="50"
       alt="Тестовая картинка"
-    ></v-img>
+    />
   </div>
 </template>
 
@@ -234,14 +241,19 @@ import { useDisplay } from "vuetify";
 import { AuthService } from "@/app/features/auth/model/Auth";
 import { userApi } from "@/shared/api/api";
 
-const { mdAndDown } = useDisplay();
+const { mdAndDown, smAndDown } = useDisplay();
 
 const router = useRouter();
 const props = defineProps({
   modelValue: { type: Object, required: true },
 });
 
-const emit = defineEmits(["update:modelValue", "logout"]);
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: any): void
+  (e: 'logout'): void
+  (e: 'error', message: string): void
+  (e: 'success', message: string): void
+}>();
 
 const isEditing = ref(false);
 const editedData = ref({ ...props.modelValue });
@@ -302,11 +314,10 @@ async function saveChanges() {
     // Уведомление об успешном обновлении
     emit("success", "Профиль успешно обновлен");
     return true;
-  } catch (error) {
+  } catch (error: any) {
     // Детализированная обработка ошибок
     const errorMessage =
       error.response?.data?.message || "Не удалось обновить профиль";
-    console.error("Ошибка при обновлении профиля:", error);
     emit("error", errorMessage);
     return false;
   }
@@ -315,7 +326,6 @@ async function saveChanges() {
 const currentImageUrl = computed(() => {
   // Если нет URL изображения в данных пользователя
   if (!props.modelValue.imageUrl) {
-    console.log("Используем резервное изображение /EmptyAvatar.png");
     return "/EmptyAvatar.png";
   }
 
@@ -327,29 +337,18 @@ const currentImageUrl = computed(() => {
     const processedUrl = processImageUrl(url);
     const finalUrl = fixImageUrl(processedUrl);
 
-    console.log("Финальный URL для отображения:", finalUrl);
-
     // Добавим проверку изображения перед отображением
     testImageUrl(finalUrl);
 
     return finalUrl;
   } catch (e) {
-    console.error("Ошибка обработки URL изображения:", e);
     return "/EmptyAvatar.png";
   }
 });
 
 // Функция для тестирования доступности изображения
-const testImageUrl = (url) => {
+const testImageUrl = (url: string) => {
   const img = new Image();
-  img.onload = () =>
-    console.log(
-      "Изображение успешно загружено, размеры:",
-      img.width,
-      "x",
-      img.height,
-    );
-  img.onerror = () => console.error("Ошибка загрузки изображения по URL:", url);
   img.src = url;
 };
 
@@ -359,22 +358,27 @@ const processImageUrl = (url: string) => {
     return "/EmptyAvatar.png";
   }
 
-  // Проверяем, является ли url относительным путем
+  // Проверяем, является ли url путем к локальному ресурсу
   if (url.startsWith("/")) {
-    // Получаем базовый URL API из настроек
-    const baseUrl = userApi.defaults.baseURL || "";
-    return `${baseUrl}${url}`;
+    return url; // Возвращаем как есть для файлов из public директории
   }
 
+  // Проверяем, является ли url относительным путем
   if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    return `https://${url}`; // Лучше использовать https
+    const baseUrl = userApi.defaults.baseURL || "";
+    return `${baseUrl}${url}`;
   }
 
   return url;
 };
 
-const fixImageUrl = (url: string) => {
+const fixImageUrl = (url: string): string => {
   if (!url) return "/EmptyAvatar.png";
+
+  // Если это локальный ресурс из public директории, возвращаем как есть
+  if (url.startsWith("/")) {
+    return url;
+  }
 
   // Очищаем URL от проблемных символов
   let fixedUrl = url.replace(/https:\/\/https:\/\//g, "https://");
@@ -387,13 +391,8 @@ const fixImageUrl = (url: string) => {
     // Потом правильно кодируем весь URL
     const encodedUrl = encodeURI(decodedUrl);
 
-    console.log("Исходный URL:", url);
-    console.log("Очищенный URL:", fixedUrl);
-    console.log("Финальный закодированный URL:", encodedUrl);
-
     return encodedUrl;
   } catch (error) {
-    console.error("Ошибка кодирования URL:", error);
     return fixedUrl; // Возвращаем хотя бы очищенный URL, если кодирование не удалось
   }
 };
@@ -413,10 +412,11 @@ function startEditing() {
   isEditing.value = true;
 }
 
-const imageFile = ref(null);
+const imageFile = ref<File | null>(null);
 const imageChanged = ref(false);
 
-function handlePhotoUpload(file: File | null) {
+function handlePhotoUpload(files: File | File[]) {
+  const file = Array.isArray(files) ? files[0] : files;
   if (file) {
     imageFile.value = file;
     imageChanged.value = true;
@@ -493,11 +493,31 @@ function logout() {
   .profile--card {
     max-height: 70vh; /* Для мобильных устройств */
   }
+  
+  /* Стили для кнопок на мобильных устройствах */
+  .profile-card--button {
+    min-width: 100px;
+    font-size: 0.8rem;
+  }
+  
+  /* Обеспечиваем равномерное распределение кнопок */
+  .d-flex.gap-2 {
+    gap: 8px;
+  }
 }
 
+/* Стили для больших экранов (960px+) */
 @media (min-width: 960px) {
   .profile-card--text {
     text-align: left;
+  }
+  
+  .profile--card .v-col:not(:first-child) {
+    padding-left: 32px !important;
+  }
+  
+  .v-list-item-title {
+    font-size: 1.4rem;
   }
 }
 

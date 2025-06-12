@@ -1,29 +1,39 @@
 <template>
   <div class="page-wrapper">
     <Header />
-    <v-container fluid class="content-container px-6 pt-2" :width="mdAndDown ? '100vw' : '60vw'">
+    <v-container
+      fluid
+      class="content-container px-6 pt-2"
+      :width="mdAndDown ? '100vw' : '60vw'"
+    >
       <div v-if="loading" class="d-flex justify-center my-5">
-        <v-progress-circular indeterminate color="#F48A21"></v-progress-circular>
+        <v-progress-circular
+          indeterminate
+          color="#F48A21"
+        />
       </div>
       <div v-else-if="error" class="error-message">
         {{ error }}
       </div>
       <div v-else>
-        <div class="back-button-container pt-4 pb-2 mt-5 pl-0 ml-0">
+        <div class="back-button-container ga-3 mt-8 mb-3">
           <v-btn
+            class="text-none secondary-action-btn"
             variant="outlined"
-            density="comfortable"
+            color="#313131"
+            text="Назад"
             :to="`/course/${courseId}/blocks/${blockId}`"
-            class="back-button font-weight-light text-none"
-          >
-            К урокам
-          </v-btn>
+          />
         </div>
         <div class="content-wrapper flex-column">
           <div class="video-block mb-0 pt-0">
-            <h2 class="font-weight-medium mb-3">{{ lessonData.lessonTitle }}</h2>
-            <VideoPlayer :video-url="lessonData.videoUrl"
-            :poster-image="fixImageUrl(lessonImageUrl)" />
+            <h2 class="font-weight-medium mb-3">
+              {{ lessonData.lessonTitle }}
+            </h2>
+            <VideoPlayer
+              :video-url="lessonData.videoUrl"
+              :poster-image="fixImageUrl(lessonImageUrl)"
+            />
             <div class="nav--buttons pt-0 mt-0 mb-1 d-flex justify-end">
               <v-btn
                 class="text-none rounded-lg"
@@ -47,80 +57,85 @@
                 @click="navigateToNextLesson()"
               >
                 <template v-if="mdAndDown">
-                  {{ isLastLesson ? 'Завершить' : 'Следующий' }}
+                  {{ isLastLesson ? "Завершить" : "Следующий" }}
                   <v-icon>mdi-arrow-right</v-icon>
                 </template>
                 <template v-else>
-                  {{ isLastLesson ? 'Завершить блок' : 'Следующий урок' }}
+                  {{ isLastLesson ? "Завершить блок" : "Следующий урок" }}
                 </template>
               </v-btn>
             </div>
           </div>
           <div class="lesson-sidebar">
-  <v-expansion-panels class="w-100">
-    <v-expansion-panel
-      v-if="lessonData.description"
-      class="w-100"
-      key="1"
-      title="01 / Описание урока"
-    >
-      <template v-slot:text>
-        <div
-          class="font-weight-light"
-          v-html="lessonData.description || 'Описание отсутствует'"
-        ></div>
-      </template>
-    </v-expansion-panel>
-        <v-expansion-panel
-          v-if="lessonData.sheetUrl"
-          class="w-100"
-          key="2"
-          title="02 / Дополнительные материалы"
-        >
-          <template v-slot:text>
-            <p class="font-weight-light">
-              <a :href="lessonData.sheetUrl" target="_blank" class="material-link">
-                Скачать материалы к уроку
-              </a>
-            </p>
-          </template>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </div>
+            <v-expansion-panels class="w-100">
+              <v-expansion-panel
+                v-if="lessonData.description"
+                class="w-100"
+                key="1"
+                title="01 / Описание урока"
+              >
+                <template v-slot:text>
+                  <div
+                    class="font-weight-light"
+                  >
+                    {{lessonData.description || 'Описание отсутствует'}}
+                  </div>
+                </template>
+              </v-expansion-panel>
+              <v-expansion-panel
+                v-if="lessonData.sheetUrl"
+                class="w-100"
+                key="2"
+                title="02 / Дополнительные материалы"
+              >
+                <template v-slot:text>
+                  <p class="font-weight-light">
+                    <a
+                      :href="lessonData.sheetUrl"
+                      target="_blank"
+                      class="material-link"
+                    >
+                      Скачать материалы к уроку
+                    </a>
+                  </p>
+                </template>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </div>
         </div>
       </div>
     </v-container>
-    <AppFooter/>
+    <AppFooter />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import Header from '@/shared/ui/PagesElem/Header.vue'
-import { useDisplay } from 'vuetify'
-import VideoPlayer from '@/entities/Course/VideoPlayer.vue'
-import { LessonStateService } from '@/shared/api/LessonStateService'
-import { courseUserService } from '@/shared/api/courseUserService'
-import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Header from "@/shared/ui/PagesElem/Header.vue";
+import { useDisplay } from "vuetify";
+import VideoPlayer from "@/entities/Course/VideoPlayer.vue";
+import { LessonStateService } from "@/shared/api/LessonStateService";
+import { courseUserService } from "@/shared/api/courseUserService";
+import AppFooter from "@/shared/ui/PagesElem/AppFooter.vue";
 
-const { mdAndDown } = useDisplay()
-const route = useRoute()
-const router = useRouter()
-const courseImage = ref()
+const { mdAndDown } = useDisplay();
+const route = useRoute();
+const router = useRouter();
+const courseImage = ref();
 
-const lessonImageUrl = ref('')
+const lessonImageUrl = ref("");
 
-const courseTitle = ref('')
+const courseTitle = ref("");
 
 const fixImageUrl = (url) => {
   if (!url) {
-    return '/public/default-lesson.jpg'
+    return "/public/default-lesson.jpg";
   }
-  let fixedUrl = url.replace(/https:\/\/https:\/\//g, 'https://')
-  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, 'https://')
-  return fixedUrl
-}
+  let fixedUrl = url.replace(/https:\/\/https:\/\//g, "https://");
+  fixedUrl = fixedUrl.replace(/https:\/\/https\//g, "https://");
+  return fixedUrl;
+};
 
 watch(
   () => route.params.lessonId,
@@ -130,45 +145,53 @@ watch(
       try {
         await fetchLessonData(); // Загружаем новые данные урока
 
-        const savedImageUrl = localStorage.getItem(`lesson_image_${newLessonId}`);
+        const savedImageUrl = localStorage.getItem(
+          `lesson_image_${newLessonId}`,
+        );
         if (savedImageUrl) {
           lessonImageUrl.value = savedImageUrl;
           localStorage.removeItem(`lesson_image_${newLessonId}`);
         } else {
           const currentLesson = allLessons.value.find(
-            (lesson) => (lesson.id || lesson.lessonId) === newLessonId
+            (lesson) => (lesson.id || lesson.lessonId) === newLessonId,
           );
-          if (currentLesson && (currentLesson.imageUrl || currentLesson.lessonImage)) {
-            lessonImageUrl.value = fixImageUrl(currentLesson.imageUrl || currentLesson.lessonImage);
+          if (
+            currentLesson &&
+            (currentLesson.imageUrl || currentLesson.lessonImage)
+          ) {
+            lessonImageUrl.value = fixImageUrl(
+              currentLesson.imageUrl || currentLesson.lessonImage,
+            );
           } else if (lessonData.value.imageUrl) {
             lessonImageUrl.value = fixImageUrl(lessonData.value.imageUrl);
           } else {
-            lessonImageUrl.value = '/public/default-lesson.jpg';
+            lessonImageUrl.value = "/public/default-lesson.jpg";
           }
         }
       } catch (err) {
-        console.error('Ошибка при обновлении урока:', err);
-        error.value = 'Не удалось загрузить урок. Пожалуйста, обновите страницу.';
+        console.error("Ошибка при обновлении урока:", err);
+        error.value =
+          "Не удалось загрузить урок. Пожалуйста, обновите страницу.";
       } finally {
         loading.value = false;
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(async () => {
-  const currentLessonId = route.params.lessonId
-  const savedImageUrl = localStorage.getItem(`lesson_image_${currentLessonId}`)
+  const currentLessonId = route.params.lessonId;
+  const savedImageUrl = localStorage.getItem(`lesson_image_${currentLessonId}`);
   if (savedImageUrl) {
-    lessonImageUrl.value = savedImageUrl
-    localStorage.removeItem(`lesson_image_${currentLessonId}`)
+    lessonImageUrl.value = savedImageUrl;
+    localStorage.removeItem(`lesson_image_${currentLessonId}`);
   }
-  await Promise.all([fetchLessonData(), fetchAllLessons()])
+  await Promise.all([fetchLessonData(), fetchAllLessons()]);
   if (!lessonImageUrl.value && lessonData.value.imageUrl) {
-    lessonImageUrl.value = fixImageUrl(lessonData.value.imageUrl)
+    lessonImageUrl.value = fixImageUrl(lessonData.value.imageUrl);
   }
-})
+});
 
 const fetchLessonData = async () => {
   const maxRetries = 3;
@@ -177,17 +200,23 @@ const fetchLessonData = async () => {
   while (retries < maxRetries) {
     try {
       loading.value = true;
-      const response = await courseUserService.fetchLessonDetails(lessonId.value);
+      const response = await courseUserService.fetchLessonDetails(
+        lessonId.value,
+      );
       lessonData.value = response;
       return response;
     } catch (err) {
       retries++;
-      console.error(`Ошибка при загрузке урока (попытка ${retries}/${maxRetries}):`, err);
+      console.error(
+        `Ошибка при загрузке урока (попытка ${retries}/${maxRetries}):`,
+        err,
+      );
       if (retries >= maxRetries) {
-        error.value = 'Не удалось загрузить урок. Пожалуйста, проверьте доступ к курсу и попробуйте снова.';
+        error.value =
+          "Не удалось загрузить урок. Пожалуйста, проверьте доступ к курсу и попробуйте снова.";
         throw err;
       }
-      await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+      await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
     } finally {
       loading.value = false;
     }
@@ -196,76 +225,83 @@ const fetchLessonData = async () => {
 
 const fetchAllLessons = async () => {
   try {
-    const response = await courseUserService.fetchBlockWithLessons(blockId.value);
+    const response = await courseUserService.fetchBlockWithLessons(
+      blockId.value,
+    );
     allLessons.value = response.lessons || [];
   } catch (err) {
-    console.error('Ошибка при загрузке списка уроков:', err);
-    error.value = 'Не удалось загрузить список уроков. Пожалуйста, проверьте ваш доступ к курсу.';
+    console.error("Ошибка при загрузке списка уроков:", err);
+    error.value =
+      "Не удалось загрузить список уроков. Пожалуйста, проверьте ваш доступ к курсу.";
   }
 };
 
 const fetchCourseData = async (id) => {
-  if (!id) return
-  loading.value = true
-  error.value = ''
+  if (!id) return;
+  loading.value = true;
+  error.value = "";
   try {
-    const response = await courseUserService.fetchCourseWithBlocks(id)
-    courseTitle.value = response.courseTitle || 'Курс без названия'
-    courseImage.value = response.imageUrl
+    const response = await courseUserService.fetchCourseWithBlocks(id);
+    courseTitle.value = response.courseTitle || "Курс без названия";
+    courseImage.value = response.imageUrl;
   } catch (err) {
-    console.error('Ошибка при загрузке курса:', err)
-    error.value = 'Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.'
+    console.error("Ошибка при загрузке курса:", err);
+    error.value =
+      "Не удалось загрузить данные курса. Пожалуйста, попробуйте позже.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  const id = route.params.courseId
+  const id = route.params.courseId;
   if (id) {
-    courseId.value = id
-    fetchCourseData(id)
+    courseId.value = id;
+    fetchCourseData(id);
   }
-})
-const loading = ref(true)
-const error = ref('')
+});
+const loading = ref(true);
+const error = ref("");
 const lessonData = ref({
-  lessonTitle: '',
-  videoUrl: '',
-  description: '',
-  sheetUrl: '',
-  imageUrl: '',
-})
+  lessonTitle: "",
+  videoUrl: "",
+  description: "",
+  sheetUrl: "",
+  imageUrl: "",
+});
 
-const courseId = computed(() => route.params.courseId)
-const blockId = computed(() => route.params.blocksId)
-const lessonId = computed(() => route.params.lessonId)
+const courseId = computed(() => route.params.courseId);
+const blockId = computed(() => route.params.blocksId);
+const lessonId = computed(() => route.params.lessonId);
 
-const allLessons = ref([])
+const allLessons = ref([]);
 const currentLessonIndex = computed(() => {
-  const current = lessonId.value ? String(lessonId.value) : null
+  const current = lessonId.value ? String(lessonId.value) : null;
   return allLessons.value.findIndex((lesson) => {
-    const lessonIdStr = lesson.id ? String(lesson.id) : null
-    const lessonLessonIdStr = lesson.lessonId ? String(lesson.lessonId) : null
-    return lessonIdStr === current || lessonLessonIdStr === current
-  })
-})
+    const lessonIdStr = lesson.id ? String(lesson.id) : null;
+    const lessonLessonIdStr = lesson.lessonId ? String(lesson.lessonId) : null;
+    return lessonIdStr === current || lessonLessonIdStr === current;
+  });
+});
 
 const previousLessonId = computed(() => {
   if (currentLessonIndex.value > 0) {
-    const lesson = allLessons.value[currentLessonIndex.value - 1]
-    return lesson.id || lesson.lessonId
+    const lesson = allLessons.value[currentLessonIndex.value - 1];
+    return lesson.id || lesson.lessonId;
   }
-  return null
-})
+  return null;
+});
 
 const nextLessonId = computed(() => {
-  if (currentLessonIndex.value < allLessons.value.length - 1 && currentLessonIndex.value !== -1) {
-    const lesson = allLessons.value[currentLessonIndex.value + 1]
-    return lesson.id || lesson.lessonId
+  if (
+    currentLessonIndex.value < allLessons.value.length - 1 &&
+    currentLessonIndex.value !== -1
+  ) {
+    const lesson = allLessons.value[currentLessonIndex.value + 1];
+    return lesson.id || lesson.lessonId;
   }
-  return null
-})
+  return null;
+});
 
 const navigateToNextLesson = async () => {
   // Если это последний урок, выполнить завершение блока
@@ -278,102 +314,121 @@ const navigateToNextLesson = async () => {
     const nextUrl = `/course/${courseId.value}/blocks/${blockId.value}/lessons/${nextLessonId.value}`;
     router.push(nextUrl);
   }
-}
+};
 const isLastLesson = computed(() => {
-  return currentLessonIndex.value !== -1 && currentLessonIndex.value === allLessons.value.length - 1
-})
+  return (
+    currentLessonIndex.value !== -1 &&
+    currentLessonIndex.value === allLessons.value.length - 1
+  );
+});
 
+watch(allLessons, () => {}, { immediate: true });
 
-watch(allLessons, () => {}, { immediate: true })
-
-watch([() => route.params.courseId, () => route.params.blocksId], ([newCourseId, newBlockId]) => {
-  if (newCourseId && newBlockId) {
-    fetchAllLessons()
-  }
-})
+watch(
+  [() => route.params.courseId, () => route.params.blocksId],
+  ([newCourseId, newBlockId]) => {
+    if (newCourseId && newBlockId) {
+      fetchAllLessons();
+    }
+  },
+);
 
 watch(
   () => route.params.lessonId,
   (newLessonId) => {
     if (newLessonId) {
       // Пытаемся получить картинку из localStorage
-      const savedImageUrl = localStorage.getItem(`lesson_image_${newLessonId}`)
+      const savedImageUrl = localStorage.getItem(`lesson_image_${newLessonId}`);
 
       if (savedImageUrl) {
-        lessonImageUrl.value = savedImageUrl
-        localStorage.removeItem(`lesson_image_${newLessonId}`)
+        lessonImageUrl.value = savedImageUrl;
+        localStorage.removeItem(`lesson_image_${newLessonId}`);
       } else {
         // Если картинки нет в localStorage, ищем в списке уроков
         const currentLesson = allLessons.value.find(
           (lesson) => (lesson.id || lesson.lessonId) === newLessonId,
-        )
+        );
 
-        if (currentLesson && (currentLesson.imageUrl || currentLesson.lessonImage)) {
-          lessonImageUrl.value = fixImageUrl(currentLesson.imageUrl || currentLesson.lessonImage)
+        if (
+          currentLesson &&
+          (currentLesson.imageUrl || currentLesson.lessonImage)
+        ) {
+          lessonImageUrl.value = fixImageUrl(
+            currentLesson.imageUrl || currentLesson.lessonImage,
+          );
         } else {
           // Если не нашли, сбрасываем URL изображения (будет обновлен в fetchLessonData)
-          lessonImageUrl.value = ''
+          lessonImageUrl.value = "";
         }
       }
     }
   },
   { immediate: true },
-)
+);
 
 const navigateToPreviousLesson = () => {
   if (!previousLessonId.value) {
-    return
+    return;
   }
 
   const prevLesson = allLessons.value.find(
     (lesson) => (lesson.id || lesson.lessonId) === previousLessonId.value,
-  )
+  );
 
   if (prevLesson && (prevLesson.imageUrl || prevLesson.lessonImage)) {
-    const prevImageUrl = fixImageUrl(prevLesson.imageUrl || prevLesson.lessonImage)
-    localStorage.setItem(`lesson_image_${previousLessonId.value}`, prevImageUrl)
+    const prevImageUrl = fixImageUrl(
+      prevLesson.imageUrl || prevLesson.lessonImage,
+    );
+    localStorage.setItem(
+      `lesson_image_${previousLessonId.value}`,
+      prevImageUrl,
+    );
   }
 
-  if (typeof LessonStateService !== 'undefined') {
-    LessonStateService.resetLessonState(lessonId.value)
+  if (typeof LessonStateService !== "undefined") {
+    LessonStateService.resetLessonState(lessonId.value);
   }
 
-  router.push(`/course/${courseId.value}/blocks/${blockId.value}/lessons/${previousLessonId.value}`)
-}
+  router.push(
+    `/course/${courseId.value}/blocks/${blockId.value}/lessons/${previousLessonId.value}`,
+  );
+};
 
 onBeforeUnmount(() => {
   if (lessonId.value) {
-    LessonStateService.resetLessonState(lessonId.value)
+    LessonStateService.resetLessonState(lessonId.value);
   }
-})
+});
 
 onMounted(async () => {
   try {
-    loading.value = true
+    loading.value = true;
 
-    await fetchCourseData(courseId.value)
+    await fetchCourseData(courseId.value);
 
-    const lessonInfo = await fetchLessonData()
+    const lessonInfo = await fetchLessonData();
 
-    await fetchAllLessons()
+    await fetchAllLessons();
 
     if (lessonInfo && lessonInfo.imageUrl) {
-      lessonImageUrl.value = fixImageUrl(lessonInfo.imageUrl)
+      lessonImageUrl.value = fixImageUrl(lessonInfo.imageUrl);
     } else {
-      const savedImageUrl = localStorage.getItem(`lesson_image_${lessonId.value}`)
+      const savedImageUrl = localStorage.getItem(
+        `lesson_image_${lessonId.value}`,
+      );
       if (savedImageUrl) {
-        lessonImageUrl.value = savedImageUrl
+        lessonImageUrl.value = savedImageUrl;
       } else {
-        lessonImageUrl.value = '/public/default-lesson.jpg'
+        lessonImageUrl.value = "/public/default-lesson.jpg";
       }
     }
   } catch (e) {
-    error.value = 'Ошибка при загрузке урока. Попробуйте обновить страницу.'
-    console.error('Ошибка загрузки:', e)
+    error.value = "Ошибка при загрузке урока. Попробуйте обновить страницу.";
+    console.error("Ошибка загрузки:", e);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 </script>
 
 <style scoped>
@@ -426,6 +481,8 @@ p {
 .material-link {
   color: #f48a21;
   text-decoration: none;
+  font-weight: 200;
+  font-size: 1rem;
 }
 
 .material-link:hover {
@@ -436,6 +493,13 @@ p {
   color: red;
   padding: 20px;
   text-align: center;
+}
+
+.primary-action-btn,
+.secondary-action-btn {
+  min-width: 150px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 @media (max-width: 819px) {

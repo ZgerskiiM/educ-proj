@@ -9,7 +9,7 @@
           </v-col>
         </v-row>
         <v-overlay :model-value="isLoading" contained class="align-center justify-center">
-          <v-progress-circular indeterminate size="64"></v-progress-circular>
+          <v-progress-circular indeterminate size="64"/>
         </v-overlay>
         <ProfileCard v-model="userData" class="mb-8" @logout="handleLogout" />
         <CourseList
