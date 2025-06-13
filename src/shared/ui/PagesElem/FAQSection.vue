@@ -2,7 +2,7 @@
   <section class="faq-section">
     <div :class="['faq-container', mdAndDown ? 'mobile-width' : 'desktop-width']">
       <h2 class="section-title mb-8 text-white">Часто задаваемые вопросы</h2>
-      
+
       <v-expansion-panels class="expansion-panels">
         <v-expansion-panel
           v-for="(item, i) in faqItems"
@@ -52,7 +52,7 @@ const faqItems = [
   background: linear-gradient(to right, #f8a21f 0%, #ffa143 71%, #ff8104 100%);
   color: white;
   width: 100%;
-  padding: 5rem 0;
+  padding: 3rem 0;
   display: flex;
   justify-content: center;
 }
@@ -96,10 +96,10 @@ const faqItems = [
   .section-title {
     font-size: 1.8rem;
   }
-  
+
   .faq-title {
     font-size: 0.9rem;
     padding: 1rem;
   }
 }
-</style> 
+</style>

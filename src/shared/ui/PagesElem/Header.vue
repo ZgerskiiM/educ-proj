@@ -7,7 +7,7 @@
           <!-- Desktop версия -->
           <div v-if="!smAndDown" class="left-section">
             <div class="logo">
-              <img src="/school_вектор_полный_w.png" class="logo__img" style="cursor: pointer;" @click="goToHome"/>
+              <img src="/logo1.webp" class="logo__img" style="cursor: pointer;" @click="goToHome"/>
             </div>
             <div class="divider"></div>
             <div class="nav-links">
@@ -17,11 +17,11 @@
               </a>
             </div>
           </div>
-          
+
           <!-- Mobile версия -->
           <div v-if="smAndDown" class="mobile-header-content">
             <div class="mobile-logo-section">
-              <img src="/school_вектор_полный_w.png" class="mobile-full-logo" @click="goToHome" />
+              <img src="/logo1.webp" class="mobile-full-logo" @click="goToHome" />
             </div>
             <div class="mobile-right-section">
               <div class="cart-container" @click="goToCart">
@@ -31,10 +31,10 @@
                   </v-btn>
                 </v-badge>
               </div>
-              <v-btn 
-                icon 
-                variant="text" 
-                color="white" 
+              <v-btn
+                icon
+                variant="text"
+                color="white"
                 @click="toggleMobileMenu"
                 class="menu-toggle-btn"
               >
@@ -52,29 +52,29 @@
                 </v-btn>
               </v-badge>
             </div>
-            
+
             <!-- Кнопки входа и регистрации для неавторизованных пользователей -->
             <div v-if="!isUserLoggedIn" class="auth-buttons">
-              <v-btn 
+              <v-btn
                 @click="goToLogin"
-                color="white" 
-                variant="outlined" 
+                color="white"
+                variant="outlined"
                 class="auth-btn"
                 size="small"
               >
                 Войти
               </v-btn>
-              <v-btn 
+              <v-btn
                 @click="goToRegister"
-                color="white" 
-                variant="flat" 
+                color="white"
+                variant="flat"
                 class="auth-btn register-btn"
                 size="small"
               >
                 Регистрация
               </v-btn>
             </div>
-            
+
             <!-- Профиль для авторизованных пользователей -->
             <div v-if="isUserLoggedIn" class="profile-container" @click="handleProfileClick">
               <div class="user-info">
@@ -91,43 +91,43 @@
     </v-app-bar>
 
     <!-- Mobile Menu Overlay -->
-    <v-overlay 
-      v-model="isMobileMenuOpen" 
+    <v-overlay
+      v-model="isMobileMenuOpen"
       class="mobile-menu-overlay"
       :z-index="9999"
     >
       <div class="mobile-menu">
         <div class="menu-header">
-          <img src="/school_вектор_полный_w.png" class="menu-logo" @click="goToHome" />
-          <v-btn 
-            icon 
-            variant="text" 
-            color="white" 
+          <img src="/logo1.webp" class="menu-logo" @click="goToHome" />
+          <v-btn
+            icon
+            variant="text"
+            color="white"
             @click="closeMobileMenu"
             class="close-btn"
           >
             <v-icon size="28">mdi-close</v-icon>
           </v-btn>
         </div>
-        
+
         <div class="menu-content">
           <div class="menu-navigation">
-                         <div class="menu-item" @click="navigateAndClose('/catalog')">
+             <div class="menu-item" @click="navigateAndClose('/')">
+               <v-icon color="#f48a21" class="menu-item-icon">mdi-home-outline</v-icon>
+               <span>Главная</span>
+             </div>
+             <div class="menu-item" @click="navigateAndClose('/catalog')">
                <v-icon color="#f48a21" class="menu-item-icon">mdi-view-grid-outline</v-icon>
                <span>Каталог</span>
              </div>
-             <div class="menu-item" @click="navigateAndClose('/about')">
-               <v-icon color="#f48a21" class="menu-item-icon">mdi-information-outline</v-icon>
-               <span>О нас</span>
-             </div>
-             <div class="menu-item" @click="navigateAndClose('/support')">
+             <div class="menu-item" @click="openSupportLink">
                <v-icon color="#f48a21" class="menu-item-icon">mdi-help-circle-outline</v-icon>
                <span>Поддержка</span>
              </div>
           </div>
-          
+
           <div class="menu-divider"></div>
-          
+
           <!-- User section -->
           <div v-if="isUserLoggedIn" class="user-section">
             <div class="user-avatar-section" @click="navigateAndClose('/profile')">
@@ -141,22 +141,22 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Auth buttons for non-authenticated users -->
           <div v-if="!isUserLoggedIn" class="auth-section">
-            <v-btn 
+            <v-btn
               @click="navigateAndClose('/login')"
-              color="white" 
-              variant="outlined" 
+              color="white"
+              variant="outlined"
               class="auth-btn mobile-auth-btn"
               block
             >
               Войти
             </v-btn>
-            <v-btn 
+            <v-btn
               @click="navigateAndClose('/register')"
-              color="white" 
-              variant="flat" 
+              color="white"
+              variant="flat"
               class="auth-btn mobile-auth-btn register-btn"
               block
             >
@@ -220,6 +220,11 @@ const navigateAndClose = (path) => {
   router.push(path)
 }
 
+const openSupportLink = () => {
+  isMobileMenuOpen.value = false
+  window.open('https://t.me/babichbaker_course', '_blank', 'noopener')
+}
+
 const updateCartCount = () => {
   const savedCart = localStorage.getItem('cart')
   if (savedCart) {
@@ -248,7 +253,7 @@ const checkAuthStatus = async () => {
 onMounted(() => {
   updateCartCount()
   checkAuthStatus()
-  
+
   // Listen for storage changes from other tabs/windows
   window.addEventListener('storage', updateCartCount)
   // Listen for custom cart update events
@@ -348,11 +353,11 @@ onUnmounted(() => {
   letter-spacing: normal;
   font-weight: 400;
   border-radius: 6px;
-  
+
   &.register-btn {
     background-color: rgba(255, 255, 255, 0.9) !important;
     color: #f48a21 !important;
-    
+
     &:hover {
       background-color: rgba(255, 255, 255, 1) !important;
     }
@@ -408,12 +413,12 @@ onUnmounted(() => {
 
 .mobile-logo-section {
   flex: 1;
-  
+
   .mobile-full-logo {
     height: 36px;
     cursor: pointer;
     transition: all 0.3s ease;
-    
+
     &:hover {
       opacity: 0.8;
       transform: scale(1.05);
@@ -484,12 +489,12 @@ onUnmounted(() => {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: rgba(244, 138, 33, 0.1);
     transform: translateX(8px);
   }
-  
+
   span {
     color: #333;
     font-size: 18px;
@@ -521,7 +526,7 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.3s ease;
   gap: 16px;
-  
+
   &:hover {
     background: rgba(244, 138, 33, 0.2);
   }
@@ -531,14 +536,14 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  
+
   .user-name {
     color: #333;
     font-size: 18px;
     font-weight: 300;
     margin-bottom: 4px;
   }
-  
+
   .user-action {
     color: rgba(51, 51, 51, 0.7);
     font-size: 14px;
@@ -560,11 +565,11 @@ onUnmounted(() => {
   border-radius: 12px;
   color: #f48a21 !important;
   border-color: #f48a21 !important;
-  
+
   &.register-btn {
     background-color: #f48a21 !important;
     color: white !important;
-    
+
     &:hover {
       background-color: #e8751a !important;
     }
@@ -584,52 +589,52 @@ onUnmounted(() => {
   .header-content {
     padding: 0 8px;
   }
-  
+
   .logo__img {
     height: 5vh;
     max-height: 30px;
   }
-  
+
   .divider {
     margin: 0 8px;
     height: 25px;
   }
-  
+
   .nav-btn {
     font-size: 14px;
     margin-right: 2px;
     padding: 4px 8px;
   }
-  
+
   .right-section {
     gap: 2px;
   }
-  
+
   .auth-buttons {
     gap: 2px;
     margin-left: 2px;
   }
-  
+
   .auth-btn {
     font-size: 13px;
     padding: 4px 8px;
   }
-  
+
   .user-name {
     font-size: 14px;
   }
-  
+
   .profile-avatar {
     height: 40px;
     width: 40px;
   }
-  
+
   .profile-container {
     padding: 2px 6px;
     gap: 4px;
     margin-left: 2px;
   }
-  
+
   .cart-container {
     padding: 2px;
   }
@@ -640,23 +645,23 @@ onUnmounted(() => {
   .mobile-full-logo {
     height: 32px;
   }
-  
+
   .menu-header {
     padding: 12px 16px;
   }
-  
+
   .menu-logo {
     height: 32px;
   }
-  
+
   .menu-item {
     padding: 16px 20px;
-    
+
     span {
       font-size: 16px;
     }
   }
-  
+
   .menu-footer {
     padding: 24px 20px;
   }
@@ -666,26 +671,26 @@ onUnmounted(() => {
   .mobile-full-logo {
     height: 28px;
   }
-  
+
   .mobile-header-content {
     padding: 0 4px;
   }
-  
+
   .menu-item {
     padding: 14px 16px;
     margin-bottom: 12px;
-    
+
     span {
       font-size: 14px;
     }
   }
-  
+
   .user-avatar-section {
     flex-direction: column;
     text-align: center;
     gap: 12px;
   }
-  
+
   .user-info-text {
     text-align: center;
   }

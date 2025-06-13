@@ -1,16 +1,16 @@
 <template>
-  <section class="results-section py-15">
-    <v-container 
+  <section class="results-section py-4">
+    <v-container
       class="results-container"
       :width="smAndDown ? '100vw' : mdAndDown ? '95vw' : '60vw'"
     >
       <h2 class="section-title mb-8">Твой результат после обучения</h2>
-      
+
       <div class="results-content">
         <div class="results-list">
           <ul class="benefits-list">
-            <li 
-              v-for="(result, index) in results" 
+            <li
+              v-for="(result, index) in results"
               :key="index"
               :style="{ '--delay': `${index * 0.1 + 0.2}s` }"
               class="benefit-item"
@@ -21,19 +21,19 @@
               <div class="benefit-text">{{ result.title }}</div>
             </li>
           </ul>
-          
-          <v-btn 
-            class="catalog-btn mt-6" 
-            color="#ff8a04" 
+
+          <v-btn
+            class="catalog-btn mt-6"
+            color="#ff8a04"
             size="large"
             @click="navigateToCatalog"
           >
             <span class="text-white text-none font-weight-regular">В каталог</span>
           </v-btn>
         </div>
-        
+
         <div class="results-image">
-          <img src="/стандарт.webp" alt="Результат обучения" class="result-img" />
+          <img src="/result.webp" alt="Результат обучения" class="result-img" />
         </div>
       </div>
     </v-container>
@@ -159,11 +159,11 @@ const results = ref([
   .results-content {
     flex-direction: column-reverse;
   }
-  
+
   .results-image {
     margin-bottom: 2rem;
   }
-  
+
   .result-img {
     max-width: 80%;
   }
@@ -180,4 +180,4 @@ const results = ref([
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(255, 138, 4, 0.3);
 }
-</style> 
+</style>

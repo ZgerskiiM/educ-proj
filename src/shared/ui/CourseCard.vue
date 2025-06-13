@@ -1,148 +1,145 @@
 <template>
-  <AppHeader />
-  <v-app>
-    <v-main>
-      <section class="catalog-section py-8">
-        <v-container
-          class="catalog-container"
-          :width="smAndDown ? '100vw' : mdAndDown ? '95vw' : '60vw'"
+  <div>
+    <!-- Course Card -->
+    <v-card class="course-card" :class="cardClass">
+      <div class="card-image-container">
+        <div class="image-wrapper">
+          <v-img :src="course.image" height="200" cover class="course-image" loading="lazy"></v-img>
+          <div class="image-overlay"></div>
+          <div class="course-badge">
+            <span class="badge-text">Старт второго потока</span>
+            <span class="badge-date">с 25 сентября</span>
+          </div>
+        </div>
+      </div>
+      <v-card-title class="course-title">{{ course.title }}</v-card-title>
+      <v-card-text class="d-flex align-center course-card-text">
+        <p>{{ course.description }}</p>
+      </v-card-text>
+      <div class="price-container px-4 pb-0 mb-0">
+        <span class="course-price">{{ course.price }}</span>
+      </div>
+      <v-card-actions class="card-actions">
+        <v-btn
+          class="cart-btn white--text w-50 text-none"
+          disabled
+          @click="handleAddToCart"
         >
-          <h1 class="section-title catalog-title">Каталог курсов</h1>
+          В корзину
+        </v-btn>
+        <v-btn variant="outlined" class="details-btn w-50 text-none" @click="openDetails">
+          Подробнее
+        </v-btn>
+      </v-card-actions>
+    </v-card>
 
-          <div class="search-container mb-8">
-            <v-text-field
-              v-model="searchQuery"
-              label="Поиск курса"
-              variant="outlined"
-              prepend-inner-icon="mdi-magnify"
-              clearable
-              hide-details
-              class="search-field"
-              density="comfortable"
-              @update:model-value="filterCourses"
-            ></v-text-field>
+    <!-- Course Details Modal -->
+    <v-dialog v-model="detailsDialog" max-width="900px" scrollable>
+      <v-card v-if="course">
+        <v-card-title class="pa-6 pb-6">
+          <div class="d-flex justify-space-between align-center w-100">
+            <h2 class="text-h5 text-wrap">{{ course.title }}</h2>
+            <v-btn icon variant="text" @click="detailsDialog = false">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
           </div>
+        </v-card-title>
 
-          <div class="cards-grid">
-            <CourseCard
-              v-for="(course, index) in filteredCourses"
-              :key="index"
-              :course="course"
-              @addToCart="handleAddToCart"
-            />
-          </div>
-        </v-container>
-      </section>
+        <v-card-text class="pa-6 pt-3">
+          <!-- Course Details Content -->
+          <LyubitelDetails v-if="course.title.includes('Любитель')" :course="course" />
+          <StandardDetails v-else-if="course.title.includes('Стандарт')" :course="course" />
+          <ProfessionalDetails v-else-if="course.title.includes('Профессионал')" :course="course" />
+          <DefaultDetails v-else :course="course" />
+        </v-card-text>
 
-
-
-      <AppFooter />
-    </v-main>
-  </v-app>
+        <v-card-actions class="pa-6 pt-3">
+          <v-spacer></v-spacer>
+          <v-btn
+            class="cart-btn-modal white--text text-none"
+            disabled
+            @click="handleAddToCart(); detailsDialog = false"
+            size="large"
+          >
+            Добавить в корзину
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
-import { useDisplay } from 'vuetify'
-import { useRouter } from 'vue-router'
-import AppHeader from '@/shared/ui/PagesElem/Header.vue'
-import AppFooter from '@/shared/ui/PagesElem/AppFooter.vue'
-import CourseCard from '@/shared/ui/CourseCard.vue'
+import LyubitelDetails from './CourseDetails/LyubitelDetails.vue'
+import StandardDetails from './CourseDetails/StandardDetails.vue'
+import ProfessionalDetails from './CourseDetails/ProfessionalDetails.vue'
+import DefaultDetails from './CourseDetails/DefaultDetails.vue'
 
-const router = useRouter()
-const { mdAndDown, smAndDown } = useDisplay()
+// Props
+const props = defineProps<{
+  course: {
+    title: string
+    description: string
+    price: string
+    image: string
+  }
+  cardClass?: string
+}>()
 
-// Поиск курса
-const searchQuery = ref('')
+// Emits
+const emit = defineEmits<{
+  addToCart: [course: any]
+}>()
 
-// Данные для курсов
-const courses = [
-  {
-    title: 'Пекарская витрина: от Булок до Хлеба. Любитель',
-    description: 'Базовый курс для начинающих, идеально подходит для домашнего выпекания',
-    price: '18 900 ₽',
-    image: '/любитель.webp'
-  },
-  {
-    title: 'Пекарская витрина: от Булок до Хлеба. Стандарт',
-    description: 'Подробное описание курса с ключевыми моментами обучения',
-    price: '30 900 ₽',
-    image: '/стандарт.webp'
-  },
-  {
-    title: 'Пекарская витрина: от Булок до Хлеба. Профессионал',
-    description: 'Расширенный курс для тех, кто хочет достичь профессионального уровня',
-    price: '54 900 ₽',
-    image: '/профессионал.webp'
-  },
-]
+// State
+const detailsDialog = ref(false)
+const cartItems = ref<any[]>([])
 
-// Отфильтрованные курсы на основе поискового запроса
-const filteredCourses = computed(() => {
-  if (!searchQuery.value) return courses
-
-  const query = searchQuery.value.toLowerCase().trim()
-  return courses.filter(course =>
-    course.title.toLowerCase().includes(query) ||
-    course.description.toLowerCase().includes(query)
+// Check if course is in cart
+const isInCart = computed(() => {
+  return cartItems.value.some(
+    (item) => item.title === props.course.title && item.price === props.course.price
   )
 })
 
-// Функция фильтрации курсов (для оптимизации производительности)
-const filterCourses = () => {
-  // Эта функция используется для обработки события ввода
-  // Сама фильтрация происходит в computed-свойстве filteredCourses
+// Load cart from localStorage
+onMounted(() => {
+  const cart = localStorage.getItem('cart')
+  if (cart) {
+    cartItems.value = JSON.parse(cart)
+  }
+})
+
+// Open details modal
+const openDetails = () => {
+  detailsDialog.value = true
 }
 
-const handleAddToCart = (course: any) => {
-  // Показываем уведомление
-  console.log('Курс добавлен в корзину:', course.title)
+// Handle add to cart
+const handleAddToCart = () => {
+  if (isInCart.value) return
+
+  let cart = localStorage.getItem('cart')
+  let items: any[] = []
+  if (cart) {
+    items = JSON.parse(cart)
+  }
+
+  items.push(props.course)
+  cartItems.value = items
+  localStorage.setItem('cart', JSON.stringify(items))
+  window.dispatchEvent(new Event('cartUpdated'))
+
+  emit('addToCart', props.course)
 }
+
+
 </script>
 
 <style scoped>
-.v-main {
-  background-color: #fff8f0;
-}
-
-/* Common layout styles */
-
-h1 {
-  font-size: 2.5rem;
-  font-weight: 600;
-}
-
-/* Section styles */
-.section-title {
-  text-align: left;
-  margin-bottom: 2rem;
-  font-weight: 600;
-}
-
-h1.catalog-title {
-  text-transform: capitalize !important;
-  text-decoration: none !important;
-  border-bottom: none !important;
-}
-
-.catalog-section {
-  display: flex;
-  justify-content: center;
-}
-
-.catalog-container {
-  margin: 0 auto;
-}
-
-/* Cards grid */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));
-  gap: 2rem;
-}
-
-/* Card styles */
-.card {
+/* Course Card Styles */
+.course-card {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -152,7 +149,7 @@ h1.catalog-title {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
+.course-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -161,14 +158,66 @@ h1.catalog-title {
   padding: 12px;
 }
 
+.image-wrapper {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .course-image {
   border-radius: 8px;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.course-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #ff8a04, #ffa143);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: left;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(255, 138, 4, 0.4);
+}
+
+.badge-text {
+  display: block;
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.badge-date {
+  display: block;
+  font-weight: 500;
+  font-size: 0.7rem;
+  opacity: 0.9;
+  line-height: 1.2;
 }
 
 .course-title {
   font-size: 1.1rem;
   line-height: 1.4;
   padding-bottom: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  hyphens: auto;
+  font-weight: 600;
+  color: #333;
+  padding: 1rem 1rem 0.5rem;
 }
 
 .price-container {
@@ -188,11 +237,14 @@ h1.catalog-title {
   display: flex;
   justify-content: space-between;
   margin-top: auto;
+  gap: 0.5rem;
 }
 
 .details-btn {
   border: 1px solid #000;
   color: #000;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .details-btn:hover {
@@ -203,6 +255,8 @@ h1.catalog-title {
 .cart-btn {
   color: white;
   background-color: #ff8a04;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .cart-btn:disabled {
@@ -214,54 +268,17 @@ h1.catalog-title {
   min-height: 80px;
   padding: 0 1rem;
   color: #666;
-}
-
-.card .v-card-title {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  line-height: 1.4;
-  hyphens: auto;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #333;
-  padding: 1rem 1rem 0.5rem;
-}
-
-.card .v-card-text {
   flex-grow: 1;
 }
 
-/* Search styles */
-.search-container {
-  width: 100%;
-  max-width: 600px;
+.cart-btn-modal {
+  background-color: #ff8a04 !important;
+  padding: 12px 24px;
 }
 
-.search-field {
-  background-color: white;
-  border-radius: 8px;
-}
-
-.v-field__input {
-  font-size: 1rem;
-}
-
-/* Footer styles */
-.v-footer {
-  background-color: #FFF8F0;
-}
-
-.v-divider {
-  height: 1px;
-}
-
-.footer-text {
-  font-size: 0.9rem;
-}
-
-a {
-  color: #313131;
+.cart-btn-modal:disabled {
+  background-color: #ccc !important;
+  color: #666 !important;
 }
 
 /* Modal styles */
@@ -581,6 +598,17 @@ a {
   box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
 }
 
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.result-image {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 /* Payment section */
 .payment-section {
   background: linear-gradient(135deg, #fff3e0, #ffe0b3);
@@ -609,42 +637,15 @@ a {
   line-height: 1.5;
 }
 
-.images-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-}
-
-.result-image {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.installment-text {
-  color: #666;
-  font-style: italic;
-  margin: 0;
-}
-
 .modal-price {
   font-size: 2rem;
   font-weight: 700;
   color: #ff8a04;
 }
 
-.cart-btn-modal {
-  background-color: #ff8a04 !important;
-  padding: 12px 24px;
-}
-
-.cart-btn-modal:disabled {
-  background-color: #ccc !important;
-  color: #666 !important;
-}
-
 /* Responsive styles */
 @media (max-width: 1500px) {
-  .card .v-card-title {
+  .course-title {
     font-size: 1.1rem;
   }
 
@@ -654,77 +655,6 @@ a {
 
   .course-card-text {
     font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 959px) {
-  .cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(45%, 1fr));
-  }
-}
-
-@media (max-width: 599px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .catalog-section {
-    padding-top: 5rem;
-  }
-
-  h1 {
-    font-size: 2.2rem;
-  }
-
-  .v-footer {
-    padding-bottom: 15px;
-  }
-
-  .text-md-right {
-    text-align: left !important;
-  }
-
-  .v-btn {
-    padding-left: 0 !important;
-  }
-
-  /* Modal responsive styles */
-  .features-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .feature-card {
-    padding: 16px;
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-
-  .content-block {
-    padding: 16px;
-  }
-
-  .block-header {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-
-  .section-title {
-    font-size: 1.2rem;
-  }
-
-  .preweek-item,
-  .guide-card,
-  .payment-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-  }
-
-  .images-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>

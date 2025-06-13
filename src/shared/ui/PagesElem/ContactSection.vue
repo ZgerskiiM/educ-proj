@@ -4,12 +4,12 @@
       <div class="image-left">
         <img src="/image1.png" alt="Декоративное изображение" class="decoration-image">
       </div>
-      
+
       <div class="contact-container">
         <h2 class="text-center">Остались вопросы?</h2>
         <p class="text-center mb-2">Мы всегда на связи</p>
         <div class="text-center">
-          <v-btn 
+          <v-btn
             class="font-weight-medium text-none"
             size="large"
           >
@@ -17,7 +17,7 @@
           </v-btn>
         </div>
       </div>
-      
+
       <div class="image-right">
         <img src="/image2.png" alt="Декоративное изображение" class="decoration-image">
       </div>
@@ -33,7 +33,7 @@ const props = defineProps<{
 
 <style scoped>
 .contact-section {
-  padding: 8vh 0;
+  padding: 4vh 0;
   background-color: #FFF8F0;
   position: relative;
   display: flex;
@@ -111,25 +111,25 @@ p {
   .contact-section {
     padding: 5vh 3vw;
   }
-  
+
   .contact-wrapper {
     flex-direction: column;
   }
-  
+
   .contact-container {
     width: 80vw;
   }
-  
+
   h2 {
     font-size: 5vw;
   }
-  
+
   p {
     font-size: 3vw;
   }
-  
+
   .image-left, .image-right {
     display: none;
   }
 }
-</style> 
+</style>

@@ -3,40 +3,26 @@
   <v-app>
     <v-main>
       <HeroSection />
-      <FeaturesSection />
       <AboutSection id="about" />
+      <FeaturesSection />
       <ForWhoSection />
-      
-      <section class="courses-section mb-15" ref="coursesSection">
-        <v-container 
+
+      <section class="courses-section mb-8" ref="coursesSection">
+        <v-container
           class="courses-container"
           :width="smAndDown ? '100vw' : mdAndDown ? '95vw' : '60vw'"
           :style="coursesContainerStyle"
         >
           <h2 class="section-title mb-8">Наши курсы</h2>
           <div class="cards-grid">
-            <v-card 
-              v-for="(course, index) in courses" 
+            <CourseCard
+              v-for="(course, index) in courses"
               :key="index"
-              class="card"
-              :class="{ 'card-visible': isCoursesVisible }"
+              :course="course"
+              :cardClass="['course-card-animated', { 'card-visible': isCoursesVisible }]"
               :style="getCardAnimationStyle(index)"
-            >
-              <div class="card-image-container">
-                <v-img :src="course.image" height="200" cover class="course-image" loading="lazy"></v-img>
-              </div>
-              <v-card-title class="course-title">{{ course.title }}</v-card-title>
-              <v-card-text class="d-flex align-center course-card-text equal-height-text">
-                <p>{{ course.description }}</p>
-              </v-card-text>
-              <div class="price-container px-4 pb-0 mb-0">
-                <span class="course-price">{{ course.price }}</span>
-              </div>
-              <v-card-actions class="card-actions">
-                <v-btn class="cart-btn white--text w-50 text-none" @click="addToCart(course)">В корзину</v-btn>
-                <v-btn variant="outlined" class="details-btn w-50 text-none">Подробнее</v-btn>
-              </v-card-actions>
-            </v-card>
+              @addToCart="handleAddToCart"
+            />
           </div>
         </v-container>
       </section>
@@ -45,9 +31,9 @@
       <ResultsSection />
 
       <!-- Testimonials section -->
-      <section class="testimonials-section mb-5">
+      <section class="testimonials-section mb-3">
         <div class="testimonials-full-width">
-          <v-container 
+          <v-container
             class="testimonials-container"
             :width="smAndDown ? '100vw' : mdAndDown ? '95vw' : '60vw'"
           >
@@ -63,16 +49,16 @@
               </div>
             </div>
           </v-container>
-          
+
           <div class="testimonials-slider">
-            <div 
-              class="testimonials-track" 
+            <div
+              class="testimonials-track"
               :style="{ transform: `translateX(${-currentSlidePosition}px)` }"
               :key="sliderKey"
             >
-              <div 
-                v-for="(testimonial, index) in displayedTestimonials" 
-                :key="`testimonial-${testimonial.id}-${index}`" 
+              <div
+                v-for="(testimonial, index) in displayedTestimonials"
+                :key="`testimonial-${testimonial.id}-${index}`"
                 class="testimonial-slide"
                 ref="testimonialSlides"
               >
@@ -90,7 +76,7 @@
                     <p class="testimonial-text font-weight-light">{{ testimonial.text }}</p>
                   </div>
                   <div class="testimonial-result">
-                    <v-img 
+                    <v-img
                       :src="testimonial.resultImage"
                       alt="Результат"
                       class="testimonial-result-image"
@@ -123,6 +109,7 @@ import ForWhoSection from '@/shared/ui/PagesElem/ForWhoSection.vue'
 import ResultsSection from '@/shared/ui/PagesElem/ResultsSection.vue'
 import FAQSection from '@/shared/ui/PagesElem/FAQSection.vue'
 import ContactSection from '@/shared/ui/PagesElem/ContactSection.vue'
+import CourseCard from '@/shared/ui/CourseCard.vue'
 
 const { mdAndDown, smAndDown } = useDisplay()
 
@@ -174,8 +161,8 @@ const displayedTestimonials = ref<any[]>([])
 const setupDisplayedTestimonials = () => {
   // Дублируем отзывы для создания эффекта бесконечного слайдера
   displayedTestimonials.value = [
-    ...testimonials.value, 
-    ...testimonials.value, 
+    ...testimonials.value,
+    ...testimonials.value,
     ...testimonials.value
   ]
 }
@@ -188,7 +175,7 @@ const slideWidth = () => {
     const slideStyle = window.getComputedStyle(slide)
     const marginLeft = parseInt(slideStyle.marginLeft) || 0
     const marginRight = parseInt(slideStyle.marginRight) || 0
-    
+
     return slideRect.width + marginLeft + marginRight
   }
   return 0
@@ -197,13 +184,13 @@ const slideWidth = () => {
 const updateSlidePosition = () => {
   // Вычисляем полную ширину одного слайда (включая отступы)
   const fullSlideWidth = slideWidth()
-  
+
   // Вычисляем позицию слайда
   currentSlidePosition.value = currentTestimonial.value * fullSlideWidth
-  
+
   // Если мы достигли конца исходных отзывов, переходим к дублированным
   const totalOriginalTestimonials = testimonials.value.length
-  
+
   if (currentTestimonial.value >= totalOriginalTestimonials * 2) {
     // После завершения анимации, мгновенно переходим к первому набору дублированных отзывов
     setTimeout(() => {
@@ -214,27 +201,27 @@ const updateSlidePosition = () => {
         track.style.transition = 'none'
         // Обновляем позицию
         currentSlidePosition.value = currentTestimonial.value * fullSlideWidth
-        
+
         // Форсируем перерисовку и возвращаем анимацию
         void track.offsetHeight
         track.style.transition = 'transform 0.5s ease'
       }
     }, 500) // Ждем завершения анимации
   }
-  
+
   if (currentTestimonial.value < 0) {
     // Если пользователь прокрутил назад ниже нуля, переходим к последнему набору дублированных отзывов
     setTimeout(() => {
       currentTestimonial.value = totalOriginalTestimonials + (currentTestimonial.value % totalOriginalTestimonials)
       if (currentTestimonial.value < 0) currentTestimonial.value = totalOriginalTestimonials - 1
-      
+
       // Отключаем анимацию для мгновенного перехода
       const track = document.querySelector('.testimonials-track') as HTMLElement
       if (track) {
         track.style.transition = 'none'
         // Обновляем позицию
         currentSlidePosition.value = currentTestimonial.value * fullSlideWidth
-        
+
         // Форсируем перерисовку и возвращаем анимацию
         void track.offsetHeight
         track.style.transition = 'transform 0.5s ease'
@@ -257,20 +244,20 @@ const prevTestimonial = () => {
 const courses = ref([
   {
     title: 'Пекарская витрина: от Булок до Хлеба. Любитель',
-    description: 'Подробное описание курса с ключевыми моментами обучения',
+    description: 'Базовый курс для начинающих, идеально подходит для домашнего выпекания',
     price: '18 900 ₽',
     image: '/любитель.webp'
   },
   {
     title: 'Пекарская витрина: от Булок до Хлеба. Стандарт',
-    description: 'Расширенный курс для тех, кто хочет достичь профессионального уровня',
-    price: '23 900 ₽',
+    description: 'Подробное описание курса с ключевыми моментами обучения',
+    price: '30 900 ₽',
     image: '/стандарт.webp'
   },
   {
     title: 'Пекарская витрина: от Булок до Хлеба. Профессионал',
-    description: 'Базовый курс для начинающих, идеально подходит для домашнего выпекания',
-    price: '12 900 ₽',
+    description: 'Расширенный курс для тех, кто хочет достичь профессионального уровня',
+    price: '54 900 ₽',
     image: '/профессионал.webp'
   }
 ])
@@ -292,7 +279,7 @@ const coursesContainerStyle = computed(() => {
 const getCardAnimationStyle = (index: number) => {
   const row = Math.floor(index / 3)
   const col = index % 3
-  
+
   return {
     '--row': row,
     '--col': col
@@ -300,21 +287,7 @@ const getCardAnimationStyle = (index: number) => {
 }
 
 // Функции для работы с корзиной
-const addToCart = (course: any) => {
-  // Получаем текущую корзину из localStorage
-  let cart = localStorage.getItem('cart')
-  let cartItems: any[] = []
-  
-  if (cart) {
-    cartItems = JSON.parse(cart)
-  }
-  
-  // Добавляем курс в корзину
-  cartItems.push(course)
-  
-  // Сохраняем корзину
-  localStorage.setItem('cart', JSON.stringify(cartItems))
-  
+const handleAddToCart = (course: any) => {
   // Показываем уведомление
   alert('Курс добавлен в корзину')
 }
@@ -341,17 +314,17 @@ const handleCoursesScroll = () => {
 
 onMounted(() => {
   setupDisplayedTestimonials()
-  
+
   // Устанавливаем начальную позицию на первый набор дублированных отзывов
   // чтобы можно было прокручивать как вперед, так и назад
   currentTestimonial.value = testimonials.value.length
-  
+
   // После монтирования элементов измеряем ширину слайда
   // и устанавливаем позицию для каждого слайда
   nextTick(() => {
     updateSlidePosition()
   })
-  
+
   // Обработка изменения размера окна
   window.addEventListener('resize', updateSlidePosition)
 
@@ -419,111 +392,20 @@ h2 {
   gap: 2rem;
 }
 
-.card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  border-radius: 0.7vw;
-  background-color: white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.course-card-animated {
   opacity: 0;
   transform: translateY(30px);
 }
 
-.card.card-visible {
+.course-card-animated.card-visible {
   opacity: 1;
   transform: translateY(0);
   transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-out;
   transition-delay: calc(0.3s + (var(--row, 0) * 0.15s) + (var(--col, 0) * 0.15s));
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.card-image-container {
-  padding: 12px;
-}
-
-.course-image {
-  border-radius: 8px;
-}
-
-.course-title {
-  font-size: 1.1rem;
-  line-height: 1.4;
-  padding-bottom: 0;
-}
-
-.price-container {
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-.course-price {
-  font-weight: 600;
-  font-size: 1.3rem;
-  color: #f48a21;
-}
-
-.card-actions {
-  padding: 16px;
-  padding-top: 4px !important;
-  display: flex;
-  justify-content: space-between;
-  margin-top: auto;
-  gap: 0.5rem;
-}
-
-.details-btn {
-  border: 1px solid #000;
-  color: #000;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-.details-btn:hover {
-  background-color: #000;
-  color: white;
-}
-
-.cart-btn {
-  color: white;
-  background-color: #ff8a04;
-  border-radius: 8px;
-  font-weight: 600;
-}
-
-.equal-height-text {
-  min-height: 80px;
-}
-
-.course-card-text {
-  min-height: 80px;
-  padding: 0 1rem;
-  color: #666;
-}
-
-.card .v-card-title {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  line-height: 1.4;
-  hyphens: auto;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #333;
-  padding: 1rem 1rem 0.5rem;
-}
-
-.card .v-card-text {
-  flex-grow: 1;
-}
-
 .testimonials-section {
-  padding: 80px 0;
+  padding: 16px 0;
   background: #fff8f0;
 }
 
@@ -559,7 +441,7 @@ h2 {
 
 .testimonial-slide {
   flex: 0 0 auto;
-  width: 40vw;
+  width: 45vw;
   padding: 0 15px;
   box-sizing: border-box;
   min-width: 400px;
@@ -569,7 +451,7 @@ h2 {
   display: flex;
   padding: 2rem;
   gap: 2rem;
-  height: 40vh;
+  height: 45vh;
   width: 100%;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border-radius: 16px;
@@ -680,17 +562,17 @@ a {
   .section-title {
     font-size: 1.8rem;
   }
-  
+
   .cards-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .testimonial-slide {
     min-width: 300px;
     width: 90vw;
   }
-  
+
   .testimonials-header {
     flex-direction: column;
     gap: 1rem;

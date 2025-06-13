@@ -10,7 +10,7 @@
         <v-card class="card" :style="cardStyle(0)">
           <div class="card-content">
             <div class="card-image-container">
-              <img src="/стандарт.webp" alt="Домашний пекарь" class="card-image" loading="lazy" />
+              <img src="/14.webp" alt="Домашний пекарь" class="card-image" loading="lazy" />
             </div>
             <div class="card-text-content">
               <v-card-title>Домашний пекарь</v-card-title>
@@ -23,7 +23,7 @@
         <v-card class="card" :style="cardStyle(1)">
           <div class="card-content">
             <div class="card-image-container">
-              <img src="/стандарт.webp" alt="Работник кухни или цеха" class="card-image" loading="lazy" />
+              <img src="/13.webp" alt="Работник кухни или цеха" class="card-image" loading="lazy" />
             </div>
             <div class="card-text-content">
               <v-card-title>Работник кухни или цеха</v-card-title>
@@ -36,7 +36,7 @@
         <v-card class="card" :style="cardStyle(2)">
           <div class="card-content">
             <div class="card-image-container">
-              <img src="/стандарт.webp" alt="Владелец производства" class="card-image" loading="lazy" />
+              <img src="/12.webp" alt="Владелец производства" class="card-image" loading="lazy" />
             </div>
             <div class="card-text-content">
               <v-card-title>Владелец производства</v-card-title>
@@ -133,7 +133,7 @@ onUnmounted(() => {
 
 <style scoped>
 .for-who-section {
-  padding: 4rem 0;
+  padding: 1.5rem 0;
   display: flex;
   justify-content: center;
   overflow: hidden;
@@ -179,8 +179,8 @@ onUnmounted(() => {
 .card-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   height: 100%;
 }
 
@@ -200,6 +200,10 @@ onUnmounted(() => {
   object-fit: cover;
 }
 
+.card:first-child .card-image {
+  transform: scaleX(-1);
+}
+
 .card-text-content {
   width: 100%;
 }
@@ -207,8 +211,8 @@ onUnmounted(() => {
 .equal-height-text {
   min-height: 80px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .card .v-card-title {
@@ -239,9 +243,9 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .section-title {
     font-size: 1.8rem;
   }
 }
-</style> 
+</style>
